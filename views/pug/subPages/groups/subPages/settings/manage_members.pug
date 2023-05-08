@@ -1,0 +1,73 @@
+include ../../../../utils/_header.pug
+include ../../../../utils/_navbar.pug
+include ../../../../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/groupPage/groupPage.css")
+        link(rel="stylesheet", href="/css/groupPage/utils/_sideBar.css")
+        link(rel="stylesheet", href="/css/groupPage/subPages/settings.css")
+        link(rel="stylesheet", href="/css/groupPage/subPages/manage_administration.css")
+
+
+        title=`${group.name} | settings`
+    body.bodyGroupPage
+        block navbar
+        include ../../../../utils/groups/_groupSideBar.pug
+
+        content(class=`group groupID_${group._id}`)
+            div(class="group__topContent")
+                img(src=`${group.bannerImage}` alt="group's background" class="group__backgroundImage")
+                div(class="topContent__container")
+                    div(class="topContent__details")
+                        h1(class="topContent__name")=group.name
+                        div(class="topContent__details__bottom")
+                            div(class="topContent__privacy")
+                                - let imgSrc = "/imgs/icons/lock-closed.png";
+                                - let text = "Private group"
+                                if group.settings.privacy !== "private"
+                                    - imgSrc = "/imgs/icons/lock-open.png"
+                                    - text = "Public group"
+                                img(class="topContent__icon icon--small" src=`${imgSrc}` alt="privacy")
+                                h1(class="topContent__description description--privacy")=text
+                            h1(class="topContent__description")=`${group.members.length} Members` 
+                    include ./../../utils/buttons.pug
+                div(class="topContent__navbar")
+                    //- if not the member - about--active
+                    a(class="topContent__element" href=`/group/${group._id}/about`) About
+                    a(class="topContent__element" href=`/group/${group._id}/discussion`) Discussion  
+                    a(class="topContent__element" href=`/group/${group._id}/members`) Members         
+                    a(class="topContent__element topContent__element--active" href=`/group/${group._id}/settings`) Settings  
+
+            div(class="group__mainContent group__mainContent--settings")
+                div(class="mainContent__section  section--members")
+                    div(class="section__top")
+                        h1(class="section__header") Settings 
+                    div(class="section_main")
+                        div(class="section__sideBar")
+                            a(href=`/group/${group._id}/settings` class="sideBar__option") Basic Settings
+
+                            a(href=`/group/${group._id}/settings/manage_administration` class="sideBar__option") Manage Administration
+
+                            a(href=`/group/${group._id}/settings/manage_members` class="sideBar__option sideBar__option--active") Manage Members
+
+                            a(href=`/group/${group._id}/settings/advanced_settings` class="sideBar__option") Advanced Settings
+
+                            a(href=`/group/${group._id}/settings/rules` class="sideBar__option") Set up Rules
+
+
+                        div(class="managerPreview managerPreview--groups_members")
+                            div(class="managerPreview__content")
+                                h1.managerPreview__header Manage Members 
+                                div(class="managerPreview__container")
+                                    .managerPreview__avatars 
+                                        for memberObj in group.members
+                                            - const schema = memberObj._id
+                                            - const role = memberObj.role 
+                                            if role === 'user' 
+                                                img(src=`${schema.profileImage}`, alt="admin's profile image", class="managerPreview__avatar")
+
+                                        a(href=`/group/${group._id}/settings/manage_members/remove_member`)
+                                            .managerPreview__editCard
+                                                img(class="editCard__image editCard__image--members" src="/imgs/icons/pencil-simple.png", alt="") 
+

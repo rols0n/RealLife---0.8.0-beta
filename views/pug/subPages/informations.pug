@@ -1,0 +1,76 @@
+include ../utils/_header.pug
+include ../utils/_navbar.pug
+include ../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/userPage/userPage.css")
+        link(rel="stylesheet", href="/css/userPage/topContent.css")
+        link(rel="stylesheet", href="/css/userPage/profileConfigMenu.css")
+        link(rel="stylesheet", href="/css/userPage/subPages/informations.css")
+
+
+
+        title Real Life | User Page
+    body(class=`body userID_${user._id}`)
+        block ../navbar
+        block ../postCreator
+        include ../utils/_profileTopContent.pug
+       
+            
+        div(class=" content content--informations")
+            div(class="content__settings content__settings--informations")
+
+                div(class="settings__navbar")
+                    h2(class="settings__header")=`${loggedIn === true ? "Settings" : "Informations"}` 
+                    button(class="navbar__btn navbar__btn--active")=`${loggedIn === true ? "Basic Settings" : "Basic Informations"}`
+                    a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations/advanced`)
+                        button(class="navbar__btn")=`${loggedIn === true ? "Advanced Settings" : "Advanced Info"}`
+                    if loggedIn === true
+                        a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations/manage_friends`)    
+                            button(class="navbar__btn") Manage Friends
+                        a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations/block_list`)    
+                            button(class="navbar__btn") Block List
+
+
+                div(class="settings__content settings__content--informations")
+                    div(class="content__setting content__setting--full_name")
+                        div(class="setting__navbar")
+                            h2(class="navbar__header") Full Name:  
+                        div(class="setting__content setting__content--full_name")
+                            if loggedIn === true
+                                input(type="text" class="content__input content__input--first_name" maxlength=`20` placeholder=`${user.firstName}`)
+                                input(type="text" class="content__input content__input--last_name" maxlength=`20` placeholder=`${user.lastName}`)
+                            if loggedIn === false
+                                input(type="text" class="content__input content__input--first_name" maxlength=`20` placeholder=`${user.firstName}` disabled)
+                                input(type="text" class="content__input content__input--last_name" maxlength=`20` placeholder=`${user.lastName}` disabled)
+
+                    div(class="content__setting content__setting--city_home")
+                        div(class="setting__navbar")
+                            h2(class="navbar__header") City Home:  
+                        div(class="setting__content setting__content--full_name")
+                            if loggedIn === true
+                                input(type="text" class="content__input content__input--city_home" maxlength=`20` placeholder=`City Home`)
+                            if loggedIn === false
+                                input(type="text" class="content__input content__input--city_home" maxlength=`20` placeholder=`City Home` disabled)
+
+                    div(class="content__setting content__setting--relationship_status")
+                        div(class="setting__navbar setting__navbar--relationship_status")
+                            h2(class="navbar__header") Relationship status:  
+                            if loggedIn === true
+                                a(class="navbar__aTag navbar__aTag--relationship_status" href=`http://127.0.0.1:3000/userPage/${user._id}/informations/relathionship`) Edit
+                        div(class="setting__content setting__content--relationship_status")
+                            h2(class="content__placeholder contnet__placeholder--relationship_status") Single
+                    if loggedIn === true
+                        div(class="content__confirmation content__confirmation--informations")
+                            button(class="confirmation__btn confirmation__btn--cancel") Cancel 
+                            button(class="confirmation__btn confirmation__btn--submit") Submit
+
+
+
+            if user.privacySettings.informations === "private"
+                div(class="privateMessageContainer")
+                    h1.privateMessage=`User's informations page is set to private`
+        script(src="/js/subPages/informations.js") 
+      
+        script(type="module" src="/js/subPages/settings/basicSettings.js")

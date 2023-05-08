@@ -1,0 +1,259 @@
+.section__main {
+  margin-top: 24px;
+  padding-bottom: 30px;
+  /* border-bottom: 0.1px dashed var(--white70tint);
+   */
+  box-shadow: 0 15px 20px -25px var(--white40tint);
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+}
+
+/* ruleCard */
+
+.main__ruleCard {
+  width: 60%;
+  margin-left: 20%;
+
+  display: flex;
+  flex-direction: column;
+
+  box-shadow: 0px 0px 16px -10px var(--white90tint);
+
+  border: 0.1px solid var(--white10tint);
+  border-radius: 12px;
+  margin-top: 10px;
+  margin-bottom: 32px;
+}
+
+.main__ruleCard--active {
+  box-shadow: 0px 0px 22px -10px var(--white90tint);
+
+  border: 3px solid var(--white20tint);
+}
+
+.ruleCard__mainContent {
+  display: flex;
+  align-items: center;
+  border-radius: 12px;
+  padding-top: 5px;
+  padding-left: 6px;
+  padding-right: 30px;
+  background-color: var(--white);
+  /* border-bottom: 2.5px dotted var(--white30tint); */
+  box-shadow: 0 14px 20px -24px var(--white80tint);
+  margin-bottom: 8px;
+  padding-bottom: 3px;
+}
+
+.mainContent__number {
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.mainContent__heading,
+.mainContent__inputHeading {
+  align-self: flex-end;
+  margin-bottom: 13px;
+  padding-left: 18px;
+  font-size: 18px;
+
+  font-weight: 500;
+}
+
+.mainContent__inputHeading {
+  border: none;
+  padding-left: 5px;
+  margin-left: 18px;
+  background-color: transparent;
+  /* min-width: 50px; */
+  width: 550px;
+  padding-right: 5px;
+  color: var(--white50tint);
+}
+
+.mainContent__inputHeading::placeholder {
+  color: var(--white40tint);
+}
+
+/* BUTTONS */
+.ruleCard__buttons {
+  margin-left: auto;
+  display: flex;
+}
+
+.buttons__hierarchy {
+  display: flex;
+  flex-direction: column;
+  width: 0px;
+}
+
+.hierarchy__btn,
+.buttons__btn {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+.buttons__btn {
+  margin-right: 10px;
+}
+
+.buttons__btn--edit {
+  opacity: 0.9;
+}
+
+.buttons__btn--edit-active {
+  opacity: 0.5;
+}
+
+.buttons__btn--edit:hover {
+  cursor: pointer;
+}
+
+.ruleCard__confirmation {
+  margin-left: auto;
+  margin-right: 50px;
+  margin-top: 6px;
+
+  margin-bottom: 12px;
+}
+
+.confirmation__cancel {
+  margin-right: 8px;
+  /* border: 0.3px solid var(--red); */
+  color: var(--white90tint);
+  background-color: transparent;
+
+  border-radius: 5px;
+}
+
+.confirmation__cancel,
+.confirmation__submit {
+  padding: 3px 10px;
+  font-size: 15px;
+
+  transition: background-color 0.3s linear;
+  transition: border-color 0.3s linear;
+  transition: transform 0.05s linear;
+  border: none;
+}
+
+.confirmation__submit {
+  /* border: 0.3px solid rgb(22, 190, 22); */
+  background-color: var(--red);
+  color: #fff;
+  border-radius: 4px;
+  width: 90px;
+}
+
+.confirmation__submit:hover {
+  cursor: pointer;
+  /* border-color: #14ab14; */
+  background-color: var(--red10tint);
+}
+.confirmation__submit:active {
+  transform: scale(1.01);
+}
+
+.confirmation__cancel:hover {
+  cursor: pointer;
+  color: var(--white90tint);
+}
+
+.confirmation__cancel:active {
+  transform: scale(0.99);
+}
+
+/* ------------- */
+
+.mainContent__heading {
+  margin-left: 12px;
+}
+
+.ruleCard__description {
+  padding-bottom: 10px;
+  /* width: 90%; */
+}
+
+.description__p {
+  margin-top: 10px;
+  width: calc(100% - 30px);
+}
+
+.description__inputDsc {
+  margin-top: 10px;
+  width: calc(100% - 35px);
+  font-size: 15px;
+
+  border: none;
+  background-color: transparent;
+
+  height: 70px;
+  resize: none;
+  font-style: italic;
+  color: var(--white50tint);
+}
+
+.description__inputDsc::placeholder {
+  font-style: italic;
+  color: var(--white40tint);
+}
+
+.main__newTemplate {
+  width: 165px;
+  margin-left: 80%;
+  margin-top: 12px;
+
+  display: flex;
+
+  font-size: 15px;
+  font-weight: 500;
+  align-items: center;
+  padding: 4px 15px;
+
+  background-color: transparent;
+
+  color: var(--white80tint);
+
+  border: 0.1px solid var(--white60tint);
+  box-shadow: 0px 0px 15px -8px var(--white70tint);
+  border-radius: 12px;
+
+  transition: box-shadow 0.3s ease-in-out;
+  transition: transform 0.3s ease-in-out;
+}
+
+.newTemplate__img {
+  width: 18px;
+  height: auto;
+  margin-right: 12px;
+
+  opacity: 0.9;
+}
+
+.main__newTemplate--disabled {
+  opacity: 0.6;
+}
+
+.main__newTemplate--disabled:hover {
+  cursor: not-allowed;
+}
+
+.main__newTemplate--working:hover {
+  cursor: pointer;
+  transform: scale(1.03, 1.03);
+}
+
+.main__newTemplate--working:active {
+  transform: scale(1.02);
+  box-shadow: 0px 0px 18px -9px var(--white70tint);
+}
+
+.ruleCard__delete {
+  background-color: transparent;
+  border: none;
+}
+
+.ruleCard__delete:hover {
+  cursor: pointer;
+}

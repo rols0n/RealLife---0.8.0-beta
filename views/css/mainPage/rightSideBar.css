@@ -1,0 +1,115 @@
+.rightSideBar {
+  flex-grow: 1;
+}
+
+.rightSideBar__topContent__profileContainer__image {
+  border-radius: 100%;
+}
+
+.rightSideBar {
+  display: flex;
+  flex-direction: column;
+  padding: 18px 18px;
+
+  height: 100%;
+
+  /* background-color: var(--white); */
+  /* box-shadow: 0 -12px 20px -3px var(--white40tint); */
+  width: 250px;
+}
+
+.rightSideBar__topContent__header {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.rightSideBar__topContent__profileContainer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  margin-top: 1%;
+  padding: 4px 0px;
+  padding-left: 5px;
+  border-radius: 6px;
+}
+
+.rightSideBar__topContent__profileContainer:hover {
+  background-color: var(--white10tint);
+  cursor: pointer;
+}
+
+.rightSideBar__topContent__profileContainer__image {
+  width: 24px;
+  height: 24px;
+  margin-left: 4%;
+  margin-top: 2%;
+}
+
+.rightSideBar__topContent__profileContainer__header {
+  padding-top: 2%;
+  margin-left: 3%;
+  font-size: 20px;
+  font-weight: 400;
+}
+.rightSideBar__topContent__profileContainer__header:hover {
+  color: var(--white90tint);
+}
+
+.rightSideBar__middleContent {
+  margin-top: 10%;
+  display: flex;
+  flex-direction: column;
+}
+
+.rightSideBar__middleContent__navigation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.rightSideBar__middleContent__navigation__header {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.rightSideBar__middleContent__navigation__searchIcon {
+  width: 20px;
+  height: 20px;
+  margin-right: 3%;
+}
+
+.rightSideBar__middleContent__contacts {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2%;
+  padding: 2% 3%;
+}
+
+.rightSideBar__middleContent__contacts:hover {
+  background-color: var(--white10tint);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.rightSideBar__middleContent__contact {
+  display: flex;
+  align-items: center;
+  margin-left: 8%;
+  margin-top: 1%;
+}
+
+.rightSideBar__middleContent__contact__image {
+  width: 35px;
+  height: 35px;
+  border-radius: 100%;
+  margin-right: 3%;
+}
+
+.rightSideBar__middleContent__contact__header {
+  font-size: 19px;
+  font-weight: 400;
+}
+
+.rightSideBar__middleContent__contact__header:hover {
+  color: var(--white90tint);
+}

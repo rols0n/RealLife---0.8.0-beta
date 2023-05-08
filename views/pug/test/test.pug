@@ -1,0 +1,16 @@
+include utils/_header.pug
+
+html 
+    head 
+        block header
+        
+        title Real Life | Login Page
+
+    body.loginPageBody
+        div(class="loginContent")
+            img(class="loginContent__logo" src="/imgs/icons/logoLoginPage.png", alt="", srcset="")
+            form(class="loginForm" id="loginForm" onsubmit="provide()")
+
+
+            h1=group
+            script(src="/js/logIn.js") 

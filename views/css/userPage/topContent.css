@@ -1,0 +1,185 @@
+.userPage__topContent {
+  width: 100%;
+  background: rgb(253, 253, 255);
+  background: linear-gradient(
+    0deg,
+    rgba(253, 253, 255, 1) 44%,
+    rgba(202, 202, 204, 1) 77%,
+    rgba(177, 177, 179, 1) 100%
+  );
+  /* padding-top: 6%; */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 0 21px -9px var(--white50tint);
+  justify-content: center;
+}
+
+.content__userPage__topContent {
+  background-color: rebeccapurple;
+  width: 100%;
+}
+
+.content__userPage__topContent {
+  margin-bottom: 10%;
+}
+
+.userPage__topContent__userDetails {
+  /* margin-right: 30%; */
+  display: flex;
+  color: var(--red);
+  width: auto;
+  margin-bottom: 74px;
+}
+
+.userPage__topContent__userDetails__profilePicture {
+  height: 160px;
+  width: 160px;
+  border-radius: 100%;
+  z-index: 3;
+  position: absolute;
+  border: 0.5vh solid rgb(253, 253, 255);
+  /* margin-bottom: 12vh; */
+  margin-top: -60px;
+  margin-left: 50px;
+}
+
+.userPage__topContent__userDetails .one {
+  display: flex;
+  align-self: center;
+  flex-direction: column;
+  /* margin-top: 20%; */
+  margin-top: 10px;
+  margin-left: 240px;
+}
+
+.topContent__sendFriendRequest,
+.topContent__btnContainer {
+  display: flex;
+  align-self: flex-end;
+  justify-content: center;
+  margin-top: 1vh;
+  margin-left: auto;
+  margin-right: 30px;
+  padding: 5px 15px;
+  border-radius: 12px;
+  background-color: #f3f3f5;
+}
+
+.btn-red {
+  margin-left: auto;
+  margin-right: 30px;
+  display: flex;
+  align-items: center;
+
+  /* height: 25px; */
+  padding: 6px 15px;
+  font-size: 16px;
+  align-self: center;
+
+  background-color: var(--red);
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 500;
+
+  transition: background-color 0.3s ease-in-out;
+  /* transition: transform 0.1s ease-in-out; */
+}
+.btn-red:hover {
+  cursor: pointer;
+  background-color: var(--red10tint);
+}
+
+.topContent__buttons {
+  margin-left: auto;
+  margin-right: 30px;
+  align-self: center;
+
+  display: flex;
+  align-items: center;
+  column-gap: 5px;
+}
+.topContent__buttons button {
+  margin-right: 0;
+}
+
+.topContent__rejectRequest {
+  padding: 6px 15px;
+  font-size: 16px;
+  align-self: center;
+  border: none;
+  border-radius: 6px;
+  color: var(--red);
+  font-weight: 500;
+  background-color: transparent;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.topContent__rejectRequest:hover {
+  cursor: pointer;
+  background-color: var(--white4tint);
+}
+
+.btn-red:active {
+  transform: scale(0.97);
+}
+
+.topContent__sendFriendRequest h1 {
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--white70tint);
+}
+.sendFriendRequest__description {
+  margin-top: 3px;
+}
+.topContent__sendFriendRequest:hover,
+.topContent__sendFriendRequest:hover {
+  transition: ease-in 0.24s;
+  background-color: var(--white10tint20shade);
+  color: var(--white80tint);
+  cursor: pointer;
+}
+
+.topContent__image {
+  width: 27px;
+  height: 27px;
+  margin-left: 1vw;
+}
+
+.sendFriendRequest__description {
+  font-weight: 500;
+  font-size: 2.7vh;
+}
+
+.userPage__topContent__userDetails__detailed__name {
+  font-size: 3vh;
+  font-weight: 800;
+}
+.userPage__topContent__userDetails__detailed__friendsCount {
+  font-size: 2vh;
+  font-weight: 500;
+  color: var(--white60tint);
+}
+
+.userPage__topContent__navbar {
+  display: flex;
+  margin-top: 3%;
+}
+
+.userPage__topContent__navbar__element {
+  font-size: 2.4vh;
+  margin-right: 1%;
+  padding: 0px 2vh;
+  padding-top: 0.7vh;
+  padding-bottom: 1vh;
+  font-weight: 400;
+  color: var(--white90tint);
+  text-decoration: none;
+}
+
+.userPage__topContent__navbar__element:hover {
+  background-color: var(--white10tint);
+  cursor: pointer;
+  /* color: var(--white90tint); */
+}

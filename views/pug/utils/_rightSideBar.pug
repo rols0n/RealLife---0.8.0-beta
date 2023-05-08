@@ -1,0 +1,39 @@
+div(class="rightSideBar")
+    div(class="rightSideBar__topContent")
+        h1(class="rightSideBar__topContent__header") Your pages and profiles 
+        a(class="rightSideBar__topContent__profileContainer" href=`/userPage/${loggedUser._id}`)
+            img(class="rightSideBar__topContent__profileContainer__image" src=`${loggedUser.profileImage}`)
+            h1(class="rightSideBar__topContent__profileContainer__header")=`${loggedUser.firstName} ${loggedUser.lastName}`
+
+
+    div(class="rightSideBar__middleContent")
+        hr
+        div(class="rightSideBar__middleContent__navigation")
+            h1(class="rightSideBar__middleContent__navigation__header") Contacts
+            img(class="rightSideBar__middleContent__navigation__searchIcon" src="/imgs/icons/searchIcon.png")
+
+        div(class="rightSideBar__middleContent__contacts")
+            div(class="rightSideBar__middleContent__contact")
+                img(class="rightSideBar__middleContent__contact__image" src="/imgs/faces/face1.jpg")
+                h1(class="rightSideBar__middleContent__contact__header") Mark Zukerberg
+        div(class="rightSideBar__middleContent__contacts")
+            div(class="rightSideBar__middleContent__contact")
+                img(class="rightSideBar__middleContent__contact__image" src="/imgs/faces/face2.jpg")
+                h1(class="rightSideBar__middleContent__contact__header") Dymitri Kij
+
+        div(class="rightSideBar__middleContent__contacts")
+            div(class="rightSideBar__middleContent__contact")
+                img(class="rightSideBar__middleContent__contact__image" src="/imgs/faces/face3.jpg")
+                h1(class="rightSideBar__middleContent__contact__header") Pit New
+
+        div(class="rightSideBar__middleContent__contacts")
+            div(class="rightSideBar__middleContent__contact")
+                img(class="rightSideBar__middleContent__contact__image" src="/imgs/faces/face4.jpg")
+                h1(class="rightSideBar__middleContent__contact__header") Bill Gates
+
+        div(class="rightSideBar__middleContent__contacts")
+            div(class="rightSideBar__middleContent__contact")
+                img(class="rightSideBar__middleContent__contact__image" src="/imgs/faces/face5.jpg")
+                h1(class="rightSideBar__middleContent__contact__header") Biggie TUP
+
+

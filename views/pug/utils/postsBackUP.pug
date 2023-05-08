@@ -1,0 +1,695 @@
+if posts
+    for post in posts
+        //- 2) Check the amount of the images/movies in post eventually if the image array === undefined
+        - let canInteract = true;
+        if group !== undefined
+            if group.settings.privacy === "public-interactions-off" && isMember === false
+                - canInteract = false
+
+        
+        if post !== undefined
+            if post.postImages.length === 0
+                div(class=`postCard postCard--${post._id}`)
+                    div(class=`postCard__details  postCard__details--${post._id}`)
+                        div(class=`details__author details__author--${post._id}`)
+                            img(class=`author__image author__image--${post._id}` src=`${post.author.profileImage}`)
+                            div(class=`postCard__authorDetails__container postCard__authorDetails__container--${post._id}`)
+                                h1(class=`postCard__authorDetails__name postCard__authorDetails__name--${post._id}`)=`${post.author.firstName} ${post.author.lastName}`
+                                h1(class=`postCard__authorDetails__createdAt postCard__authorDetails__createdAt--${post._id}`)=`${calcTimePassed("Posted", post.createdAt).string}, at ${calcTimePassed("Posted", post.createdAt).hour}`
+
+                        h1(class=`postCard__postText postCard__postText--${post._id}`)=`${post.postText}`
+                        div(class=`postCard__interactions postCard__interactions--${post._id}`)
+
+                            //- 
+                            div(class=`postCard__interactions__reactions postCard__interactions__reactions--${post._id}`)
+                                img(class=`postCard__interactions__reactions__image postCard__interactions__reactions__image--${post._id}` src="/imgs/icons/thumbsUp.png", alt="")
+                                h1(class=`postCard__interactions__reactions__header postCard__interactions__reactions__header--${post._id}`) Reactions
+
+                            div(class=`postCard__interactions__button postCard__interactions__button--${post._id}`)
+                                img(class=`postCard__interactions__button__image postCard__interactions__button__image--${post._id}` src="/imgs/icons/messages.png")
+                                h1(class=`postCard__interactions__button__header postCard__interactions__button__header--${post._id}`) Comments
+
+
+                                //- 
+                    div(class=`postCard__commentsSection postCard__commentsSection--${post._id}`)
+                        if canInteract === true
+                            form(class=`commentForm commentForm--main commentForm--${post._id} hidden`)
+                                div(class=`commentForm__profile commentForm__profile--${post._id}`)
+                                    img(class=`commentForm__top__leftSide__profilePicture commentForm__top__leftSide__profilePicture--${post._id}` src=`${loggedUser.profileImage}`)
+                                div(class=`commentForm__inputField`)
+                                    textarea(name="", cols="120"  class=`commentForm__inputField__text commentForm__inputField__text--${post._id}` placeholder="Hey, whats going on?")
+                                    label(for="commentForm__inputField__files" class="commentForm__inputField__files--label")
+                                        img(src="/imgs/icons/camera.png", alt="Choose file", class="commentForm__inputField__files--label__image" srcset="") 
+                                    label(for="commentForm__inputField__submit" class=`commentForm__inputField__submit--label commentForm__inputField__submit--label---${post._id}`)
+                                        img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm__inputField__submit--label__image" srcset="") 
+
+
+                            div(class="commentForm__inputs")
+                                input(class=`commentForm__inputField__files commentForm__inputField__files--${post._id}`  type="file", name="" id="commentForm__inputField__files") 
+                                input(class=`commentForm__inputField__submit commentForm__inputField__submit--${post._id}` id="commentForm__inputField__submit" type="submit", value="Submit")
+                        each commentTree in post.commentsTree            
+                            div(class=`commentTree commentTree--${post._id} commentTreeId--${commentTree._id} hidden`)
+                                //- root comment
+                                div(class=`commentTree__root commentTree__root--idPath_${commentTree._id}-${commentTree.commentTree._id}`)  
+                                    div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+                                        img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}` src=`${commentTree.commentTree.author.profileImage}`)
+                                        div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+                                            h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}`)=`${commentTree.commentTree.author.firstName} ${commentTree.commentTree.author.lastName}`
+                                        
+                                            h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}`)=commentTree.commentTree.commentText
+                                            div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+                                                if canInteract === false
+                                                    h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) responds
+
+                                                if canInteract === true
+                                                    h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) react 
+                                                    h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) responds
+                                                    h1( class=`commentTree__commentCard__container__interactions__respond span--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author} userID-${commentTree.commentTree.author}`) respond
+                                        //- root comment responds container
+                                    div(class=`commentTree__root__respondsContainer commentTree__root__respondsContainer--idPath_${commentTree._id}-${commentTree.commentTree._id}--container hidden`)
+                                        //- root comment respond
+                                        form(class=`commentForm commentForm--levelTwo commentForm--levelTwo---${commentTree._id} hidden`)
+                                            div(class=`commentForm__profile commentForm--levelTwo__profile--${commentTree._id}`)
+                                                img(class=`commentForm__top__leftSide__profilePicture commentForm--levelTwo__top__leftSide__profilePicture--${commentTree._id}` src=`${loggedUser.profileImage}`)
+                                            div(class=`commentForm__inputField`)
+                                                textarea(name="", cols="120"  class=`commentForm--levelTwo__inputField__text commentForm--levelTwo__inputField__text--${commentTree._id}` placeholder="Hey, whats going on?")
+                                                label(for=`commentForm--levelTwo__inputField__files--${commentTree._id}` class="commentForm__inputField__files--label")
+                                                    img(src="/imgs/icons/camera.png", alt="Choose file", class=`commentForm__inputField__files--label__image commentForm__inputField__files--label__image--${commentTree._id}` srcset="") 
+
+                                                label(for=`commentForm--levelTwo__inputField__submit--${commentTree._id}` class=`commentForm__inputField__submit--label commentForm--levelTwo__inputField__submit--label---${commentTree._id}`)
+                                                    img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm--levelTwo__inputField__submit--label__image" srcset="") 
+                                            div(class="commentForm__inputs")
+                                                input(class=`commentForm__inputField__files commentForm--levelTwo__inputField__files--${commentTree._id}`  type="file", name="" id="commentForm--levelTwo__inputField__files") 
+                                                input(class=`commentForm__inputField__submit commentForm--levelTwo__inputField__submit--${commentTree._id}` id="commentForm--levelTwo__inputField__submit" type="submit", value="Submit")                                                                                
+                                        each rootRespond in commentTree.commentTree.responds
+                                            div(class=`commentTree__root__respondsContainer__respond commentTree__root__respondsContainer__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+                                                div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+                                                    img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}` src=`${rootRespond.author.profileImage}`)
+                                                    div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+                                                        h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)=`${rootRespond.author.firstName} ${rootRespond.author.lastName}`
+                                                        //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+                                                        h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)=rootRespond.commentText
+                                                        div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+                                                            if canInteract === false
+                                                                h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) responds
+                                                            if canInteract === true 
+                                                                h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) React
+                                                                h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) responds
+                                                                h1( class=`commentTree__commentCard__container__interactions__respond span--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) respond
+                                                div(class=`commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---container hidden`)
+                                                    //- respond of the root comment respond
+
+                                                    form(class=`commentForm commentForm--levelThree commentForm--levelThree---${commentTree._id} hidden`)
+                                                        div(class=`commentForm__profile commentForm--levelThree__profile--${commentTree._id}`)
+                                                            img(class=`commentForm__top__leftSide__profilePicture commentForm--levelThree__top__leftSide__profilePicture--${commentTree._id}` src=`${loggedUser.profileImage}`)
+                                                        div(class=`commentForm__inputField`)
+                                                            textarea(name="", cols="120"  class=`commentForm--levelThree__inputField__text commentForm--levelThree__inputField__text--${commentTree._id}` placeholder="Hey, whats going on?")
+                                                            label(for=`commentForm--levelThree__inputField__files--${commentTree._id}` class="commentForm__inputField__files--label")
+                                                                img(src="/imgs/icons/camera.png", alt="Choose file", class=`commentForm__inputField__files--label__image commentForm__inputField__files--label__image--${commentTree._id}` srcset="") 
+
+                                                            label(for=`commentForm--levelThree__inputField__submit--${commentTree._id}` class=`commentForm__inputField__submit--label commentForm--levelThree__inputField__submit--label---${commentTree._id}`)
+                                                                img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm--levelThree__inputField__submit--label__image" srcset="") 
+                                                        div(class="commentForm__inputs")
+                                                            input(class=`commentForm__inputField__files commentForm--levelThree__inputField__files--${commentTree._id}`  type="file", name="" id="commentForm--levelThree__inputField__files") 
+                                                            input(class=`commentForm__inputField__submit commentForm--levelThree__inputField__submit--${commentTree._id}` id="commentForm--levelThree__inputField__submit" type="submit", value="Submit")                                                                                                           
+                                                    each levelTwoRespond in rootRespond.responds
+                                                        div(class="commentForm__inputs")
+                                                            input(class=`commentForm__inputField__files commentForm__inputField__files--${post._id}`  type="file", name="" id="commentForm__inputField__files") 
+                                                            input(class=`commentForm__inputField__submit commentForm__inputField__submit--${post._id}` id="commentForm__inputField__submit" type="submit", value="Submit")                        
+                                                                //- container of responds of the root comment responds
+                                                        div(class=`commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer__levelTwoRespond commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer__levelTwoRespond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)             
+                                                            div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+                                                                img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}` src=`${levelTwoRespond.author.profileImage}`)
+                                                                div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+                                                                    h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)=`${levelTwoRespond.author.firstName} ${levelTwoRespond.author.lastName}`
+                                                                    //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+                                                                    h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)=levelTwoRespond.commentText
+                                                                    div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+                                                                        if canInteract === true
+                                                                            h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id} userID-${levelTwoRespond.author._id}`) React
+                                                                            h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id} userID-${levelTwoRespond.author._id}`) respond
+
+
+
+
+            if post.postImages.length === 1
+                div(class=`postCard postCard--${post._id}`)
+                    div(class=`post post--${post._id}`)
+                        div(class=`postCard__authorDetails postCard__authorDetails--${post._id}`)
+                            img(class=`postCard_authorDetails__image postCard_authorDetails__image--${post._id}` src=`${post.author.profileImage}`)
+                            div(class=`postCard__authorDetails__container postCard__authorDetails__container--${post._id}`)
+                                h1(class=`postCard__authorDetails__name postCard__authorDetails__name--${post._id}`)=`${post.author.firstName} ${post.author.lastName}`
+                                h1(class=`postCard__authorDetails__createdAt postCard__authorDetails__createdAt--${post._id}`)=`${calcTimePassed("Posted", post.createdAt).string}, at ${calcTimePassed("Posted", post.createdAt).hour}`
+
+
+                        h1(class=`postCard__postText postCard__postText--${post._id}`)=`${post.postText}`
+                        div(class=`postCard__images__one postCard__images__one--${post._id}`) 
+                            img(class=`postCard__images__one__firstImage postCard__images__one__firstImage--${post._id}` src=`${post.postImages[0]}`)
+                        div(class=`postCard__interactions postCard__interactions--${post._id}`)
+
+                            if canInteract === true
+                                div(class=`postCard__interactions__reactions postCard__interactions__reactions--${post._id}`)
+                                    img(class=`postCard__interactions__reactions__image postCard__interactions__reactions__image--${post._id}` src="/imgs/icons/thumbsUp.png", alt="")
+                                    h1(class=`postCard__interactions__reactions__header postCard__interactions__reactions__header--${post._id}`) Reactions
+                            if canInteract === false 
+                                div(class=`postCard__interactions__reactions postCard__interactions__reactions--${post._id}` style="cursor: not-allowed")
+                                    img(class=`postCard__interactions__reactions__image postCard__interactions__reactions__image--${post._id}` src="/imgs/icons/thumbsUp.png", alt="")
+                                    h1(class=`postCard__interactions__reactions__header`) Reactions
+
+                            div(class=`postCard__interactions__button postCard__interactions__button--${post._id}`)
+                                img(class=`postCard__interactions__button__image postCard__interactions__button__image--${post._id}` src="/imgs/icons/messages.png")
+                                h1(class=`postCard__interactions__button__header postCard__interactions__button__header--${post._id}`) Comments
+                    div(class=`postCard__commentsSection postCard__commentsSection--${post._id}`)
+                        if canInteract === true
+                            form(class=`commentForm commentForm--main commentForm--${post._id} hidden`)
+                                div(class=`commentForm__profile commentForm__profile--${post._id}`)
+                                    img(class=`commentForm__top__leftSide__profilePicture commentForm__top__leftSide__profilePicture--${post._id}` src=`${loggedUser.profileImage}`)
+                                div(class=`commentForm__inputField`)
+                                    textarea(name="", cols="120"  class=`commentForm__inputField__text commentForm__inputField__text--${post._id}` placeholder="Hey, whats going on?")
+                                    label(for="commentForm__inputField__files" class="commentForm__inputField__files--label")
+                                        img(src="/imgs/icons/camera.png", alt="Choose file", class="commentForm__inputField__files--label__image" srcset="") 
+                                    label(for="commentForm__inputField__submit" class=`commentForm__inputField__submit--label commentForm__inputField__submit--label---${post._id}`)
+                                        img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm__inputField__submit--label__image" srcset="") 
+
+
+                                div(class="commentForm__inputs")
+                                    input(class=`commentForm__inputField__files commentForm__inputField__files--${post._id}`  type="file", name="" id="commentForm__inputField__files") 
+                                    input(class=`commentForm__inputField__submit commentForm__inputField__submit--${post._id}` id="commentForm__inputField__submit" type="submit", value="Submit")
+                        if canInteract === false  
+                            form(class=`commentForm commentForm--main commentForm--${post._id} hidden`, style="display: hidden; margin: 0;")
+                        each commentTree in post.commentsTree            
+                            div(class=`commentTree commentTree--${post._id} commentTreeId--${commentTree._id} hidden`)
+                                //- root comment
+                                div(class=`commentTree__root commentTree__root--idPath_${commentTree._id}-${commentTree.commentTree._id}`)  
+                                    div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+                                        img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}` src=`${commentTree.commentTree.author.profileImage}`)
+                                        div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+                                            h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}`)=`${commentTree.commentTree.author.firstName} ${commentTree.commentTree.author.lastName}`
+                                            //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+                                            h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}`)=commentTree.commentTree.commentText
+                                            div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+                                                if canInteract === false
+                                                    h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) responds
+
+                                                if canInteract === true
+                                                    h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) react 
+                                                    h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) responds
+                                                    h1( class=`commentTree__commentCard__container__interactions__respond span--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author} userID-${commentTree.commentTree.author}`) respond
+                                        //- root comment responds container
+                                    div(class=`commentTree__root__respondsContainer commentTree__root__respondsContainer--idPath_${commentTree._id}-${commentTree.commentTree._id}--container hidden`)
+                                        //- root comment respond
+                                        form(class=`commentForm commentForm--levelTwo commentForm--levelTwo---${commentTree._id} hidden`)
+                                            div(class=`commentForm__profile commentForm--levelTwo__profile--${commentTree._id}`)
+                                                img(class=`commentForm__top__leftSide__profilePicture commentForm--levelTwo__top__leftSide__profilePicture--${commentTree._id}` src=`${loggedUser.profileImage}`)
+                                            div(class=`commentForm__inputField`)
+                                                textarea(name="", cols="120"  class=`commentForm--levelTwo__inputField__text commentForm--levelTwo__inputField__text--${commentTree._id}` placeholder="Hey, whats going on?")
+                                                label(for=`commentForm--levelTwo__inputField__files--${commentTree._id}` class="commentForm__inputField__files--label")
+                                                    img(src="/imgs/icons/camera.png", alt="Choose file", class=`commentForm__inputField__files--label__image commentForm__inputField__files--label__image--${commentTree._id}` srcset="") 
+
+                                                label(for=`commentForm--levelTwo__inputField__submit--${commentTree._id}` class=`commentForm__inputField__submit--label commentForm--levelTwo__inputField__submit--label---${commentTree._id}`)
+                                                    img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm--levelTwo__inputField__submit--label__image" srcset="") 
+                                            div(class="commentForm__inputs")
+                                                input(class=`commentForm__inputField__files commentForm--levelTwo__inputField__files--${commentTree._id}`  type="file", name="" id="commentForm--levelTwo__inputField__files") 
+                                                input(class=`commentForm__inputField__submit commentForm--levelTwo__inputField__submit--${commentTree._id}` id="commentForm--levelTwo__inputField__submit" type="submit", value="Submit")                                                                                
+                                        each rootRespond in commentTree.commentTree.responds
+                                            div(class=`commentTree__root__respondsContainer__respond commentTree__root__respondsContainer__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+                                                div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+                                                    img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}` src=`${rootRespond.author.profileImage}`)
+                                                    div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+                                                        h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)=`${rootRespond.author.firstName} ${rootRespond.author.lastName}`
+                                                        //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+                                                        h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)=rootRespond.commentText
+                                                        div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+                                                            if canInteract === false
+                                                                h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) responds
+                                                            if canInteract === true 
+                                                                h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) React
+                                                                h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) responds
+                                                                h1( class=`commentTree__commentCard__container__interactions__respond span--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) respond
+                                                div(class=`commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---container hidden`)
+                                                    //- respond of the root comment respond
+
+                                                    form(class=`commentForm commentForm--levelThree commentForm--levelThree---${commentTree._id} hidden`)
+                                                        div(class=`commentForm__profile commentForm--levelThree__profile--${commentTree._id}`)
+                                                            img(class=`commentForm__top__leftSide__profilePicture commentForm--levelThree__top__leftSide__profilePicture--${commentTree._id}` src=`${loggedUser.profileImage}`)
+                                                        div(class=`commentForm__inputField`)
+                                                            textarea(name="", cols="120"  class=`commentForm--levelThree__inputField__text commentForm--levelThree__inputField__text--${commentTree._id}` placeholder="Hey, whats going on?")
+                                                            label(for=`commentForm--levelThree__inputField__files--${commentTree._id}` class="commentForm__inputField__files--label")
+                                                                img(src="/imgs/icons/camera.png", alt="Choose file", class=`commentForm__inputField__files--label__image commentForm__inputField__files--label__image--${commentTree._id}` srcset="") 
+
+                                                            label(for=`commentForm--levelThree__inputField__submit--${commentTree._id}` class=`commentForm__inputField__submit--label commentForm--levelThree__inputField__submit--label---${commentTree._id}`)
+                                                                img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm--levelThree__inputField__submit--label__image" srcset="") 
+                                                        div(class="commentForm__inputs")
+                                                            input(class=`commentForm__inputField__files commentForm--levelThree__inputField__files--${commentTree._id}`  type="file", name="" id="commentForm--levelThree__inputField__files") 
+                                                            input(class=`commentForm__inputField__submit commentForm--levelThree__inputField__submit--${commentTree._id}` id="commentForm--levelThree__inputField__submit" type="submit", value="Submit")                                                                                                           
+                                                    each levelTwoRespond in rootRespond.responds
+                                                        div(class="commentForm__inputs")
+                                                            input(class=`commentForm__inputField__files commentForm__inputField__files--${post._id}`  type="file", name="" id="commentForm__inputField__files") 
+                                                            input(class=`commentForm__inputField__submit commentForm__inputField__submit--${post._id}` id="commentForm__inputField__submit" type="submit", value="Submit")                        
+                                                                //- container of responds of the root comment responds
+                                                        div(class=`commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer__levelTwoRespond commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer__levelTwoRespond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)             
+                                                            div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+                                                                img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}` src=`${levelTwoRespond.author.profileImage}`)
+                                                                div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+                                                                    h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)=`${levelTwoRespond.author.firstName} ${levelTwoRespond.author.lastName}`
+                                                                    //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+                                                                    h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)=levelTwoRespond.commentText
+                                                                    div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+                                                                        if canInteract === true
+                                                                            h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id} userID-${levelTwoRespond.author._id}`) React
+                                                                            h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id} userID-${levelTwoRespond.author._id}`) respond
+
+
+            else if post.postImages.length === 2
+                div(class="postCard")
+                    div(class="post")
+                        div(class="postCard__authorDetails")
+                            img(class="postCard_authorDetails__image" src=`${post.author.profileImage}`)
+                            div(class="postCard__authorDetails__container")
+                                h1(class="postCard__authorDetails__name")=`${post.author.firstName} ${post.author.lastName}`
+                                h1(class="postCard__authorDetails__createdAt")=calcTimePassed("Posted", post.createdAt)
+
+
+                        h1(class="postCard__postText")=`${post.postText}`
+
+                        div(class="postCard__images__two--horizontallyAligned")
+                            img(class="postCard__images__two__firstImage--horizontallyAligned" src=`${post.postImages[0]}`)
+                            img(class="postCard__images__two__secondImage--horizontallyAligned" src=`${post.postImages[1]}`)                                
+                        //- div(class="postCard__images__two--verticallyAligned")
+                        //-     img(class="postCard__images__two__firstImage--verticallyAligned" src="imgs/pictures/e60.jpg")
+                        //-     img(class="postCard__images__two__secondImage--verticallyAligned" src="imgs/pictures/bugatti.jpg")                                
+
+                        div(class="postCard__interactions")
+
+                            div(class="postCard__interactions__reactions")
+                                img(class="postCard__interactions__reactions__image" src="/imgs/icons/thumbsUp.png", alt="")
+                                h1(class="postCard__interactions__reactions__header") Reactions
+
+                            div(class="postCard__interactions__button")
+                                img(class="postCard__interactions__button__image" src="/imgs/icons/messages.png")
+                                h1(class="postCard__interactions__button__header") Comments                                                       
+
+
+            else if post.postImages.length === 3
+                div(class="postCard")
+                    div(class="post")
+                        div(class="postCard__authorDetails")
+                            img(class="postCard_authorDetails__image" src=`${post.author.profileImage}`)
+                            div(class="postCard__authorDetails__container")
+                                h1(class="postCard__authorDetails__name")=`${post.author.firstName} ${post.author.lastName}`
+                                h1(class="postCard__authorDetails__createdAt")=calcTimePassed("Posted", post.createdAt)
+
+
+                        h1(class="postCard__postText")=`${post.postText}`
+
+                        div(class="postCard__images__three--horizontallyAligned")
+                            img(class="postCard__images__three__firstImage--horizontallyAligned" src=`${post.postImages[0]}`)
+                            img(class="postCard__images__three__secondImage--horizontallyAligned" src=`${post.postImages[1]}`)                                
+                            img(class="postCard__images__three__thirdImage--horizontallyAligned" src=`${post.postImages[2]}`)                                
+
+                        div(class="postCard__interactions")
+
+                            div(class="postCard__interactions__reactions")
+                                img(class="postCard__interactions__reactions__image" src="/imgs/icons/thumbsUp.png", alt="")
+                                h1(class="postCard__interactions__reactions__header") Reactions
+
+                            div(class="postCard__interactions__button")
+                                img(class="postCard__interactions__button__image" src="/imgs/icons/messages.png")
+                                h1(class="postCard__interactions__button__header") Comments
+
+            else if post.postImages.length === 4
+                div(class="postCard")
+                    div(class="post")
+                        div(class="postCard__authorDetails")
+                            img(class="postCard_authorDetails__image" src=`${post.author.profileImage}`)
+                            div(class="postCard__authorDetails__container")
+                                h1(class="postCard__authorDetails__name")=`${post.author.firstName} ${post.author.lastName}`
+                                h1(class="postCard__authorDetails__createdAt")=calcTimePassed("Posted", post.createdAt)
+
+
+                        h1(class="postCard__postText")=`${post.postText}`
+                        div(class="postCard__images__one") 
+                            img(class="postCard__images__one__firstImage" src=`${post.postImages[0]}`)
+
+
+
+                        div(class="postCard__interactions")
+
+                            div(class="postCard__interactions__reactions")
+                                img(class="postCard__interactions__reactions__image" src="/imgs/icons/thumbsUp.png", alt="")
+                                h1(class="postCard__interactions__reactions__header") Reactions
+
+                            div(class="postCard__interactions__button")
+                                img(class="postCard__interactions__button__image" src="/imgs/icons/messages.png")
+                                h1(class="postCard__interactions__button__header") Comments
+
+
+
+
+
+//- if posts
+//-     for post in posts
+//-         //- 2) Check the amount of the images/movies in post eventually if the image array === undefined
+//-         - let canInteract = true;
+//-         if group !== undefined
+//-             if group.settings.privacy === "public-interactions-off" && isMember === false
+//-                 - canInteract = false
+
+        
+//-         if post !== undefined
+//-             if post.postImages.length === 0
+//-                 div(class=`postCard postCard--${post._id}`)
+//-                     div(class=`post post--${post._id} || postCard__details  postCard__details--${post._id}`)
+//-                         div(class=`postCard__authorDetails postCard__authorDetails--${post._id}`)
+//-                             img(class=`postCard_authorDetails__image postCard_authorDetails__image--${post._id}` src=`${post.author.profileImage}`)
+//-                             div(class=`postCard__authorDetails__container postCard__authorDetails__container--${post._id}`)
+//-                                 h1(class=`postCard__authorDetails__name postCard__authorDetails__name--${post._id}`)=`${post.author.firstName} ${post.author.lastName}`
+//-                                 h1(class=`postCard__authorDetails__createdAt postCard__authorDetails__createdAt--${post._id}`)=`${calcTimePassed("Posted", post.createdAt).string}, at ${calcTimePassed("Posted", post.createdAt).hour}`
+
+
+//-                         h1(class=`postCard__postText postCard__postText--${post._id}`)=`${post.postText}`
+//-                         div(class=`postCard__interactions postCard__interactions--${post._id}`)
+
+//-                             div(class=`postCard__interactions__reactions postCard__interactions__reactions--${post._id}`)
+//-                                 img(class=`postCard__interactions__reactions__image postCard__interactions__reactions__image--${post._id}` src="/imgs/icons/thumbsUp.png", alt="")
+//-                                 h1(class=`postCard__interactions__reactions__header postCard__interactions__reactions__header--${post._id}`) Reactions
+
+//-                             div(class=`postCard__interactions__button postCard__interactions__button--${post._id}`)
+//-                                 img(class=`postCard__interactions__button__image postCard__interactions__button__image--${post._id}` src="/imgs/icons/messages.png")
+//-                                 h1(class=`postCard__interactions__button__header postCard__interactions__button__header--${post._id}`) Comments
+//-                     div(class=`postCard__commentsSection postCard__commentsSection--${post._id}`)
+//-                         if canInteract === true
+//-                             form(class=`commentForm commentForm--main commentForm--${post._id} hidden`)
+//-                                 div(class=`commentForm__profile commentForm__profile--${post._id}`)
+//-                                     img(class=`commentForm__top__leftSide__profilePicture commentForm__top__leftSide__profilePicture--${post._id}` src=`${loggedUser.profileImage}`)
+//-                                 div(class=`commentForm__inputField`)
+//-                                     textarea(name="", cols="120"  class=`commentForm__inputField__text commentForm__inputField__text--${post._id}` placeholder="Hey, whats going on?")
+//-                                     label(for="commentForm__inputField__files" class="commentForm__inputField__files--label")
+//-                                         img(src="/imgs/icons/camera.png", alt="Choose file", class="commentForm__inputField__files--label__image" srcset="") 
+//-                                     label(for="commentForm__inputField__submit" class=`commentForm__inputField__submit--label commentForm__inputField__submit--label---${post._id}`)
+//-                                         img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm__inputField__submit--label__image" srcset="") 
+
+
+//-                             div(class="commentForm__inputs")
+//-                                 input(class=`commentForm__inputField__files commentForm__inputField__files--${post._id}`  type="file", name="" id="commentForm__inputField__files") 
+//-                                 input(class=`commentForm__inputField__submit commentForm__inputField__submit--${post._id}` id="commentForm__inputField__submit" type="submit", value="Submit")
+//-                         each commentTree in post.commentsTree            
+//-                             div(class=`commentTree commentTree--${post._id} commentTreeId--${commentTree._id} hidden`)
+//-                                 //- root comment
+//-                                 div(class=`commentTree__root commentTree__root--idPath_${commentTree._id}-${commentTree.commentTree._id}`)  
+//-                                     div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+//-                                         img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}` src=`${commentTree.commentTree.author.profileImage}`)
+//-                                         div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+//-                                             h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}`)=`${commentTree.commentTree.author.firstName} ${commentTree.commentTree.author.lastName}`
+//-                                             //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+//-                                             h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}`)=commentTree.commentTree.commentText
+//-                                             div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+//-                                                 if canInteract === false
+//-                                                     h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) responds
+
+//-                                                 if canInteract === true
+//-                                                     h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) react 
+//-                                                     h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) responds
+//-                                                     h1( class=`commentTree__commentCard__container__interactions__respond span--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author} userID-${commentTree.commentTree.author}`) respond
+//-                                         //- root comment responds container
+//-                                     div(class=`commentTree__root__respondsContainer commentTree__root__respondsContainer--idPath_${commentTree._id}-${commentTree.commentTree._id}--container hidden`)
+//-                                         //- root comment respond
+//-                                         form(class=`commentForm commentForm--levelTwo commentForm--levelTwo---${commentTree._id} hidden`)
+//-                                             div(class=`commentForm__profile commentForm--levelTwo__profile--${commentTree._id}`)
+//-                                                 img(class=`commentForm__top__leftSide__profilePicture commentForm--levelTwo__top__leftSide__profilePicture--${commentTree._id}` src=`${loggedUser.profileImage}`)
+//-                                             div(class=`commentForm__inputField`)
+//-                                                 textarea(name="", cols="120"  class=`commentForm--levelTwo__inputField__text commentForm--levelTwo__inputField__text--${commentTree._id}` placeholder="Hey, whats going on?")
+//-                                                 label(for=`commentForm--levelTwo__inputField__files--${commentTree._id}` class="commentForm__inputField__files--label")
+//-                                                     img(src="/imgs/icons/camera.png", alt="Choose file", class=`commentForm__inputField__files--label__image commentForm__inputField__files--label__image--${commentTree._id}` srcset="") 
+
+//-                                                 label(for=`commentForm--levelTwo__inputField__submit--${commentTree._id}` class=`commentForm__inputField__submit--label commentForm--levelTwo__inputField__submit--label---${commentTree._id}`)
+//-                                                     img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm--levelTwo__inputField__submit--label__image" srcset="") 
+//-                                             div(class="commentForm__inputs")
+//-                                                 input(class=`commentForm__inputField__files commentForm--levelTwo__inputField__files--${commentTree._id}`  type="file", name="" id="commentForm--levelTwo__inputField__files") 
+//-                                                 input(class=`commentForm__inputField__submit commentForm--levelTwo__inputField__submit--${commentTree._id}` id="commentForm--levelTwo__inputField__submit" type="submit", value="Submit")                                                                                
+//-                                         each rootRespond in commentTree.commentTree.responds
+//-                                             div(class=`commentTree__root__respondsContainer__respond commentTree__root__respondsContainer__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+//-                                                 div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+//-                                                     img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}` src=`${rootRespond.author.profileImage}`)
+//-                                                     div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+//-                                                         h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)=`${rootRespond.author.firstName} ${rootRespond.author.lastName}`
+//-                                                         //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+//-                                                         h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)=rootRespond.commentText
+//-                                                         div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+//-                                                             if canInteract === false
+//-                                                                 h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) responds
+//-                                                             if canInteract === true 
+//-                                                                 h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) React
+//-                                                                 h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) responds
+//-                                                                 h1( class=`commentTree__commentCard__container__interactions__respond span--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) respond
+//-                                                 div(class=`commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---container hidden`)
+//-                                                     //- respond of the root comment respond
+
+//-                                                     form(class=`commentForm commentForm--levelThree commentForm--levelThree---${commentTree._id} hidden`)
+//-                                                         div(class=`commentForm__profile commentForm--levelThree__profile--${commentTree._id}`)
+//-                                                             img(class=`commentForm__top__leftSide__profilePicture commentForm--levelThree__top__leftSide__profilePicture--${commentTree._id}` src=`${loggedUser.profileImage}`)
+//-                                                         div(class=`commentForm__inputField`)
+//-                                                             textarea(name="", cols="120"  class=`commentForm--levelThree__inputField__text commentForm--levelThree__inputField__text--${commentTree._id}` placeholder="Hey, whats going on?")
+//-                                                             label(for=`commentForm--levelThree__inputField__files--${commentTree._id}` class="commentForm__inputField__files--label")
+//-                                                                 img(src="/imgs/icons/camera.png", alt="Choose file", class=`commentForm__inputField__files--label__image commentForm__inputField__files--label__image--${commentTree._id}` srcset="") 
+
+//-                                                             label(for=`commentForm--levelThree__inputField__submit--${commentTree._id}` class=`commentForm__inputField__submit--label commentForm--levelThree__inputField__submit--label---${commentTree._id}`)
+//-                                                                 img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm--levelThree__inputField__submit--label__image" srcset="") 
+//-                                                         div(class="commentForm__inputs")
+//-                                                             input(class=`commentForm__inputField__files commentForm--levelThree__inputField__files--${commentTree._id}`  type="file", name="" id="commentForm--levelThree__inputField__files") 
+//-                                                             input(class=`commentForm__inputField__submit commentForm--levelThree__inputField__submit--${commentTree._id}` id="commentForm--levelThree__inputField__submit" type="submit", value="Submit")                                                                                                           
+//-                                                     each levelTwoRespond in rootRespond.responds
+//-                                                         div(class="commentForm__inputs")
+//-                                                             input(class=`commentForm__inputField__files commentForm__inputField__files--${post._id}`  type="file", name="" id="commentForm__inputField__files") 
+//-                                                             input(class=`commentForm__inputField__submit commentForm__inputField__submit--${post._id}` id="commentForm__inputField__submit" type="submit", value="Submit")                        
+//-                                                                 //- container of responds of the root comment responds
+//-                                                         div(class=`commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer__levelTwoRespond commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer__levelTwoRespond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)             
+//-                                                             div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+//-                                                                 img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}` src=`${levelTwoRespond.author.profileImage}`)
+//-                                                                 div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+//-                                                                     h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)=`${levelTwoRespond.author.firstName} ${levelTwoRespond.author.lastName}`
+//-                                                                     //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+//-                                                                     h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)=levelTwoRespond.commentText
+//-                                                                     div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+//-                                                                         if canInteract === true
+//-                                                                             h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id} userID-${levelTwoRespond.author._id}`) React
+//-                                                                             h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id} userID-${levelTwoRespond.author._id}`) respond
+
+
+
+
+//-             //- if post.postImages.length === 1
+//-             //-     div(class=`postCard postCard--${post._id}`)
+//-             //-         div(class=`post post--${post._id}`)
+//-             //-             div(class=`postCard__authorDetails postCard__authorDetails--${post._id}`)
+//-             //-                 img(class=`postCard_authorDetails__image postCard_authorDetails__image--${post._id}` src=`${post.author.profileImage}`)
+//-             //-                 div(class=`postCard__authorDetails__container postCard__authorDetails__container--${post._id}`)
+//-             //-                     h1(class=`postCard__authorDetails__name postCard__authorDetails__name--${post._id}`)=`${post.author.firstName} ${post.author.lastName}`
+//-             //-                     h1(class=`postCard__authorDetails__createdAt postCard__authorDetails__createdAt--${post._id}`)=`${calcTimePassed("Posted", post.createdAt).string}, at ${calcTimePassed("Posted", post.createdAt).hour}`
+
+
+//-             //-             h1(class=`postCard__postText postCard__postText--${post._id}`)=`${post.postText}`
+//-             //-             div(class=`postCard__images__one postCard__images__one--${post._id}`) 
+//-             //-                 img(class=`postCard__images__one__firstImage postCard__images__one__firstImage--${post._id}` src=`${post.postImages[0]}`)
+//-             //-             div(class=`postCard__interactions postCard__interactions--${post._id}`)
+
+//-             //-                 if canInteract === true
+//-             //-                     div(class=`postCard__interactions__reactions postCard__interactions__reactions--${post._id}`)
+//-             //-                         img(class=`postCard__interactions__reactions__image postCard__interactions__reactions__image--${post._id}` src="/imgs/icons/thumbsUp.png", alt="")
+//-             //-                         h1(class=`postCard__interactions__reactions__header postCard__interactions__reactions__header--${post._id}`) Reactions
+//-             //-                 if canInteract === false 
+//-             //-                     div(class=`postCard__interactions__reactions postCard__interactions__reactions--${post._id}` style="cursor: not-allowed")
+//-             //-                         img(class=`postCard__interactions__reactions__image postCard__interactions__reactions__image--${post._id}` src="/imgs/icons/thumbsUp.png", alt="")
+//-             //-                         h1(class=`postCard__interactions__reactions__header`) Reactions
+
+//-             //-                 div(class=`postCard__interactions__button postCard__interactions__button--${post._id}`)
+//-             //-                     img(class=`postCard__interactions__button__image postCard__interactions__button__image--${post._id}` src="/imgs/icons/messages.png")
+//-             //-                     h1(class=`postCard__interactions__button__header postCard__interactions__button__header--${post._id}`) Comments
+//-             //-         div(class=`postCard__commentsSection postCard__commentsSection--${post._id}`)
+//-             //-             if canInteract === true
+//-             //-                 form(class=`commentForm commentForm--main commentForm--${post._id} hidden`)
+//-             //-                     div(class=`commentForm__profile commentForm__profile--${post._id}`)
+//-             //-                         img(class=`commentForm__top__leftSide__profilePicture commentForm__top__leftSide__profilePicture--${post._id}` src=`${loggedUser.profileImage}`)
+//-             //-                     div(class=`commentForm__inputField`)
+//-             //-                         textarea(name="", cols="120"  class=`commentForm__inputField__text commentForm__inputField__text--${post._id}` placeholder="Hey, whats going on?")
+//-             //-                         label(for="commentForm__inputField__files" class="commentForm__inputField__files--label")
+//-             //-                             img(src="/imgs/icons/camera.png", alt="Choose file", class="commentForm__inputField__files--label__image" srcset="") 
+//-             //-                         label(for="commentForm__inputField__submit" class=`commentForm__inputField__submit--label commentForm__inputField__submit--label---${post._id}`)
+//-             //-                             img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm__inputField__submit--label__image" srcset="") 
+
+
+//-             //-                     div(class="commentForm__inputs")
+//-             //-                         input(class=`commentForm__inputField__files commentForm__inputField__files--${post._id}`  type="file", name="" id="commentForm__inputField__files") 
+//-             //-                         input(class=`commentForm__inputField__submit commentForm__inputField__submit--${post._id}` id="commentForm__inputField__submit" type="submit", value="Submit")
+//-             //-             if canInteract === false  
+//-             //-                 form(class=`commentForm commentForm--main commentForm--${post._id} hidden`, style="display: hidden; margin: 0;")
+//-             //-             each commentTree in post.commentsTree            
+//-             //-                 div(class=`commentTree commentTree--${post._id} commentTreeId--${commentTree._id} hidden`)
+//-             //-                     //- root comment
+//-             //-                     div(class=`commentTree__root commentTree__root--idPath_${commentTree._id}-${commentTree.commentTree._id}`)  
+//-             //-                         div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+//-             //-                             img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}` src=`${commentTree.commentTree.author.profileImage}`)
+//-             //-                             div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+//-             //-                                 h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}`)=`${commentTree.commentTree.author.firstName} ${commentTree.commentTree.author.lastName}`
+//-             //-                                 //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+//-             //-                                 h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}`)=commentTree.commentTree.commentText
+//-             //-                                 div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}`)
+//-             //-                                     if canInteract === false
+//-             //-                                         h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) responds
+
+//-             //-                                     if canInteract === true
+//-             //-                                         h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) react 
+//-             //-                                         h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author}`) responds
+//-             //-                                         h1( class=`commentTree__commentCard__container__interactions__respond span--idPath_${commentTree._id}-${commentTree.commentTree._id} userID-${commentTree.commentTree.author} userID-${commentTree.commentTree.author}`) respond
+//-             //-                             //- root comment responds container
+//-             //-                         div(class=`commentTree__root__respondsContainer commentTree__root__respondsContainer--idPath_${commentTree._id}-${commentTree.commentTree._id}--container hidden`)
+//-             //-                             //- root comment respond
+//-             //-                             form(class=`commentForm commentForm--levelTwo commentForm--levelTwo---${commentTree._id} hidden`)
+//-             //-                                 div(class=`commentForm__profile commentForm--levelTwo__profile--${commentTree._id}`)
+//-             //-                                     img(class=`commentForm__top__leftSide__profilePicture commentForm--levelTwo__top__leftSide__profilePicture--${commentTree._id}` src=`${loggedUser.profileImage}`)
+//-             //-                                 div(class=`commentForm__inputField`)
+//-             //-                                     textarea(name="", cols="120"  class=`commentForm--levelTwo__inputField__text commentForm--levelTwo__inputField__text--${commentTree._id}` placeholder="Hey, whats going on?")
+//-             //-                                     label(for=`commentForm--levelTwo__inputField__files--${commentTree._id}` class="commentForm__inputField__files--label")
+//-             //-                                         img(src="/imgs/icons/camera.png", alt="Choose file", class=`commentForm__inputField__files--label__image commentForm__inputField__files--label__image--${commentTree._id}` srcset="") 
+
+//-             //-                                     label(for=`commentForm--levelTwo__inputField__submit--${commentTree._id}` class=`commentForm__inputField__submit--label commentForm--levelTwo__inputField__submit--label---${commentTree._id}`)
+//-             //-                                         img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm--levelTwo__inputField__submit--label__image" srcset="") 
+//-             //-                                 div(class="commentForm__inputs")
+//-             //-                                     input(class=`commentForm__inputField__files commentForm--levelTwo__inputField__files--${commentTree._id}`  type="file", name="" id="commentForm--levelTwo__inputField__files") 
+//-             //-                                     input(class=`commentForm__inputField__submit commentForm--levelTwo__inputField__submit--${commentTree._id}` id="commentForm--levelTwo__inputField__submit" type="submit", value="Submit")                                                                                
+//-             //-                             each rootRespond in commentTree.commentTree.responds
+//-             //-                                 div(class=`commentTree__root__respondsContainer__respond commentTree__root__respondsContainer__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+//-             //-                                     div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+//-             //-                                         img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}` src=`${rootRespond.author.profileImage}`)
+//-             //-                                         div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+//-             //-                                             h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)=`${rootRespond.author.firstName} ${rootRespond.author.lastName}`
+//-             //-                                             //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+//-             //-                                             h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)=rootRespond.commentText
+//-             //-                                             div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}`)
+//-             //-                                                 if canInteract === false
+//-             //-                                                     h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) responds
+//-             //-                                                 if canInteract === true 
+//-             //-                                                     h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) React
+//-             //-                                                     h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) responds
+//-             //-                                                     h1( class=`commentTree__commentCard__container__interactions__respond span--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id} userID-${rootRespond.author._id}`) respond
+//-             //-                                     div(class=`commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---container hidden`)
+//-             //-                                         //- respond of the root comment respond
+
+//-             //-                                         form(class=`commentForm commentForm--levelThree commentForm--levelThree---${commentTree._id} hidden`)
+//-             //-                                             div(class=`commentForm__profile commentForm--levelThree__profile--${commentTree._id}`)
+//-             //-                                                 img(class=`commentForm__top__leftSide__profilePicture commentForm--levelThree__top__leftSide__profilePicture--${commentTree._id}` src=`${loggedUser.profileImage}`)
+//-             //-                                             div(class=`commentForm__inputField`)
+//-             //-                                                 textarea(name="", cols="120"  class=`commentForm--levelThree__inputField__text commentForm--levelThree__inputField__text--${commentTree._id}` placeholder="Hey, whats going on?")
+//-             //-                                                 label(for=`commentForm--levelThree__inputField__files--${commentTree._id}` class="commentForm__inputField__files--label")
+//-             //-                                                     img(src="/imgs/icons/camera.png", alt="Choose file", class=`commentForm__inputField__files--label__image commentForm__inputField__files--label__image--${commentTree._id}` srcset="") 
+
+//-             //-                                                 label(for=`commentForm--levelThree__inputField__submit--${commentTree._id}` class=`commentForm__inputField__submit--label commentForm--levelThree__inputField__submit--label---${commentTree._id}`)
+//-             //-                                                     img(src="/imgs/icons/send.png", alt="Choose file", class="commentForm--levelThree__inputField__submit--label__image" srcset="") 
+//-             //-                                             div(class="commentForm__inputs")
+//-             //-                                                 input(class=`commentForm__inputField__files commentForm--levelThree__inputField__files--${commentTree._id}`  type="file", name="" id="commentForm--levelThree__inputField__files") 
+//-             //-                                                 input(class=`commentForm__inputField__submit commentForm--levelThree__inputField__submit--${commentTree._id}` id="commentForm--levelThree__inputField__submit" type="submit", value="Submit")                                                                                                           
+//-             //-                                         each levelTwoRespond in rootRespond.responds
+//-             //-                                             div(class="commentForm__inputs")
+//-             //-                                                 input(class=`commentForm__inputField__files commentForm__inputField__files--${post._id}`  type="file", name="" id="commentForm__inputField__files") 
+//-             //-                                                 input(class=`commentForm__inputField__submit commentForm__inputField__submit--${post._id}` id="commentForm__inputField__submit" type="submit", value="Submit")                        
+//-             //-                                                     //- container of responds of the root comment responds
+//-             //-                                             div(class=`commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer__levelTwoRespond commentTree__root__levelTwoRespondsContainer__levelTwoRespond__levelTwoRespondsContainer__levelTwoRespond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)             
+//-             //-                                                 div(class=`commentTree__root__commentCard--opened commentTree__root__commentCard--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+//-             //-                                                     img(class=`commentTree__commentCard__image commentTree__commentCard__image--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}` src=`${levelTwoRespond.author.profileImage}`)
+//-             //-                                                     div(class=`commentTree__commentCard__container commentTree__commentCard__container--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+//-             //-                                                         h1(class=`commentTree__commentCard__container__name commentTree__commentCard__container__name--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)=`${levelTwoRespond.author.firstName} ${levelTwoRespond.author.lastName}`
+//-             //-                                                         //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+//-             //-                                                         h1(class=`commentTree__commentCard__container__comment commentTree__commentCard__container__comment--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)=levelTwoRespond.commentText
+//-             //-                                                         div(class=`commentTree__commentCard__container__interactions commentTree__commentCard__container__interactions--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id}`)
+//-             //-                                                             if canInteract === true
+//-             //-                                                                 h1(class=`commentTree__commentCard__container__interactions__react commentTree__commentCard__container__interactions__react--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id} userID-${levelTwoRespond.author._id}`) React
+//-             //-                                                                 h1(class=`commentTree__commentCard__container__interactions__respond commentTree__commentCard__container__interactions__respond--idPath_${commentTree._id}-${commentTree.commentTree._id}--${rootRespond._id}---${levelTwoRespond._id} userID-${levelTwoRespond.author._id}`) respond
+
+
+//-             //- else if post.postImages.length === 2
+//-             //-     div(class="postCard")
+//-             //-         div(class="post")
+//-             //-             div(class="postCard__authorDetails")
+//-             //-                 img(class="postCard_authorDetails__image" src=`${post.author.profileImage}`)
+//-             //-                 div(class="postCard__authorDetails__container")
+//-             //-                     h1(class="postCard__authorDetails__name")=`${post.author.firstName} ${post.author.lastName}`
+//-             //-                     h1(class="postCard__authorDetails__createdAt")=calcTimePassed("Posted", post.createdAt)
+
+
+//-             //-             h1(class="postCard__postText")=`${post.postText}`
+
+//-             //-             div(class="postCard__images__two--horizontallyAligned")
+//-             //-                 img(class="postCard__images__two__firstImage--horizontallyAligned" src=`${post.postImages[0]}`)
+//-             //-                 img(class="postCard__images__two__secondImage--horizontallyAligned" src=`${post.postImages[1]}`)                                
+//-             //-             //- div(class="postCard__images__two--verticallyAligned")
+//-             //-             //-     img(class="postCard__images__two__firstImage--verticallyAligned" src="imgs/pictures/e60.jpg")
+//-             //-             //-     img(class="postCard__images__two__secondImage--verticallyAligned" src="imgs/pictures/bugatti.jpg")                                
+
+//-             //-             div(class="postCard__interactions")
+
+//-             //-                 div(class="postCard__interactions__reactions")
+//-             //-                     img(class="postCard__interactions__reactions__image" src="/imgs/icons/thumbsUp.png", alt="")
+//-             //-                     h1(class="postCard__interactions__reactions__header") Reactions
+
+//-             //-                 div(class="postCard__interactions__button")
+//-             //-                     img(class="postCard__interactions__button__image" src="/imgs/icons/messages.png")
+//-             //-                     h1(class="postCard__interactions__button__header") Comments                                                       
+
+
+//-             //- else if post.postImages.length === 3
+//-             //-     div(class="postCard")
+//-             //-         div(class="post")
+//-             //-             div(class="postCard__authorDetails")
+//-             //-                 img(class="postCard_authorDetails__image" src=`${post.author.profileImage}`)
+//-             //-                 div(class="postCard__authorDetails__container")
+//-             //-                     h1(class="postCard__authorDetails__name")=`${post.author.firstName} ${post.author.lastName}`
+//-             //-                     h1(class="postCard__authorDetails__createdAt")=calcTimePassed("Posted", post.createdAt)
+
+
+//-             //-             h1(class="postCard__postText")=`${post.postText}`
+
+//-             //-             div(class="postCard__images__three--horizontallyAligned")
+//-             //-                 img(class="postCard__images__three__firstImage--horizontallyAligned" src=`${post.postImages[0]}`)
+//-             //-                 img(class="postCard__images__three__secondImage--horizontallyAligned" src=`${post.postImages[1]}`)                                
+//-             //-                 img(class="postCard__images__three__thirdImage--horizontallyAligned" src=`${post.postImages[2]}`)                                
+
+//-             //-             div(class="postCard__interactions")
+
+//-             //-                 div(class="postCard__interactions__reactions")
+//-             //-                     img(class="postCard__interactions__reactions__image" src="/imgs/icons/thumbsUp.png", alt="")
+//-             //-                     h1(class="postCard__interactions__reactions__header") Reactions
+
+//-             //-                 div(class="postCard__interactions__button")
+//-             //-                     img(class="postCard__interactions__button__image" src="/imgs/icons/messages.png")
+//-             //-                     h1(class="postCard__interactions__button__header") Comments
+
+//-             //- else if post.postImages.length === 4
+//-             //-     div(class="postCard")
+//-             //-         div(class="post")
+//-             //-             div(class="postCard__authorDetails")
+//-             //-                 img(class="postCard_authorDetails__image" src=`${post.author.profileImage}`)
+//-             //-                 div(class="postCard__authorDetails__container")
+//-             //-                     h1(class="postCard__authorDetails__name")=`${post.author.firstName} ${post.author.lastName}`
+//-             //-                     h1(class="postCard__authorDetails__createdAt")=calcTimePassed("Posted", post.createdAt)
+
+
+//-             //-             h1(class="postCard__postText")=`${post.postText}`
+//-             //-             div(class="postCard__images__one") 
+//-             //-                 img(class="postCard__images__one__firstImage" src=`${post.postImages[0]}`)
+
+
+
+//-             //-             div(class="postCard__interactions")
+
+//-             //-                 div(class="postCard__interactions__reactions")
+//-             //-                     img(class="postCard__interactions__reactions__image" src="/imgs/icons/thumbsUp.png", alt="")
+//-             //-                     h1(class="postCard__interactions__reactions__header") Reactions
+
+//-             //-                 div(class="postCard__interactions__button")
+//-             //-                     img(class="postCard__interactions__button__image" src="/imgs/icons/messages.png")
+//-             //-                     h1(class="postCard__interactions__button__header") Comments
+
+
+
+
+

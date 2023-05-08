@@ -1,0 +1,162 @@
+include ../../utils/_header.pug
+include ../../utils/_navbar.pug
+include ../../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/groupPage/groupPage.css")
+        link(rel="stylesheet", href="/css/groupPage/utils/_sideBar.css")
+        link(rel="stylesheet", href="/css/groupPage/subPages/settings.css")
+       
+
+
+
+        title=`${group.name} | settings`
+    body(class="bodyGroupPage" data-group-id=`${group._id}`)
+        block navbar
+        include ../../utils/groups/_groupSideBar.pug
+
+
+        //- POPUPS
+        //- 1.
+        div(class="confirmText hidden")
+            .confirmText__heading 
+                h1.heading__text Confirm provided group name
+                img(src="/imgs/icons/x.png", alt="x", srcset="" class="confirmText__hideBtn")
+
+            h1.confirmText_dsc=`Are you sure you want to change groups name, from "${group.name}" to newNAME? If so, then write the new name down here and submit`
+            .confirmText__inputContainer 
+                input(type="text" class="inputContainer__text" maxlength="35" placeholder=`Confirm the new group's name`)
+                img(src="/imgs/icons/send.png", class="inputContainer__submit", alt="", srcset="")
+
+        //- 2. Change avatar
+        div(class="changeAvatar hidden")
+            .changeImage__heading 
+                h1.heading__text Change Group's Avatar
+                img(src="/imgs/icons/x.png", alt="x", srcset="" class="changeAvatar__hideBtn")
+
+
+            div(class="changeAvatar__comparasion")
+                div(class="comparasion__element element--first")
+                    h1.element__header Old Avatar: 
+                    img(class="element__image" src=`${group.avatarImage}`)
+                
+                div(class="comparasion__element element--second")
+                    h1.element__header New Avatar: 
+
+
+            
+            div(class="image__submit changeAvatar__submit")
+                h1.submit__text Submit 
+
+            p.changeImage__dsc 
+                em *As soon as you click on the submit button, the group's avatar image will be changed. If you don't want to change the group's avatar anymore - just click the X on the top right corner.
+        //- 3. Change banner
+        div(class="changeBanner hidden")
+            .changeImage__heading 
+                h1.heading__text Change Group's Banner
+                img(src="/imgs/icons/x.png", alt="x", srcset="" class="hideBtn changeBanner__hideBtn")
+
+
+            div(class="changeBanner__comparasion")
+                div(class="comparasion__element banner__element--first")
+                    h1.element__header Old Banner: 
+                    img(class="element__banner" src=`${group.bannerImage}`)
+                
+                div(class="comparasion__element banner__element--second")
+                    h1.element__header New Banner: 
+
+
+            
+            div(class="image__submit changeBanner__submit")
+                h1.submit__text Submit 
+
+            p.changeImage__dsc 
+                em *As soon as you click on the submit button, the group's banner image will be changed. If you don't want to change the group's banner anymore - just click the X on the top right corner.
+
+
+
+
+
+
+        content(class=`group groupID_${group._id}`)
+            div(class="group__topContent")
+                img(src=`${group.bannerImage}` alt="group's background" class="group__backgroundImage")
+                div(class="topContent__container")
+                    div(class="topContent__details")
+                        h1(class="topContent__name")=group.name
+                        div(class="topContent__details__bottom")
+                            div(class="topContent__privacy")
+                                - let imgSrc = "/imgs/icons/lock-closed.png";
+                                - let text = "Private group"
+                                if group.settings.privacy !== "private"
+                                    - imgSrc = "/imgs/icons/lock-open.png"
+                                    - text = "Public group"
+                                img(class="topContent__icon icon--small" src=`${imgSrc}` alt="privacy")
+                                h1(class="topContent__description description--privacy")=text
+                            h1(class="topContent__description")=`${group.members.length} Members` 
+                    include ./utils/buttons.pug
+                div(class="topContent__navbar")
+                    //- if not the member - about--active
+                    a(class="topContent__element" href=`/group/${group._id}/about`) About
+                    a(class="topContent__element" href=`/group/${group._id}/discussion`) Discussion  
+                    a(class="topContent__element" href=`/group/${group._id}/members`) Members         
+                    a(class="topContent__element topContent__element--active" href=`/group/${group._id}/settings`) Settings  
+
+            div(class="group__mainContent group__mainContent--settings")
+                div(class="mainContent__section  section--members")
+                    div(class="section__top")
+                        h1(class="section__header") Settings 
+                    div(class="section_main")
+                        div(class="section__sideBar")
+                            a(href=`/group/${group._id}/settings` class="sideBar__option sideBar__option--active") Basic Settings
+
+                            a(href=`/group/${group._id}/settings/manage_administration` class="sideBar__option") Manage Administration
+
+                            a(href=`/group/${group._id}/settings/manage_members` class="sideBar__option") Manage Members
+
+                            a(href=`/group/${group._id}/settings/advanced_settings` class="sideBar__option") Advanced Settings
+
+                            a(href=`/group/${group._id}/settings/rules` class="sideBar__option") Set up Rules
+                        div(class="section__settings")
+
+                        div(class="mainContent__settings")
+                            div(class="settings__section")
+                                h1.section__heading Change group's Avatar 
+                                div(class="settings__content settings__content--image")
+                                    img(class="settings__avatar"  src=`${group.avatarImage}`, alt="", srcset="")
+                                    label(for="settings_fileInput--avatar" class="settings__label settings__label--changeAvatar") 
+                                        img(src="/imgs/icons/upload.png", alt="", srcset="", class="input__icon")
+                                        h1.input__text Change avatar
+                                    input(type="file", id="settings_fileInput--avatar" name="settings_fileInput--avatar" class="settings__fileInput settings__fileInput--avatar hidden" accept=".jpg, .jpeg, .png")
+                            
+                            div(class="settings__section")
+                                h1.section__heading Change group's Banner 
+                                div(class="settings__content settings__content--banner")
+                                    img(class="settings__banner"  src=`${group.bannerImage}`, alt="", srcset="")
+                                    label(for="settings_fileInput--banner" class="settings__label settings__label--changeBanner") 
+                                        img(src="/imgs/icons/upload.png", alt="", srcset="", class="input__icon")
+                                        h1.input__text Change Banner
+                                    input(type="file", id="settings_fileInput--banner" name="settings_fileInput--banner" class="settings__fileInput settings_fileInput--banner hidden" accept=".jpg, .jpeg, .png")
+                                                        
+                            div(class="settings__section")
+                                h1.section__heading Change group's Name 
+                                div(class="settings__content settings__content--inputs")                                    
+                                    h1.section__subHeading Current group's name:
+                                    div(class="settings__fakeInput")
+                                        div.fakeInput__container
+                                            h1.fakeInput__text=`${group.name}`
+                                        img(src="/imgs/icons/pencil-simple.png", alt="", srcset="" class="fakeInput__button")
+
+                                    div(class="settings__inputContainer hidden")
+                                        input(class="settings__input" placeholder=`${group.name}`)
+                                        img(class="settings__submit submit--change_groups_name" src="/imgs/icons/send.png")
+
+
+
+                
+
+        script(src="/js/utils/_groupSideBar.js")
+        script(src="/js/groups/requests/subPages/settings/basicSettings/changeName.js") 
+        script(src="/js/groups/requests/subPages/settings/basicSettings/changeAvatar.js") 
+        script(src="/js/groups/requests/subPages/settings/basicSettings/changeBanner.js") 

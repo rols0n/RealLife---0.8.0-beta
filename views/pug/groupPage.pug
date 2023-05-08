@@ -1,0 +1,17 @@
+include utils/_header.pug
+include utils/_navbar.pug
+include utils/_postCreator.pug
+html 
+    head 
+        block header
+
+        title Real Life | User Page
+    body.bodyGroupPage
+        block navbar
+        include utils/groups/_groupSideBar.pug
+
+        //- if not logged in
+        include subPages/groups/about.pug
+
+        //- if logged in show discussion
+        script(src="/js/utils/_groupSideBar.js") 

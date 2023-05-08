@@ -1,0 +1,56 @@
+include ../utils/_header.pug
+include ../utils/_navbar.pug
+include ../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/userPage/userPage.css")
+        link(rel="stylesheet", href="/css/userPage/topContent.css")
+        link(rel="stylesheet", href="/css/userPage/profileConfigMenu.css")
+        link(rel="stylesheet", href="/css/userPage/subPages/friends.css")
+        
+
+
+
+        title Real Life | User Page
+    body(class=`body userID_${user._id}`)
+        block ../navbar
+        block ../postCreator
+        include ../utils/_profileTopContent.pug
+
+        
+        div(class="content content--friends")
+            //- Friends
+            div(class="content__userPage__friends || content__page content__page--friends")
+                if user.privacySettings.visibilityOfFriends === "public"
+                    div(class="content__userPage__friends__navbar")
+                        div(class="content__userPage__friends__navbar__top")
+                            h1(class="content__userPage__friends__navbar__top__header") Friends 
+                            div(class="input__container ")
+                                img(src="/imgs/icons/searchIcon.png", alt="")
+                                input(class="content__userPage__friends__navbar__top__input" placeholder="Search")
+                            h1(class="content__userPage__friends__navbar__top__href") Friends invites 
+                            h1(class="content__userPage__friends__navbar__top__href") Find friends
+                        div(class="content__userPage__friends__navbar__bottom")
+                            h1(class="content__userPage__friends__navbar__bottom__header--active") All friends 
+                            a(href=`/userPage/${user._id}/friends/birthdays`)
+                                h1(class="content__userPage__friends__navbar__bottom__header" ) Birthdays
+                            h1(class="content__userPage__friends__navbar__bottom__header") Mutal
+                    div(class="content__user__page__friends__list")
+                        div(class="message hidden")
+                            img(src="/imgs/icons/smiley-sad.png" class="message__img animate__animated animate__wobble")
+                            h3.message__heading Not found 
+                            p.message__dsc Unfortunately we couldn't find anyone.
+
+                        div(class="friendCards friendCards--all")
+                            each friend in user.friends 
+                                div(class="friendCard__container animate__animated animate__jackInTheBox")
+                                    img(src=`${friend.profileImage}`, alt="friend's profile picture")
+                                    div(class="friendCard__container__details")
+                                        a(class="friendCard__container__details__userName" href=`/userPage/${friend._id}`)=`${friend.firstName} ${friend.lastName}`
+                                        h1(class="friendCard__container__details__info") 20 common friends
+                        div(class="friendCards friendCards--queried hidden")
+                else if user.privacySettings.friends === "private"
+                    div(class="privateMessageContainer")
+                        h1.privateMessage=`User's friends list is set to private`
+        script(src="/js/subPages/friends.js" type="module") 

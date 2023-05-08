@@ -1,0 +1,34 @@
+div(class="sideBar")
+    div(class="sideBar__info")
+        img(class="sideBar__avatar" alt="groups avatar" src=`${group.avatarImage}`)
+        div(class="sideBar__rightSide")
+            h1(class="sideBar__name")=group.name
+            h1(class="sideBar__members")=`${group.members.length} Members`
+    div(class="sideBar__navbar")
+        a(href=`/group/${group._id}`)
+            div(class="sideBar__communityHome")
+                img(class="sideBar__icon" alt="sideBar icon" src="/imgs/icons/home.png")
+                h1(class="sideBar__header") Community home 
+        //- If logged in display
+        if isMember === true
+            a(href=`/group/${group._id}/settings`)
+                div(class="sideBar__settings")
+                    img(class="sideBar__icon" alt="sideBar icon" src="/imgs/icons/settings.png")
+                    h1(class="sideBar__header") Settings 
+
+            if loggedUserRole !== "user"
+                div(class="sideBar__showReqManager sideBar__showReqManager--opened")
+                    a( style="display: flex" href=`/group/${group._id}/manageRequests`)
+                        img(class="sideBar__icon sB__icon--1st" src="/imgs/icons/requests.png")
+                        h1(class="sideBar__header") Manage requests
+                        
+                        - let count = group.requests.received.length + group.requests.sent.length;
+
+
+                        if count > 0
+                            div(class="sideBar__requestsCount")
+                                h3(class="requestsCount__count")=count
+                  
+            
+
+                

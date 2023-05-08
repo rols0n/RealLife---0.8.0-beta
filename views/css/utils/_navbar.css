@@ -1,0 +1,376 @@
+/* NAVBAR */
+
+.navbar {
+  position: fixed;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  /* justify-content: space-between; */
+  padding: 0.5 0;
+  background-color: #fff;
+  box-shadow: 0px 4px 15px -8px var(--white40tint);
+  /* border-bottom: 0.3px solid var(--white50tint); */
+  height: 6%;
+  z-index: 4;
+}
+
+.navbar__logo {
+  width: 65px;
+  height: 65px;
+  margin-right: 5px;
+}
+
+.navbar__searchActive {
+  margin-right: auto;
+  position: absolute;
+  display: block;
+  /* z-index: 3; */
+  margin-right: 24px;
+  width: 345px;
+  top: 0;
+  left: 0;
+
+  min-height: 129px;
+  max-height: 700px;
+
+  background-color: var(--white);
+
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 12px;
+
+  box-shadow: 2px 3px 23px -10px var(--white70tint);
+}
+
+.searchActive__top {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin: 3px 6px;
+  margin-top: 10px;
+}
+
+.searchActive__top input {
+  background-color: var(--white4tint);
+  padding: 8px 15px;
+  border-radius: 40px;
+  font-size: 15px;
+
+  width: 268px;
+  margin-left: 8px;
+}
+
+.searchActive__icon {
+  background-color: transparent;
+  border: none;
+}
+
+.searchActive__icon img {
+  width: 30px;
+  height: 30px;
+  margin-right: 5px;
+}
+
+.searchActive__content {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: center;
+
+  margin-left: 49px;
+  margin-top: 10px;
+
+  padding-bottom: 16px;
+}
+
+.searchActive__card {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.couldntFind {
+  display: flex;
+  flex-direction: column;
+  /* align-items: center;
+  justify-content: center; */
+  margin-bottom: 10px;
+  width: 100%;
+}
+
+.couldntFind__img {
+  width: 50px;
+  height: 50px;
+  margin-bottom: 5px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.couldntFind__text {
+  font-weight: 500;
+  font-size: 14px;
+  margin-left: auto;
+  margin-right: auto;
+  width: 82%;
+}
+
+.searchActive__info {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.info__text {
+  font-size: 14px;
+
+  text-align: center;
+}
+
+.searchActive__avatar {
+  height: 40px;
+  width: 40px;
+  margin-right: 5px;
+
+  border-radius: 100%;
+}
+
+.searchActive__details {
+  display: flex;
+  margin-left: 7px;
+  flex-direction: column;
+}
+
+.searchActive__name {
+  text-decoration: none;
+  text-transform: none;
+
+  color: var(--white90tint);
+  font-weight: 500;
+}
+
+.searchActive__name:hover {
+  text-decoration: underline;
+}
+
+.searchActive__hint {
+  font-size: 14px;
+}
+
+/* # */
+
+.navbar__searchBar {
+  /* align-items: left; */
+  /* margin-right: auto; */
+  padding: 8px 15px;
+  background-color: var(--white4tint);
+  border-radius: 40px;
+  height: 25px;
+}
+
+.navbar__searchBar {
+  display: flex;
+  align-items: center;
+}
+
+.navbar__searchIcon {
+  margin-right: 8px;
+}
+
+.navbar__input {
+  background-color: inherit;
+  border: none;
+  font-size: 16px;
+  font-weight: 400;
+}
+
+/* MID */
+
+.navbar__navigations {
+}
+
+.navbar__navigations a img {
+  height: 35px;
+  width: 35px;
+}
+
+.navbar__friends {
+  margin-left: 35px;
+  margin-right: 35px;
+}
+
+/* RIGHT SIDE */
+
+.navbar__content {
+  display: flex;
+  column-gap: 22px;
+  align-items: center;
+}
+
+.navbar__profileIcon {
+  margin-right: 24px;
+  border-radius: 100%;
+  height: 36px;
+  width: 36px;
+}
+
+.navbar__messagesIcon,
+.navbar__notificationsIcon {
+  height: 32px;
+  width: 32px;
+}
+.navbar__notificationsIcon:hover {
+  cursor: pointer;
+}
+
+.navbar__menu {
+  position: fixed;
+  background-color: #fff;
+  margin-top: 65px;
+  right: 0;
+  margin-right: 20px;
+  width: 320px;
+
+  box-shadow: 0px 0px 15px -8px var(--white60tint);
+  z-index: 5;
+  max-height: 88vh;
+
+  padding: 10px 20px;
+
+  padding-bottom: 32px;
+  overflow-y: scroll;
+}
+
+.navbar__menu::-webkit-scrollbar-track {
+  background-color: none;
+}
+.navbar__menu::-webkit-scrollbar {
+  width: 8px;
+}
+
+.menu__navbar {
+  display: flex;
+  flex-direction: column;
+  row-gap: 10px;
+}
+
+.navbar__bottom,
+.navbar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbar__top {
+}
+.navbar__bottom {
+  /* column-gap: 12px; */
+  margin-left: 12px;
+  margin-right: 12px;
+}
+
+.navbar__anchor {
+  background-color: transparent;
+  border: none;
+}
+
+.navbar__anchor[data-navbar-anchor-type="new"] {
+  font-size: 18px;
+  color: var(--red);
+  font-weight: 500;
+}
+
+.navbar__anchor[data-navbar-anchor-type="see-all"] {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--white80tint);
+}
+
+.menu__card {
+  margin-left: 13px;
+  margin-right: 13px;
+  display: flex;
+
+  align-items: center;
+}
+
+.card__avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 100%;
+}
+
+.card__icon[data-card-type="notification"] {
+  /* position: absolute; */
+  /* bottom: 0; */
+  /* left: 0; */
+
+  /* background-color: var(--red); */
+  background: radial-gradient(
+    circle,
+    rgba(159, 13, 13, 1) 0%,
+    rgba(218, 27, 33, 1) 50%
+  );
+  padding: 5px 5px;
+  border-radius: 100%;
+  position: absolute;
+  margin-left: 35px;
+  margin-top: 45px;
+  z-index: 7;
+  height: 16px;
+  width: 16px;
+  opacity: 0.9;
+}
+
+.card__right {
+  margin-left: 12px;
+}
+
+.card__user[data-card-type="notification"] {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--white80tint);
+}
+
+.card__text[data-card-type="notification"] {
+  font-weight: 500;
+  font-size: 16px;
+  color: var(--white60tint);
+}
+
+.navbar__hotNotifications {
+  display: flex;
+  align-items: center;
+}
+
+.navbar__hotNotifications:hover {
+  cursor: pointer;
+}
+.hotNotifications__count {
+  position: absolute;
+
+  font-weight: 500;
+  font-size: 13px;
+  padding: 3px 6px;
+  border-radius: 100%;
+  background-color: var(--red);
+  color: #fff;
+  margin-left: 19px;
+  margin-bottom: 18px;
+}
+
+.navbar__cards {
+  display: flex;
+  flex-direction: column;
+  row-gap: 18px;
+
+  /* overflow-y: scroll; */
+  /* height: 70vh; */
+}
+
+.navbar__cards a h5 {
+  font-size: 14px;
+  color: var(--white70tint);
+  align-self: center;
+
+  margin-left: 80px;
+}

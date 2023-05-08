@@ -1,0 +1,134 @@
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes example {
+  0% {
+    background-color: red;
+    left: 0px;
+    top: 0px;
+  }
+  25% {
+    background-color: yellow;
+    left: 18px;
+    top: 0px;
+  }
+  50% {
+    background-color: blue;
+    left: 18px;
+    top: 18px;
+  }
+  75% {
+    background-color: green;
+    left: 0px;
+    top: 18px;
+  }
+  100% {
+    background-color: red;
+    left: 0px;
+    top: 0px;
+  }
+}
+
+@keyframes spin-1deg {
+  0% {
+    transform: roate(0deg);
+  }
+  100% {
+    transform: rotate(1deg);
+  }
+}
+
+@keyframes spin-2deg {
+  0% {
+    transform: roate(0deg);
+  }
+  100% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes spin-2deg-return {
+  0% {
+    transform: roate(0deg);
+  }
+  25% {
+    transform: rotate(2deg);
+  }
+
+  50% {
+    transform: rotate(0deg);
+  }
+
+  75% {
+    transform: rotate(-2deg);
+  }
+
+  100% {
+    transform: rotate(0deg);
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes growing-100px {
+  from {
+    width: 300px;
+    padding: 2px 10px;
+  }
+
+  to {
+    width: 400px;
+    padding: 4px 10px;
+  }
+}
+
+@keyframes shrinking-100px {
+  0% {
+    width: 300px;
+    padding: 4px 10px;
+  }
+
+  50% {
+    transform: scaleX(1.05);
+    padding: 3px 10px;
+  }
+
+  100% {
+    width: 300px;
+    padding: 2px 10px;
+  }
+}
+
+@keyframes input85-100 {
+  0% {
+    align-self: center;
+    width: 75%;
+  }
+
+  100% {
+    align-self: center;
+    width: 90%;
+  }
+}

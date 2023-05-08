@@ -1,0 +1,60 @@
+div(class="mainContent__section section--about")
+    div(class="section__top")
+        h1(class="section__header") About this group
+    div(class="section__midContent")
+        h1(class="midContent__groupDescription")=`This is description of the group... lorem ipsum sit dolor`
+        div(class="midContent__informations")
+            if group.settings.privacy === "private"
+                div(class="midContent__information")
+                    img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/lock-fill-closed.png")
+                    div(class="midContent__rightSide")
+                        h1(class="midContent__header") Private 
+                        h2(class="midContent__description") This group is private.
+
+            if group.settings.privacy === "public-interactions-on"
+                div(class="midContent__information")
+                    img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/lock-duotone-open.png")
+                    div(class="midContent__rightSide")
+                        h1(class="midContent__header") Public 
+                        h2(class="midContent__description") This group is public and interactions for strangers are turned on.
+
+            if group.settings.privacy === "public-interactions-off"
+                div(class="midContent__information")
+                    img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/lock-duotone-open.png")
+                    div(class="midContent__rightSide")
+                        h1(class="midContent__header") Public 
+                        h2(class="midContent__description") This group is public and interactions for strangers are turned off.                               
+
+
+
+            if group.settings.visibility === "anyone-can-find"
+                div(class="midContent__information")
+                    img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/eye-fill-open.png")
+                    div(class="midContent__rightSide")
+                        h1(class="midContent__header") Visible 
+                        h2(class="midContent__description") Anyone can find this group.
+
+            if group.settings.visibility === "members-and-their-friends-only"
+                div(class="midContent__information")
+                    img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/eye-duotone-closed.png")
+                    div(class="midContent__rightSide")
+                        h1(class="midContent__header") Hidden 
+                        h2(class="midContent__description") Only members and their friends can find this group.
+
+            if group.settings.visibility === "members-only"
+                div(class="midContent__information")
+                    img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/eye-duotone-closed.png")
+                    div(class="midContent__rightSide")
+                        h1(class="midContent__header") Hidden
+                        h2(class="midContent__description") Only members can find this group.                                        
+
+            div(class="midContent__information")
+                img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/clock-fill.png")
+                div(class="midContent__rightSide")
+                    h1(class="midContent__header") History 
+                    h2(class="midContent__description")=`Group created at ${group.createdAt.getUTCDate()}/${group.createdAt.getUTCMonth() + 1}/${group.createdAt.getUTCFullYear()} `
+
+            div(class="midContent__information")
+                img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/map-pin-fill.png")
+                div(class="midContent__rightSide")
+                    h1(class="midContent__header") Poland

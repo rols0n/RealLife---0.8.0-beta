@@ -1,0 +1,17 @@
+include utils/_header.pug
+include utils/_navbar.pug
+
+html 
+    head 
+        block header
+      
+        title Real Life | ERROR
+
+        body
+            block navbar
+
+            div(class="errorCard")
+                div(class="errorCard__main")
+                    img(class="errorCard__image" src="/imgs/icons/warning-fill.png")
+                    h1(class="errorCard__heading")=error
+                    h2(class="errorCard__description")=description

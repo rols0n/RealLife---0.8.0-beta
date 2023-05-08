@@ -1,0 +1,72 @@
+include ../../../../utils/_header.pug
+include ../../../../utils/_navbar.pug
+include ../../../../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/userPage/userPage.css")
+        link(rel="stylesheet", href="/css/userPage/topContent.css")
+        link(rel="stylesheet", href="/css/userPage/profileConfigMenu.css")
+        link(rel="stylesheet", href="/css/userPage/subPages/informations.css")
+
+
+
+        title Real Life | User Page
+    body(class=`body userID_${user._id}`)
+        //- block ../../../../navbar
+        if loggedIn === false 
+            div(class="errorCard")
+                div(class="errorCard__main")
+                    img(class="errorCard__image" src="/imgs/icons/warning-fill.png")
+                    h1(class="errorCard__heading") 404 | Not Found
+                    h2(class="errorCard__description") Something went wrong, the link might be broken or you  are not allowed to browse this content           
+
+
+        if loggedIn === true
+            block ../../../../postCreator
+            include ../../../../utils/_profileTopContent.pug
+
+
+
+
+            div(class="manager manager--users_friends")
+                div(class="manager__navbar manager__navbar--custom")
+                    h1(class="manager__header") Settings - friends manager
+                    a(class="manager__moveBack"   href=`/userPage/${user._id}/informations/manage_friends`) 
+                        img(src="/imgs/icons/arrow-u-down-left.png") 
+                div(class="manager__content")
+                    div(class="manager__choose manager__choose--admin")
+                        h2(class="manager__header--medium") Current Friends:
+
+                        div(class="manager__cards manager__cards--left")
+                            - let adminCount = 0;
+                            for schema in user.friends
+                                - const admin = schema
+                                if `${admin._id}` !== `${loggedUser._id}`
+                                    - const IDs = `left userID_${admin._id} friendNum_${adminCount}`;
+
+                                    - adminCount++;
+                                    div(class=`manager__card manager__card--left ${IDs}`)
+                                        img(class=`manager__btn ${IDs}` src="/imgs/icons/x-circle-red.png", alt="")
+                                        a(href=`/userPage/${admin._id}` target="_tab" class=`manager__container ${IDs}`)
+                                            div(class=`manager__details ${IDs}`)
+                                                img(class="manager__avatar" src=`${admin.profileImage}`)
+                                                h3(class=`manager__name ${IDs}`)=`${admin.firstName} ${admin.lastName}`
+
+
+
+
+
+                    div(class=" manager__choosed manager__choose--admin")
+                        h2(class="manager__header--medium") Friends choosed to be deleted:
+                        div(class="manager__cards manager__cards--right")
+
+                div(class="section__submit || manager__submit") 
+                    h4(class="submit__btn || manager__btn--submit") Submit 
+                    p(class="submit__info || manager__info") 
+                        em *As soon as you submit, these "friends" on the right side will not be your friends anymore.
+
+
+
+            script(src="/js/subPages/informations.js")  
+            script(type="module" src="/js/subPages/settings/friendsManager.js")

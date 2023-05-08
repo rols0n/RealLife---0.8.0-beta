@@ -1,0 +1,52 @@
+include ../utils/_header.pug
+include ../utils/_navbar.pug
+include ../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/chats/chats.css")
+        script(src="/js/_navbar.js" async) 
+
+        title Real Life | Chats
+
+        
+    body(class="body" data-loggedUser-id=`${loggedUser._id}` style="overflow: hidden")
+        block navbar
+
+        div(class="content")
+            div(class="shortcuts")
+                div(class="shortcuts__navbar")
+                    h2(class="shortcuts__header") Chats 
+
+                    div(class="search")
+                        img(class="search__icon" src="/imgs/icons/searchicon.png")
+                        input(type="text" class="search__input" placeholder="Search for conversation")
+
+                
+      
+
+            div(class="conversation")
+                div(class="conversation__navbar")
+                    div(class="navbar__card")
+                        
+
+                div(class="conversation__content")
+                    
+
+                    
+
+                div(class="conversation__action")
+                    
+
+
+        script(src="/js/chats/chats.js" type="module") 
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,103 @@
+include ../../../../utils/_header.pug
+include ../../../../utils/_navbar.pug
+include ../../../../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/groupPage/groupPage.css")
+        link(rel="stylesheet", href="/css/groupPage/utils/_sideBar.css")
+        link(rel="stylesheet", href="/css/groupPage/subPages/settings.css")
+        link(rel="stylesheet", href="/css/groupPage/subPages/manage_administration.css")       
+        link(rel="stylesheet", href="/css/groupPage/subPages/rules.css")
+
+
+        title=`${group.name} | settings`
+    body(class="bodyGroupPage" data-loggedUser-id=`${loggedUser._id}` data-group-id=`${group._id}`)
+        block navbar
+        include ../../../../utils/groups/_groupSideBar.pug
+
+        content(class=`group groupID_${group._id}`)
+            div(class="group__topContent")
+                img(src=`${group.bannerImage}` alt="group's background" class="group__backgroundImage")
+                div(class="topContent__container")
+                    div(class="topContent__details")
+                        h1(class="topContent__name")=group.name
+                        div(class="topContent__details__bottom")
+                            div(class="topContent__privacy")
+                                - let imgSrc = "/imgs/icons/lock-closed.png";
+                                - let text = "Private group"
+                                if group.settings.privacy !== "private"
+                                    - imgSrc = "/imgs/icons/lock-open.png"
+                                    - text = "Public group"
+                                img(class="topContent__icon icon--small" src=`${imgSrc}` alt="privacy")
+                                h1(class="topContent__description description--privacy")=text
+                            h1(class="topContent__description")=`${group.members.length} Members` 
+                    include ../../utils/buttons.pug
+                div(class="topContent__navbar")
+                    //- if not the member - about--active
+                    a(class="topContent__element" href=`/group/${group._id}/about`) About
+                    a(class="topContent__element" href=`/group/${group._id}/discussion`) Discussion  
+                    a(class="topContent__element" href=`/group/${group._id}/members`) Members         
+                    a(class="topContent__element topContent__element--active" href=`/group/${group._id}/settings`) Settings  
+
+            div(class="group__mainContent group__mainContent--settings")
+                div(class="mainContent__section  section--members")
+                    div(class="section__top section__top--custom")
+                        h1(class="section__header") Settings - Set up Rules
+                        a(class="section__back"   href=`/group/${group._id}/settings`) 
+                            img(src="/imgs/icons/arrow-u-down-left.png") 
+                    div(class="section__main")
+                        //- div(class="main__ruleCard ruleNum_1") 
+                           
+                        //-     div(class="ruleCard__mainContent ruleNum_1")
+                        //-         h3(class="mainContent__number ruleNum_1") 1
+                        //-         h3(class="mainContent__heading ruleNum_1") Rule one
+                        //-         input(class="mainContent__inputHeading ruleNum_1 hidden" autofocus  type='text' placeholder='Rule one') 
+                        //-         div(class="ruleCard__buttons ruleNum_1")
+                        //-             button(class="buttons__btn ruleNum_1 buttons__btn--edit")
+                        //-                 img(src="/imgs/icons/pencil-simple.png")
+                        //-             div(class="buttons__hierarchy ruleNum_1")
+                        //-                 button(class="hierarchy__btn ruleNum_1 hierarchy__btn--up")
+                        //-                     img(src="/imgs/icons/arrow-up.png") 
+
+                        //-                 button(class="hierarchy__btn ruleNum_1 hierarchy__btn--down")
+                        //-                     img(src="/imgs/icons/arrow-down.png") 
+                        //-     div(class="ruleCard__description ruleNum_1")
+                        //-         p(class="description__p ruleNum_1")
+                        //-             em Description of rule number 1                       
+                        //-         textarea(class="description__inputDsc ruleNum_1 hidden" autofocus type='text' maxlength='212' placeholder='Description of rule number 1      ')
+                        //-     div(class="ruleCard__confirmation ruleNum_1 hidden")
+                        //-         button(class="confirmation__cancel ruleNum_1") Cancel
+                        //-         button(class="confirmation__submit ruleNum_1") Submit
+
+                        //- div(class="main__ruleCard ruleNum_2 main__ruleCard--active ") 
+                        //-     //- Main content 
+                        //-     div(class="ruleCard__mainContent ruleNum_2")
+                        //-         h3(class="mainContent__number ruleNum_2") 2
+                        //-         h3(class="mainContent__heading ruleNum_2 hidden") Rule numer 2
+                        //-         input(class="mainContent__inputHeading ruleNum_2" autofocus  type='text' placeholder='Rule numer 2') 
+                        //-         div(class="ruleCard__buttons ruleNum_2")
+                        //-             button(class="buttons__btn ruleNum_2 buttons__btn--edit-active")
+                        //-                 img(src="/imgs/icons/pencil-simple.png")
+                        //-             div(class="buttons__hierarchy ruleNum_2")
+                        //-                 button(class="hierarchy__btn ruleNum_2 hierarchy__btn--up")
+                        //-                     img(src="/imgs/icons/arrow-up.png") 
+
+                        //-                 button(class="hierarchy__btn ruleNum_2 hierarchy__btn--down")
+                        //-                     img(src="/imgs/icons/arrow-down.png") 
+                        //-     div(class="ruleCard__description ruleNum_2")
+                        //-         p(class="description__p ruleNum_2 hidden")
+                        //-             em Lorem ipsum 
+                        //-         textarea(class="description__inputDsc ruleNum_2" autofocus type='text' maxlength='212' placeholder='Lorem ipsum dolor sit amet consectetur adipisicing elit. Sed cumque corrupti placeat commodi, officiis quaerat numquam a ad obcaecati beatae magni sequi doloremque saepe architecto iure, laborum vero explicabo possimus.')
+                        //-     div(class="ruleCard__confirmation ruleNum_2")
+                        //-         button(class="confirmation__cancel ruleNum_2") Cancel
+                        //-         button(class="confirmation__submit ruleNum_2") Submit
+
+                    button(class="main__newTemplate main__newTemplate--working")
+                        img(src="/imgs/icons/plus.png", alt="", srcset="" class="newTemplate__img")
+                        =`New Template`
+                    .section__submit 
+                        h4.submit__btn Submit 
+                        p.submit__info 
+                            em *As soon as you submit, these "admins" on the right side will not be admins anymore.
+        script(src="/js/groups/requests/subPages/settings/rules.js" type="module") 

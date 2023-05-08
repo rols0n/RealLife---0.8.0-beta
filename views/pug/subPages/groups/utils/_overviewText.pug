@@ -1,0 +1,13 @@
+- const overview = mutualGroupMembers[counter]
+    - let description = '';
+    - const oMfLength = overview.mutualFriends.length
+    if overview.friends === true 
+        if oMfLength > 0
+            - description = `You are friends and you have ${oMfLength === 1 ? "One mutual friend" : `${oMfLength} mutual friends`}.`
+        if oMfLength === 0
+            - description = `You are friends.`
+    if overview.friends === false 
+        if oMfLength > 0
+            - description = `You have ${oMfLength} mutual friends, including ${ overview.mutualFriends[0].firstName} ${ overview.mutualFriends[0].lastName}`
+        if oMfLength === 1
+            - description = `You have one mutual friend: ${ overview.mutualFriends[0].firstName} ${ overview.mutualFriends[0].lastName}`

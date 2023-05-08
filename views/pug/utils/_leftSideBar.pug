@@ -1,0 +1,14 @@
+div(class="leftSideBar")
+    div(class="leftSideBar__topContent")
+        a(class="leftSideBar__button" href=`/userPage/${loggedUser._id}`)
+            img(class="leftSideBar__profileImage" src=`${loggedUser.profileImage}`)
+            h1(class="leftSideBar__text")=`${loggedUser.firstName} ${loggedUser.lastName}`
+
+        div(class="leftSideBar__button leftSideBar__friendsContainer")
+            img(class="leftSideBar__friendsIcon" src="/imgs/icons/friends.png")
+            h1(class="leftSideBar__text") Friends
+
+        div(class="leftSideBar__button  leftSideBar__groupsContainer")
+            img(class="leftSideBar__groupsIcon" src="/imgs/icons/groups.png") 
+            h1(class="leftSideBar__text") Groups
+

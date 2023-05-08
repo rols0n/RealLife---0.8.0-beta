@@ -1,0 +1,77 @@
+include ../../../../utils/_header.pug
+include ../../../../utils/_navbar.pug
+include ../../../../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/userPage/userPage.css")
+        link(rel="stylesheet", href="/css/userPage/topContent.css")
+        link(rel="stylesheet", href="/css/userPage/profileConfigMenu.css")
+        link(rel="stylesheet", href="/css/userPage/subPages/informations.css")
+
+
+
+        title Real Life | User Page
+    body(class=`body userID_${user._id}`)
+        //- block ../../../../navbar
+
+        if loggedIn === false 
+            div(class="errorCard")
+                div(class="errorCard__main")
+                    img(class="errorCard__image" src="/imgs/icons/warning-fill.png")
+                    h1(class="errorCard__heading") 404 | Not Found
+                    h2(class="errorCard__description") Something went wrong, the link might be broken or you  are not allowed to browse this content           
+        if loggedIn === true        
+            block ../../../../postCreator
+            include ../../../../utils/_profileTopContent.pug
+
+
+            div(class=" content content--informations")
+                div(class="content__settings content__settings--informations")
+                    div(class="settings__navbar")
+                        h2(class="settings__header")=`${loggedIn === true ? "Settings" : "Informations"}` 
+                        a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations`)
+                            button(class="navbar__btn") Basic Settings
+
+
+                        a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations/advanced`)    
+                            button(class="navbar__btn") Advanced Settings
+
+                        a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations/manage_friends`)    
+                            button(class="navbar__btn ") Manage Friends
+
+                        
+                        button(class="navbar__btn navbar__btn--active") Block List
+
+
+                    div(class="managerPreview managerPreview--users_friends")
+                        div(class="managerPreview__content managerPreview__content--users_friends")
+                            h1(class="managerPreview__header") Manage your Block List 
+                            div(class="managerPreview__container managerPreview__container--users_friends")
+                                div(class="managerPreview__avatars") 
+                                    for list in user.blockList
+                                        - const user = list.schema
+                                        img(src=`${user.profileImage}`, alt="admin's profile image", class="managerPreview__avatar")
+                                    a(href=`/userPage/${user._id}/informations/block_list/manage_list`)
+                                        div(class="managerPreview__editCard")
+                                            img(class="editCard__image editCard__image--administrators" src="/imgs/icons/pencil-simple.png", alt="")                              
+
+
+                        div(class="managerPreview__content managerPreview__content--users_friends managerPreview__content--blockList")
+                            h1(class="managerPreview__header") Change duration of the block
+                            div(class="managerPreview__container managerPreview__container--users_friends")
+                                div(class="managerPreview__avatars") 
+                                    for list in user.blockList
+                                        - const user = list.schema
+                                        img(src=`${user.profileImage}`, alt="admin's profile image", class="managerPreview__avatar")
+                                    a(href=`/userPage/${user._id}/informations/block_list/change_duration`)
+                                        div(class="managerPreview__editCard")
+                                            img(class="editCard__image editCard__image--administrators" src="/imgs/icons/pencil-simple.png", alt="")  
+
+
+                if user.privacySettings.informations === "private"
+                    div(class="privateMessageContainer")
+                        h1.privateMessage=`User's informations page is set to private`
+            script(src="/js/subPages/informations.js") 
+
+            script(type="module" src="/js/subPages/settings/advanced_settings.js")

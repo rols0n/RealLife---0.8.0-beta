@@ -1,0 +1,68 @@
+block postCreator
+include _profileTopContent.pug
+
+div(class="curtain")
+    img(class="curtain__logo" src="/imgs/icons/longLogoLogin.png")
+
+div(class="content content--userPage")
+    //- POSTS
+    div(class="content__leftSide content__leftSide--userPage")
+
+
+
+        div(class="leftSide__card leftSide__card--photos")
+            if user.privacySettings.visibilityOfPhotosTab === "public"
+                div(class="card__navbar card__navbar--photos")
+                    div(class="navbar__details navbar__details--photos") 
+                        h1(class="card__name card__name--photos") Photos 
+                        h2(class="card__quantity card__quantity--photos")=`${user.images.length + 2} ${user.images.length + 2=== 1 ? "photo" : "photos" }` 
+                    a(class="card__aTag card__aTag--see_more_photos") See all photos
+                div(class="card__content card__content--photos")
+                    if user.images.length <= 4
+                        for image in user.images 
+                            img(class="card__image card__image--photos" src=`${image}`)
+                        img(class="card__image card__image--photos" src=`${user.profileImage}`)
+                        img(class="card__image card__image--photos" src=`${user.bannerImage}`)
+                    else if user.images.length >= 4
+                        for num in [0,1,2,3]
+                            img(class="card__image card__image--photos" src=`${user.images[num]}`)
+                        img(class="card__image card__image--photos" src=`${user.profileImage}`)
+                        img(class="card__image card__image--photos" src=`${user.bannerImage}`)
+            else if user.privacySettings.visibilityOfPhotosTab === "private"
+                div(class="card__content card__content--message")
+                    h3(class="content__message")=`User's photos list is set to private`
+
+
+        div(class="leftSide__card leftSide__card--friends")
+            if user.privacySettings.visibilityOfFriends === "public"
+                div(class="card__navbar card__navbar--friends")
+                    div(class="navbar__details navbar__details--friends") 
+                        h1(class="card__name card__name--friends") friends 
+                        h2(class="card__quantity card__quantity--friends")=`${user.friends.length} friends`
+                    a(class="card__aTag card__aTag--see_more_friends" href=`/userPage/${user._id}/friends`) See all friends
+                div(class="card__content card__content--friends")
+                    for friend in user.friends 
+                        div(class="content__card content__card--friends")
+                            a(class=""  href=`http://127.0.0.1:3000/userPage/${friend._id}`)
+                                img(class="card__image card__image--friends" src=`${friend.profileImage}`)
+                            a(class="content__dsc content__dsc--friends" href=`http://127.0.0.1:3000/userPage/${friend._id}`)=`${friend.firstName} ${friend.lastName}`
+            else if user.privacySettings.visibilityOfFriends === "private"
+                div(class="card__content card__content--message")
+                    h3(class="content__message")=`User's friends list is set to private`    
+
+
+
+
+
+
+
+    div(class="content__userPage__rightContent")
+        if loggedIn === true 
+            div(class="postCreatorDisplayer")
+                include _postCreatorDisplayer.pug
+
+        div(class="posts posts--userPage")
+            
+            //- if user.privacySettings.posts === "public" || loggedIn === true
+            include _posts.pug
+            //- else if user.privacySettings.posts === "private"

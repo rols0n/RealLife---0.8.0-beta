@@ -1,0 +1,15 @@
+div(class="topContent__buttons")
+    if isMember === true && group.settings.requests === "anyone-can-send" 
+        button(class=`topContent__btn topContent__btn--large topContent__btn--red-outline btnNAME_leaveGroup btnID_${group._id}`) Leave group  
+        a(class="topContent__btn topContent__btn--small topContent__btn--gray btnNAME_settings" href=`/group/${group._id}/settings`) 
+            img(src="/imgs/icons/settings.png", alt="")
+
+    if isMember === false && hasUserReceivedRequest === false && hasUserSentRequest === false
+        button(class=`topContent__btn topContent__btn--large topContent__btn--red btnNAME_joinGroup btnID_${group._id}`) Join group
+
+    if isMember === false && hasUserSentRequest === true 
+        button(class=`topContent__btn topContent__btn--large topContent__btn--red-outline btnNAME_cancelRequest btnID_${group._id}`) Cancel request
+
+    if isMember === false && hasUserReceivedRequest === true 
+        button(class=`topContent__btn topContent__btn--large topContent__btn--green btnNAME_acceptRequest btnID_${group._id}`) Accept request
+        button(class=`topContent__btn topContent__btn--large topContent__btn--red btnNAME_rejectRequest btnID_${group._id}`) Reject request

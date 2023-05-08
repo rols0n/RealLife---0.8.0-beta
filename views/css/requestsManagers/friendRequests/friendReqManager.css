@@ -1,0 +1,220 @@
+.container {
+  display: flex;
+  margin-top: 3%;
+}
+
+.leftSide {
+  justify-self: flex-start;
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  /* border-top: 1px solid var(--white90tint); */
+  padding-top: 1%;
+  padding-left: 0.5%;
+  width: 19.5%;
+  height: 100vh;
+  background-color: var(--white);
+  border-right: 0.3px solid var(--white50tint);
+  margin-top: 0%;
+}
+
+.leftSide__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-left: 1.5%;
+  margin-right: 3.5%;
+}
+.leftSide__description {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.leftSide__icon {
+  width: 30px;
+  height: 30px;
+}
+
+.leftSide__receivedRequests,
+.leftSide__sentRequests,
+.section {
+  display: flex;
+  flex-direction: column;
+  padding-right: 3%;
+}
+
+.manager,
+.leftSide__sentRequest,
+.manager {
+  display: flex;
+  align-items: center;
+  /* padding: 1% 1%; */
+  padding-left: 3%;
+  padding-top: 1.5%;
+  padding-bottom: 1.5%;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background-color: #f6f6f7;
+  transition: border-color 0.3s;
+  transition: background-color 0.3s;
+  margin-bottom: 3%;
+}
+
+.manager:hover,
+.leftSide__sentRequest:hover,
+.manager:hover {
+  border-color: var(--white10tint20shade);
+  background-color: var(--white10tint20shade);
+  cursor: pointer;
+}
+
+.leftSide__profileImage {
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+  margin-right: 3.5%;
+}
+
+.manager--joined {
+  display: flex;
+  margin-top: 1vh;
+  margin-bottom: 0.8vh;
+  width: 97%;
+  /* padding: 2px 5px; */
+  padding: 6px 0px;
+  border-radius: 4px;
+}
+.manager--joined:hover {
+  cursor: pointer;
+  background-color: var(--white10tint20shade);
+}
+
+.leftSide__profileImage--groups {
+  height: 55px;
+  width: 55px;
+  margin-left: 0.3vw;
+  border-radius: 12px;
+}
+.leftSide__bannerImage {
+  width: 98%;
+  height: 10vh;
+  object-fit: cover;
+}
+.leftSide__container {
+  display: flex;
+  flex-direction: column;
+  width: calc(100% - 55px);
+}
+.leftSide__leave,
+.leftSide__cancel--groups {
+  width: 95%;
+  border: 2px solid var(--red);
+  background-color: var(--red);
+  color: #fbecec;
+  font-size: 17px;
+  font-weight: 500;
+  height: 2.65vh;
+  border-radius: 4.5px;
+  transition: border-color 0.3s;
+  transition: background-color 0.3s;
+}
+
+.leftSide__leave:hover,
+.leftSide__cancel--groups:hover {
+  background-color: inherit;
+  color: var(--red);
+  cursor: pointer;
+}
+
+.leftSide__userName {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 0.8%;
+}
+
+.leftSide__buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.leftSide__accept {
+  border: 2px solid #6fcd86;
+  margin-right: 2%;
+  background-color: #6fcd86;
+  width: 49%;
+  font-size: 17px;
+  height: 30px;
+  color: #f2fcf4;
+  border-radius: 4.5px;
+  font-weight: 500;
+  transition: border-color 0.3s;
+  transition: background-color 0.3s;
+}
+
+.leftSide__accept:hover {
+  background-color: #64b979;
+  cursor: pointer;
+
+  color: #f2fcf4;
+  /* text-shadow: -1px 0px #64b979; */
+}
+
+.leftSide__reject {
+  border: 2px solid var(--red);
+  margin-right: 5%;
+  background-color: var(--red);
+  color: #fbecec;
+  width: 40%;
+  font-size: 17px;
+  font-weight: 500;
+  height: 30px;
+  border-radius: 4.5px;
+  transition: border-color 0.3s;
+  transition: background-color 0.3s;
+}
+
+.leftSide__reject:hover {
+  background-color: inherit;
+  color: var(--red);
+  cursor: pointer;
+}
+
+.leftSide__cancel {
+  border: 2px solid var(--red);
+  margin-right: 3%;
+  background-color: var(--red);
+  color: #fbecec;
+  width: 230;
+  font-size: 20px;
+  font-weight: 500;
+  height: 33px;
+  border-radius: 4.5px;
+  transition: border-color 0.3s;
+  transition: background-color 0.3s;
+}
+
+.leftSide__cancel:hover {
+  background-color: inherit;
+  color: var(--red);
+  cursor: pointer;
+}
+
+.leftSide__toggle--sentRequests {
+  margin-top: 8%;
+}
+
+.leftSide__description {
+  color: var(--white90tint);
+}
+
+.rightSide {
+  width: 79.5%;
+  margin-left: 19.5%;
+}
+
+.rightSide__description {
+  margin-left: 19vw;
+  margin-top: 40vh;
+  font-size: 1.8vw;
+  font-weight: 400;
+}

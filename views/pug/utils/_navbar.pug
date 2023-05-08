@@ -1,0 +1,106 @@
+block navbar 
+    //- - const hotNotifications = []
+    
+    //- for notification in loggedUser.notifications 
+    //-     //- h1=notification.notificationStatus
+
+    //-     if notification&& notification.notificationStatus == "new"
+    //-         - hotNotifications.push(notification)
+    //-         - loggedUser.notifications.pop(notification)
+    
+    navbar(class="navbar")
+        //- h1=loggedUser.notifications 
+
+        
+
+
+        div(style="display: flex; align-items: center; justify-content: center" class="navbar__leftSide")
+            img(class="navbar__logo " src="/imgs/icons/logo.png") 
+            div(class="navbar__searchBar ")
+                img(class="navbar__searchIcon" src="/imgs/icons/searchIcon.png")  
+                input( class="navbar__input" type="text" data-input-type="not-active" placeholder="Search RealLife")
+        div(class="navbar__searchActive hidden animate__animated animate__bounceIn")
+
+            div(class="searchActive__top")
+                button(class="searchActive__icon")
+                    img(src="/imgs/icons/arrow-left.png")
+                input(class="navbar__input" type="text" data-input-type="active" placeholder="Search RealLife")
+            div(class="searchActive__content")
+
+
+            div(class="searchActive__info")
+                h3(class="info__text") Type something in to search for Group/User.
+
+            div(class="couldntFind hidden animate__animated  animate__shakeX")
+                img(class="couldntFind__img animate__animated animate__wobble" src="/imgs/icons/smiley-sad.png")
+                h3(class="couldntFind__text") Unfortunately we could not find anything that matches value "" 
+
+
+
+
+        div(class="navbar__navigations")
+            a(class="navbar__home" href="http://127.0.0.1:3000")
+                img(class="navbar__homeIcon" src="/imgs/icons/home.png")
+
+
+            a(class="navbar__friends" href="http://127.0.0.1:3000/friends")
+                img(class="navbar__friendsIcon" src="/imgs/icons/friends.png")  
+
+            a(class="navbar__groups" href="http://127.0.0.1:3000/groups")
+                img(class="navbar__groupsIcon" src="/imgs/icons/groups.png") 
+
+        div(class="navbar__rightSide")
+            div(class="navbar__content")
+                img(class="navbar__messagesIcon" src="/imgs/icons/messages.png")  
+                //- if hotNotifications.length > 0
+                img(class="navbar__notificationsIcon " src="/imgs/icons/notificationsQuiet.png")  
+                
+                div(class="navbar__hotNotifications hidden")
+                    img(class="navbar__notificationsIcon" src="/imgs/icons/notificationsAlert.png")
+                    h1(class="hotNotifications__count")
+                //- else 
+                //- img(class="navbar__notificationsIcon " src="/imgs/icons/notificationsQuiet.png")  
+                
+                //- div(class="navbar__hotNotifications hidden")
+                //-     img(class="navbar__notificationsIcon" src="/imgs/icons/notificationsAlert.png")
+                //-     h1(class="hotNotifications__count")=hotNotifications.length
+
+
+                if loggedUser !== undefined
+                    a(href=`/userPage/${loggedUser._id}`)
+                        img(class="navbar__profileIcon" data-loggedUser-id=`${loggedUser._id}` src=`${loggedUser.profileImage}` alt="iimage")
+    div(class="navbar__menu hidden" )
+        div(class="menu__content" data-menu-type="notifications")
+            div(class="menu__navbar" data-root-parent-name="navbar__menu")
+                div(class="navbar__top")
+                    h2(class="navbar__header") Notifications 
+                    a(class="navbar__anchor" data-navbar-anchor-type="settings")
+                        img(src="/imgs/icons/settings.png")
+                div(class="navbar__bottom" data-root-parent-name="navbar__menu")
+                    a(class="navbar__anchor" data-navbar-anchor-type="new") Latest 
+                    a(class="navbar__anchor" data-navbar-anchor-type="see-all") See all 
+
+                div(class="navbar__cards" data-root-parent-name="navbar__menu")
+                    
+                //- for hotNotification in hotNotifications 
+                //-     - const user = hotNotification.author
+                //-     - let message = '';
+                //-     //- if hotNotification.eventName
+                //-     //- h1=user
+                   
+                //-     a(href="/")
+                //-         <div class="menu__card" data-card-type="notification" >
+                    
+                //-             div(class="card__left")
+                //-                 img(class="card__avatar" src=`${user.profileImage}`)
+                //-             img(class="card__icon" data-card-type="notification" src="/imgs/icons/thumbsUp-filled-white.png")
+                            
+                //-             div(class="card__right")
+
+                //-                 <h3 class="card__text" data-card-type="notification">
+                //-                     span(class="card__user" data-card-type="notification")=`${user.firstName + " " + user.lastName}`
+                //-                     =`. Liked your post`
+                //-                 </h3>
+                                
+                //-         </div>
+            

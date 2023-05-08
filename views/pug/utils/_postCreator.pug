@@ -1,0 +1,19 @@
+block postCreator 
+    form(class="postCreator postCreator--container hidden")
+        nav(class="postCreator__navbar")
+            h1(class="postCreator__header") Create Post 
+            img(class="postCreator__quit" src="/imgs/icons/x.png")
+        div(class="postCreator__mainContent")
+            <textarea class="postCreator__textarea" id="postCreator__textarea"  placeholder="Hey, what's on your mind?"></textarea>
+            div(class="postCreator__imagesCard hidden")
+                img(class="postCreator__image " )
+
+            div(class="postCreator__fileUploads")
+                label(for="postCreator__hiddenImageInput")
+                    img(class="postCreator__imageInput" src="/imgs/icons/camera.png", alt="", srcset="")
+                label(for="postCreator__hiddenSubmit")
+                    img(class="postCreator__submit" src="/imgs/icons/send.png") 
+
+            div(class="postCreator__invisibleInputs" style="display: none")
+                input(type="file" id="postCreator__hiddenImageInput" )
+                input(type="submit" id="postCreator__hiddenSubmit")    

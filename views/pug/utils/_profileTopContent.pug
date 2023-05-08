@@ -1,0 +1,78 @@
+div(class="profileConfigMenu hidden")
+    div.profileConfigMenu__content
+        div(class="content__topbar")
+            h1(class="topbar__header") Edit profile
+            img(class="topbar__btn topbar__btn--quit" src="/imgs/icons/x.png")
+                
+        hr
+
+        div(class="content__section content__section--avatar")
+            div(class="section__navbar section__navbar--avatar")
+                h1(class="section__name") Profile Picture
+                button(class="section__btn section__btn--edit_avatar") Edit
+
+            div(class="section__preview section__preview--avatar")
+                img(class="preview__img preview__img--avatar"  src=`${user.profileImage}`, alt="")  
+
+
+            form(class="section__form section__form--avatar hidden")
+                label(for="label__inputFile--avatar" class="form__label form__label--avatar")
+                    input(type="file" id="label__inputFile--avatar" class="label__inputFile label__inputFile--avatar" name="label__inputFile--avatar" accept="image/*")
+                input(type="submit", value="Change picture")
+
+        div(class="content__section section--baner")
+            div(class="section__navbar section__navbar--banner")
+                h1(class="section__name") Banner Picture
+                button(class="section__btn section__btn--edit_banner") Edit
+            div(class="section__preview section__preview--banner")
+                img(class="preview__img preview__img--banner "  src=`${user.bannerImage}`, alt="")  
+
+
+            form(class="section__form section__form--banner hidden")
+                label(for="label__inputFile--banner" class="form__label form__label--banner")
+                    input(type="file"    id="label__inputFile--banner" class="label__inputFile label__inputFile--banner" name="label__inputFile--banner" accept="image/*")
+                input(type="submit", value="Change picture") 
+
+        //- div(class="profileConfigMenu__editProfileInformations__container || ") 
+        //-     h1.profileConfigMenu__container__editProfileInformations Edit profile informations
+        a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations` class="section__btn section__btn--move_to_settings") Edit profile informations
+
+div(class="userPage__topContent")
+    div(class="userPage__topContent--container")
+
+        div(class="userPage__topContent__banner")
+            img(class="userPage__topContent__banner__image" src=`${user.bannerImage}`, alt="")
+                //- future button
+        div(class="userPage__topContent__userDetails")
+            img(class="userPage__topContent__userDetails__profilePicture" src=`${user.profileImage}`)
+            if loggedIn === true
+                div.picturezindex2div
+                    img(src="/imgs/icons/camera.png", class="picturezindex2" alt="")
+            div.one
+                h1(class=`userPage__topContent__userDetails__detailed__name userId_${user._id}`)=`${user.firstName} ${user.lastName}`
+                h1(class="userPage__topContent__userDetails__detailed__friendsCount")=`${user.friends.length} friends`
+            if loggedIn !== true  
+                if whichBtnToDisplay === "addFriend"
+                    div.topContent__sendFriendRequest
+                        h1.sendFriendRequest__description Add friend 
+                        img(src="/imgs/icons/friends.png" class="topContent__image")
+                else if whichBtnToDisplay === "accept/reject request"
+                    div.topContent__buttons
+                        <button class="topContent__acceptRequest btn-red">Accept </button>
+                        button.topContent__rejectRequest Reject 
+                else if whichBtnToDisplay === "cancel request"
+                    <button class="topContent__cancelRequest btn-red">Cancel Friend Request</button>
+                    //- <button class="topContent__deleteFriend btn-red">Delete friend</button> 
+
+                else if whichBtnToDisplay === "delete friend"
+
+                    <button class="topContent__deleteFriend btn-red">Delete friend</button>   
+
+            h1(class="editProfile") Edit profile
+        div(class="userPage__topContent__navbar")
+            a(class="userPage__topContent__navbar__element active" href=`/userPage/${user._id}`) Posts
+            a(class="userPage__topContent__navbar__element" href=`/userPage/${user._id}/informations`)=`${loggedIn === false ? "Informations": "Settings"}`
+            a(class="userPage__topContent__navbar__element" href=`/userPage/${user._id}/friends`) Friends
+            a(class="userPage__topContent__navbar__element" href=`/userPage/${user._id}/photos`) Photos
+            a(class="userPage__topContent__navbar__element" href=`/userPage/${user._id}/movies`) Movies
+

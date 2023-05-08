@@ -1,0 +1,108 @@
+.postCreatorDisplayer hr {
+  width: 100%;
+  /* note color */
+  color: #2f3332;
+  margin-top: 1%;
+  margin-bottom: 1%;
+}
+
+.postCreatorDisplayer {
+  display: grid;
+  justify-content: center;
+  background-color: var(--white);
+  border-radius: 12px;
+  border-bottom: 3px solid var(--red);
+  box-shadow: 0 4px 8px 0 var(--white20tint);
+  padding-top: 13px;
+  padding-bottom: 7px;
+  width: 640px;
+  margin-bottom: 32px;
+}
+
+.postCreatorDisplayer--groups {
+  width: auto;
+}
+
+.postCreatorDisplayer--mainPage {
+  margin-left: 0%;
+  margin-top: 31px;
+  margin-bottom: 12px;
+}
+
+.postCreatorDisplayer__topContent {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2%;
+}
+
+.postCreatorDisplayer__topContent__profile {
+  width: 4.8vh;
+  height: 4.8vh;
+  border-radius: 100%;
+  margin-right: 2%;
+}
+
+.postCreatorDisplayer__topContent__container {
+  border: none;
+  height: 4vh;
+  width: 400px;
+  background: #e4e4e671;
+  border-radius: 30px;
+  padding-left: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.postCreatorDisplayer__topContent__container__header {
+  color: #000;
+  font-weight: 400;
+  font-size: 19px;
+}
+
+.postCreatorDisplayer__topContent__container:hover {
+  cursor: pointer;
+  background-color: var(--white10tint);
+}
+
+.postCreatorDisplayer__bottomContent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.postCreatorDisplayer__bottomContent img {
+  width: 28px;
+  height: 28px;
+}
+
+.postCreatorDisplayer__bottomContent__images {
+  margin-right: 2%;
+  background-size: 20px 30px;
+}
+
+.postCreatorDisplayer__bottomContent__emojies:hover {
+  background-color: var(--white10tint);
+  cursor: pointer;
+}
+
+.postCreatorDisplayer__bottomContent__moviesImages:hover {
+  background-color: var(--white10tint);
+  cursor: pointer;
+}
+
+.postCreatorDisplayer__bottomContent__moviesImages,
+.postCreatorDisplayer__bottomContent__emojies {
+  display: flex;
+  align-items: center;
+  /* justify-content: center; */
+  margin-right: auto;
+  padding: 1.6% 2.3%;
+  height: 25px;
+  border-radius: 5px;
+}
+
+.postCreatorDisplayer__bottomContent__moviesImages__header,
+.postCreatorDisplayer__bottomContent__emojies__header {
+  font-size: 20px;
+  font-weight: 300;
+}

@@ -1,0 +1,41 @@
+.content {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 0.5%;
+}
+.mainCOntent {
+  flex-grow: 6;
+  margin: 0 3%;
+
+  height: 100%;
+  width: 400px;
+}
+
+.mainCOntent {
+  margin-top: 0%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.content__userPage__rightContent {
+  width: 38vw;
+  margin-left: 2vw;
+}
+
+.activityStatus {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  /* margin-top: 1%; */
+  margin-bottom: 30px;
+}
+
+.activityStatus__image {
+  height: 50px;
+  width: 50px;
+  border-radius: 100%;
+  margin-right: 4%;
+  box-shadow: 0 4px 8px 0 var(--white20tint);
+  border: 2px solid var(--white10tint);
+}

@@ -1,0 +1,123 @@
+.creator__section {
+  padding-left: 9px;
+  margin-bottom: 19px;
+
+  /* box-shadow: 0 10px 20px -19px var(--white20tint); */
+  padding-bottom: 20px;
+}
+
+.creator__header {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--white80tint);
+}
+
+.creator__input,
+.creator__select,
+#creator__fileInput {
+  margin-left: 15px;
+  margin-top: 5px;
+}
+
+.creator__input,
+.creator__select {
+  margin-left: 15px;
+  margin-top: 5px;
+
+  background-color: transparent;
+  font-size: 16px;
+  font-weight: 400;
+
+  padding: 0px 8px;
+  padding-bottom: 3px;
+  border: none;
+  border-bottom: 1px solid var(--white50tint);
+}
+
+#creator__fileInput {
+  background-color: var(--white0tint);
+
+  border: none;
+  box-shadow: 0px 0px 3px 0px var(--white40tint);
+  width: 230px;
+
+  padding: 2px 0px;
+  padding-left: 5px;
+  padding-right: 10px;
+  margin-right: 50px;
+
+  font-weight: 400;
+  font-size: 14px;
+  border-radius: 5px;
+  color: var(--white70tint);
+}
+
+#creator__fileInput::-webkit-file-upload-button {
+  border: 0.4px solid var(--white4tint);
+  padding: 4px 10px;
+  background-color: var(--white4tint);
+  font-size: 13px;
+  color: var(--white90tint);
+
+  border-radius: 4px;
+
+  transition: background-color 0.3s ease-in-out;
+  transition: transform 0.3s linear;
+}
+
+#creator__fileInput::-webkit-file-upload-button:hover {
+  background-color: var(--white6tint);
+
+  cursor: pointer;
+}
+
+#creator__fileInput::-webkit-file-upload-button:active {
+  transform: scale(1);
+}
+
+.creator__input {
+  /* box-shadow: 0 5px 20px -20px var(--white10tint);
+ */
+
+  width: 80%;
+}
+.creator__select {
+  width: 80%;
+}
+
+.creator__buttons {
+  display: flex;
+  width: 90%;
+
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.creator__cancel {
+  background-color: transparent;
+
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--white90tint);
+  border: none;
+  padding: 3px 0;
+}
+
+.creator__submit {
+  background-color: var(--red);
+
+  font-size: 20px;
+  font-weight: 500;
+  color: #fff;
+
+  padding: 3px 15px;
+
+  border: none;
+  border-radius: 5px;
+  margin-left: 10px;
+}
+
+.creator__cancel:hover,
+.creator__submit:hover {
+  cursor: pointer;
+}

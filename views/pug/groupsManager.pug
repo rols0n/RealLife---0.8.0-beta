@@ -1,0 +1,82 @@
+include utils/_header.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/requestsManagers/groups&friends.css")
+        title Real Life | Groups Manager
+
+    body.friendsBody
+        include utils/_navbar.pug
+
+        div(class="container")
+            div(class="leftSide")
+                a(class="leftSide__btn" data-btn-type="active" href="/groups")
+                    img(class="leftSide__icon" src="/imgs/icons/home-white.png")
+                    h3(class="leftSide__text") Home
+
+                a(class="leftSide__btn" data-btn-type="not-active" href=`/groups/received`)
+                    img(class="leftSide__icon" src="/imgs/icons/user-plus-white.png")
+                    h3(class="leftSide__text") Received group requests
+                a(class="leftSide__btn" data-btn-type="not-active" href=`/groups/sent`)
+                    img(class="leftSide__icon" src="/imgs/icons/users-white.png")
+                    h3(class="leftSide__text") Sent group requests
+                a(class="leftSide__btn" data-btn-type="not-active" href=`/groups/groups-you-may-know`)
+                    img(class="leftSide__icon" src="/imgs/icons/users-three-white.png")
+                    h3(class="leftSide__text") Groups you may know
+                a(class="leftSide__btn" data-btn-type="not-active" href=`/creators/create-group`)
+                    img(class="leftSide__icon" src="/imgs/icons/users-three-white.png")
+                    h3(class="leftSide__text") Create your own group
+
+                        
+                
+                                
+
+             
+
+            
+            
+            div(class="rightSide")
+                if loggedUser.groups.requests.received.length > 0 
+                    div(class="rightSide__section" data-section-type="received")
+                        div(class="section__heading" data-section-type="received")
+                            h3(class="rightSide__header" data-section-type="received") Received Group Requests
+                            if loggedUser.groups.requests.received.length > 8
+                                a(class="rightSide__seeAll" data-section-type="received" href=``) See All
+
+                        div(class="rightSide__cards" data-section-type="received")
+                            for x in [0,1,2,3,4,5,6,7]
+                                - let group = loggedUser.groups.requests.received[x]
+                                if group !== undefined
+                                    - group = group.group;
+                                    div(class="rightSide__card" data-section-type="received" data-group-id=`${group._id}`)
+                                        a(href=`/groups/received/${group._id}`)
+                                            img(class="rightSide__avatar" data-section-type="received" data-group-id=`${group._id}` src=`${group.avatarImage}`)
+                                        a(href=`/groups/received/${group._id}`)
+                                            h4(class="rightSide__name" data-section-type="received" data-group-id=`${group._id}`)=`${group.name} `
+                                        button(class="rightSide__btn" data-btn-type="confirm" data-section-type="received" data-group-id=`${group._id}`) Confirm
+                                        button(class="rightSide__btn" data-btn-type="remove" data-section-type="received"  data-group-id=`${group._id}`) Remove
+
+
+                if loggedUser.groups.requests.sent.length > 0 
+                    div(class="rightSide__section" data-section-type="sent")
+                        div(class="section__heading" data-section-type="sent")
+                            h3(class="rightSide__header" data-section-type="sent") Sent group Requests
+                            if loggedUser.groups.requests.sent.length > 8
+                                a(class="rightSide__seeAll" data-section-type="sent" href=``) See All
+
+                        div(class="rightSide__cards" data-section-type="sent")
+                            for x in [0,1,2,3,4,5,6,7]
+                                - let group = loggedUser.groups.requests.sent[x]
+                                if group !== undefined
+                                    - group = group.group;
+                                    div(class="rightSide__card" data-section-type="sent" data-group-id=`${group._id}`)
+                                        a(href=`/groups/sent/${group._id}`)
+                                            img(class="rightSide__avatar" data-section-type="sent" data-group-id=`${group._id}` src=`${group.avatarImage}`)
+                                        a(href=`/groups/sent/${group._id}`)
+                                            h4(class="rightSide__name" data-section-type="sent" data-group-id=`${group._id}`)=`${group.name} `
+                                        button(class="rightSide__btn" data-btn-type="confirm" data-section-type="sent" data-group-id=`${group._id}`) Confirm
+                                        button(class="rightSide__btn" data-btn-type="remove" data-section-type="sent"  data-group-id=`${group._id}`) Remove
+
+
+        script(src="/js/groups.js") 
+        script(src="/js/userPage.js")         

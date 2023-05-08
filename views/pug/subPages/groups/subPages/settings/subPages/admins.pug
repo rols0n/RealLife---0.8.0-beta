@@ -1,0 +1,80 @@
+include ../../../../../utils/_header.pug
+include ../../../../../utils/_navbar.pug
+include ../../../../../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/groupPage/groupPage.css")
+        link(rel="stylesheet", href="/css/groupPage/utils/_sideBar.css")
+        link(rel="stylesheet", href="/css/groupPage/subPages/settings.css")
+        link(rel="stylesheet", href="/css/groupPage/subPages/manage_administration.css")
+
+
+        title=`${group.name} | settings`
+    body.bodyGroupPage
+        block navbar
+        include ../../../../../utils/groups/_groupSideBar.pug
+
+        content(class=`group groupID_${group._id}`)
+            div(class="group__topContent")
+                img(src=`${group.bannerImage}` alt="group's background" class="group__backgroundImage")
+                div(class="topContent__container")
+                    div(class="topContent__details")
+                        h1(class="topContent__name")=group.name
+                        div(class="topContent__details__bottom")
+                            div(class="topContent__privacy")
+                                - let imgSrc = "/imgs/icons/lock-closed.png";
+                                - let text = "Private group"
+                                if group.settings.privacy !== "private"
+                                    - imgSrc = "/imgs/icons/lock-open.png"
+                                    - text = "Public group"
+                                img(class="topContent__icon icon--small" src=`${imgSrc}` alt="privacy")
+                                h1(class="topContent__description description--privacy")=text
+                            h1(class="topContent__description")=`${group.members.length} Members` 
+                    include ./..//../../utils/buttons.pug
+                div(class="topContent__navbar")
+                    //- if not the member - about--active
+                    a(class="topContent__element" href=`/group/${group._id}/about`) About
+                    a(class="topContent__element" href=`/group/${group._id}/discussion`) Discussion  
+                    a(class="topContent__element" href=`/group/${group._id}/members`) Members         
+                    a(class="topContent__element topContent__element--active" href=`/group/${group._id}/settings`) Settings  
+
+            div(class="group__mainContent group__mainContent--settings")
+                div(class="manager manager--admins")
+                    div(class="manager__navbar manager__navbar--custom")
+                        h1(class="manager__header") Settings - Friends manager
+                        a(class="manager__moveBack"   href=`/group/${group._id}/settings/manage_administration`) 
+                            img(src="/imgs/icons/arrow-u-down-left.png") 
+                    div(class="manager__content")
+                        div(class="manager__choose manager__choose--admin")
+                            h2(class="manager__header--medium") Current Admins:
+
+                            div(class="manager__cards manager__cards--left")
+                                - let adminCount = 0;
+                                for schema in group.administration.admins 
+                                    - const admin = schema._id
+                                    if `${admin._id}` !== `${loggedUser._id}`
+                                        - const IDs = `left userID_${admin._id} adminNum_${adminCount}`;
+
+                                        - adminCount++;
+                                        div(class=`manager__card manager__card--left ${IDs}`)
+                                            img(class=`manager__btn ${IDs}` src="/imgs/icons/x-circle-red.png", alt="")
+                                            a(href=`/userPage/${admin._id}` target="_tab" class=`manager__container ${IDs}`)
+                                                div(class=`manager__details ${IDs}`)
+                                                    img(class="manager__avatar" src=`${admin.profileImage}`)
+                                                    h3(class=`manager__name ${IDs}`)=`${admin.firstName} ${admin.lastName}`
+
+                                    
+
+
+
+                        div(class=" manager__choosed manager__choose--admin")
+                            h2(class="manager__header--medium") Admins choosed to degradetion:
+                            div(class="manager__cards manager__cards--right")
+
+                    div(class="manager__submit") 
+                        h4(class="manager__btn--submit") Submit 
+                        p(class="manager__info") 
+                            em *As soon as you submit, these "admins" on the right side will not be admins anymore.
+
+        script(type="module" src="/js/groups/requests/subPages/settings/managers/adminsManager.js") 

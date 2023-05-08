@@ -1,0 +1,153 @@
+.loginPageBody {
+  background-color: var(--red10tint);
+}
+
+.loginContent {
+  display: flex;
+  flex-direction: column;
+  margin-left: auto;
+  margin-right: auto;
+  /* background: rgb(214, 64, 69); */
+  /* background-color: #150607; */
+  background-color: var(--white80shade);
+  /* border: 1px solid #270c0c; */
+  border-top: 0px solid #270c0c;
+  /* background: linear-gradient(
+    180deg,
+    rgba(214, 64, 69, 1) 76%,
+    rgba(228, 228, 230, 1) 100%
+  ); */
+  border-bottom-left-radius: 50px;
+  border-bottom-right-radius: 50px;
+
+  padding-left: 8%;
+  padding-right: 8%;
+  padding-bottom: 15%;
+}
+
+.loginContent__logo {
+  width: 350px;
+  /* width: 100%; */
+  /* height: 300px; */
+  height: auto;
+  object-fit: contain;
+  /* background-color: #f2f2f3; */
+}
+
+.loginFrom__email {
+  margin-bottom: 5%;
+}
+.loginFrom__email label,
+.loginForm__password label {
+  font-size: 22px;
+  font-weight: 500;
+}
+
+.loginFrom__email input,
+.loginForm__password input {
+  font-size: 18px;
+  background-color: var(--white80shade);
+  width: 300px;
+  border: 0px solid black;
+  border-bottom: 1px solid var(--white90tint);
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-top: 1%;
+  padding-bottom: 1%;
+  font-weight: 400;
+}
+
+.submit {
+  margin-top: 3%;
+  background-color: var(--red10tint);
+  padding: 3% 11%;
+  border: 1px solid var(--red10tint);
+  color: #f9ebec;
+  font-weight: 900;
+  border-radius: 2px;
+  margin-left: 1.2px;
+}
+
+.buttons {
+  display: flex;
+}
+
+.buttons button {
+  margin-top: 3%;
+  background-color: inherit;
+  padding: 3% 11%;
+  border: 1px solid var(--red10tint);
+  color: #ae3438;
+  font-weight: 900;
+  border-radius: 2px;
+  margin-left: 3.5%;
+  width: 160px;
+}
+
+.buttons button:hover {
+  cursor: pointer;
+  background-color: var(--red10tint);
+  border: 1px solid var(--red10tint);
+  color: #f9ebec;
+}
+.submit:hover {
+  cursor: pointer;
+  background-color: inherit;
+  border: 1px solid var(--red10tint);
+  color: #ae3438;
+}
+
+.Form__name input {
+  font-size: 18px;
+  background-color: var(--white80shade);
+  width: 140px;
+  border: 0px solid black;
+  border-bottom: 1px solid var(--white90tint);
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-top: 1%;
+  padding-bottom: 1%;
+  font-weight: 400;
+}
+
+.Form__name__lastName {
+  margin-left: 20px;
+}
+
+.Form__name input {
+  margin-bottom: 5%;
+}
+
+.Form__birthdate {
+  border-bottom: 1px solid var(--white90tint);
+  width: 300px;
+  margin-bottom: 5%;
+}
+.Form__birthdate label {
+  font-size: 20px;
+  padding-left: 3%;
+  color: var(--white80tint);
+}
+
+.birthdate {
+  border: none;
+
+  padding-left: 2%;
+  padding-right: 2%;
+  padding-top: 1%;
+  padding-bottom: 1%;
+  font-weight: 400;
+  font-size: 18px;
+  color: var(--white40tint);
+}
+
+.birthdate:hover {
+  cursor: pointer;
+}
+
+.loginForm__warning {
+  font-size: 18px;
+  padding-bottom: 5%;
+  margin-left: 3%;
+  font-weight: 900;
+}

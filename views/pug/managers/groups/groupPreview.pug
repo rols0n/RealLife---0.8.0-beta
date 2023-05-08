@@ -1,0 +1,35 @@
+
+if group !== undefined
+    include ../../utils/_postCreator.pug
+    content(class=`group groupID_${group._id}`)
+        div(class="group__topContent")
+            img(src=`${group.bannerImage}` alt="group's background" class="group__backgroundImage")
+            div(class="topContent__container")
+                div(class="topContent__details")
+                    h1(class="topContent__name")=group.name
+                    div(class="topContent__details__bottom")
+                        div(class="topContent__privacy")
+                            img(class="topContent__icon icon--small" src="/imgs/icons/lock-closed.png" alt="privacy")
+                            h1(class="topContent__description description--privacy") Private group 
+                        h1(class="topContent__description")=`${group.members.length} Members` 
+                include ../../subPages/groups/utils/buttons.pug
+            div(class="topContent__navbar")
+                //- if not the member - about--active
+                a(class="topContent__element" href=`/group/${group._id}/about`) About
+                a(class="topContent__element topContent__element--active" href=`/group/${group._id}/discussion`) Discussion  
+                a(class="topContent__element" href=`/group/${group._id}/members`) Members         
+        div(class="group__mainContent group__mainContent--discussion")
+            div(class="mainContent__leftSide")
+                if group.settings.privacy === "public-interactions-on" || isMember === true 
+                    div(class="postCreatorDisplayer postCreatorDisplayer--groups")
+                        include ../../utils/_postCreatorDisplayer.pug
+                    div(class="posts posts--userPage")
+
+                else if group.settings.privacy === "public-interactions-off"
+                    div(class="posts posts--userPage")
+
+
+
+
+            div(class="mainContent__rightSide")
+                include ../../subPages/groups/utils/sectionAbout.pug         

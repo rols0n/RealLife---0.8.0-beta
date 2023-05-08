@@ -1,0 +1,45 @@
+:root {
+  /* MAIN COLOR */
+  --white: #fdfdff;
+  --white2tint: #f8f8fa;
+  --white4tint: #f3f3f5;
+  --white6tint: #eeeef0;
+  --white10tint: #e4e4e6;
+  --white10tint20shade: #e9e9eb;
+  --white15tint: #d7d7d9;
+
+  --white20tint: #cacacc;
+  --white30tint: #b1b1b3;
+  --white40tint: #989899;
+  --white50tint: #7f7f80;
+  --white60tint: #656566;
+  --white70tint: #4c4c4c;
+  --white80tint: #333333;
+  --white90tint: #191919;
+
+  --white30shade: #fefeff;
+  --white80shade: #ffffff;
+
+  --red: #d64045;
+  --red10tint: #c13a3e;
+  --red20tint: #ab3337;
+  --red60tint: #561a1c;
+  --red40shade: #e68c8f;
+  --red90shade: #fbecec;
+
+  --redchat: #f53535;
+  --redchat10tint: #dd3030;
+  --redchat20tint: #c42a2a;
+  --redchat30tint: #ac2525;
+  --redchat40tint: #932020;
+  --redchat50tint: #7b1b1b;
+  --redchat60tint: #621515;
+  --redchat70tint: #491010;
+  --redchat80tint: #310b0b;
+  --redchat90tint: #180505;
+
+  --redchat10shade: #f64949;
+
+  --green: rgb(22, 190, 22);
+  --green10tint: #14ab14;
+}

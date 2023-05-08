@@ -1,0 +1,89 @@
+include ../../../utils/_header.pug
+include ../../../utils/_navbar.pug
+include ../../../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/groupPage/groupPage.css")
+        link(rel="stylesheet", href="/css/groupPage/utils/_sideBar.css")
+
+
+        
+        title GROUP NAME | Real Life
+    body.bodyGroupPage
+        block navbar
+        include ../../../utils/groups/_groupSideBar.pug
+
+        content(class="group")
+            div(class="group__topContent")
+                img(src="/imgs/pictures/bugatti.jpg" alt="group's background" class="group__backgroundImage")
+                div(class="topContent__container")
+                    div(class="topContent__details")
+                        h1(class="topContent__name")=group.name
+                        div(class="topContent__details__bottom")
+                            div(class="topContent__privacy")
+                                - let imgSrc = "/imgs/icons/lock-closed.png";
+                                - let text = "Private group"
+                                if group.settings.privacy !== "private"
+                                    - imgSrc = "/imgs/icons/lock-open.png"
+                                    - text = "Public group"
+                                img(class="topContent__icon icon--small" src=`${imgSrc}` alt="privacy")
+                                h1(class="topContent__description description--privacy")=text
+                            h1(class="topContent__description")=`${group.members.length} Members` 
+                    include ../utils/buttons.pug
+                div(class="topContent__navbar")
+                    //- if not the member - about--active
+                    a(class="topContent__element" href=`/group/${group._id}/about`) About
+                    a(class="topContent__element" href=`/group/${group._id}/discussion`) Discussion  
+                    a(class="topContent__element topContent__element--active" href=`/group/${group._id}/members`) Members      
+
+            div(class="group__mainContent group__mainContent--members")
+                div(class="mainContent__section section--members")
+                    div(class="section__top")
+                        h1(class="section__header") Members  ·
+                            span(style="color: var(--white60tint); font-size: 18px")   36,266
+                    div(class="section__search")
+                        img(src="/imgs/icons/searchIcon.png", alt="" class="section__icon")
+                        input(type="text" class="section__input" placeholder="Find a member")
+                        
+                    div(class="section--overline section__administration")
+                        h1(class="section__header section__header--marginBottom") New to the group
+                        div(class="section__userCard")
+                            div(class="userCard__user")
+                                img(src="/imgs/faces/face4.jpg", alt="User picture", srcset="", class="userCard__image")
+                                div(class="user__details")
+                                    h1(class="userCard__name") Andrew Tate 
+                                    div(class="userCard__badges")
+                                        h1(class="userCard__badge") Admin
+                                    h2(class="userCard__description") Member since 2h
+                            div(class="userCard__btns")
+                                button(class="userCard__btn") 
+                                    img(class="btn__image" src="/imgs/icons/friends.png")
+                                    span Add friend
+
+                        div(class="section__userCard")
+                            div(class="userCard__user")
+                                img(src="/imgs/faces/face1.jpg", alt="User picture", srcset="", class="userCard__image")
+                                div(class="user__details")
+                                    h1(class="userCard__name") Andrew Tate 
+                                    div(class="userCard__badges")
+                                        h1(class="userCard__badge") Admin
+                                    h2(class="userCard__description") Member since yesterday
+                            div(class="userCard__btns")
+                                button(class="userCard__btn") 
+                                    img(class="btn__image" src="/imgs/icons/friends.png")
+                                    span Add friend
+
+                        div(class="section__userCard")
+                            div(class="userCard__user")
+                                img(src="/imgs/faces/face5.jpg", alt="User picture", srcset="", class="userCard__image")
+                                div(class="user__details")
+                                    h1(class="userCard__name") Andrew Tate 
+                                    div(class="userCard__badges")
+                                        h1(class="userCard__badge") Moderator
+                                    h2(class="userCard__description") Warsaw
+                            div(class="userCard__btns")
+                                button(class="userCard__btn") 
+                                    img(class="btn__image" src="/imgs/icons/friends.png")
+                                    span Add friend
+        script(src="/js/groups/requests/subPages/friendRequests.js")

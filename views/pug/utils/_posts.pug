@@ -1,0 +1,1078 @@
+if posts
+    if posts.length === 0
+        div(class="info")
+            img(class="info__img" src="/imgs/icons/smiley-sad.png")
+            h1(class="info__text") There's no conent for you to be displayed. User's feed is either empty or private.
+
+
+    for post in posts
+        //- 2) Check the amount of the images/movies in post eventually if the image array === undefined
+        - let canInteract = true;
+        if group !== undefined
+            if group.settings.privacy === "public-interactions-off" && isMember === false
+                - canInteract = false
+
+
+        if post !== undefined
+            - let didLikeThePost = false;
+            - let didDisikeThePost = false;
+
+            for user in post.reactions.likes.users
+                if `${user._id}` === `${loggedUser._id}`
+                    - didLikeThePost = true;
+            for user in post.reactions.disLikes.users
+                if `${user._id}` === `${loggedUser._id}`
+                    - didDisikeThePost = true;
+
+            if post.postImages.length === 0
+                div(class=`postCard ` data-postID=`${post._id}`)
+                    div(class=`postCard__details` data-postID=`${post._id}`)
+                        div(class=`postCard__author` data-postID=`${post._id}` data-post-author-id=`${post.author._id}`)
+                            img(class=`postCard__avatar` data-postID=`${post._id}` data-post-author-id=`${post.author._id}` src=`${post.author.profileImage}`)
+                            div(class=`postCard__authorDetails` data-postID=`${post._id}`)
+                                h1(class=`postCard__name` data-postID=`${post._id}`)=`${post.author.firstName} ${post.author.lastName}`
+                                if calcTimePassed("Posted", post.createdAt)
+                                    h1(class=`postCard__createdAt` data-postID=`${post._id}`)=`${calcTimePassed("Posted", post.createdAt).string}, at ${calcTimePassed("Posted", post.createdAt).hour}`
+
+                            if `${post.author._id}` === `${loggedUser._id}`
+                                img(class=`postCard__setting--open` data-postID=`${post._id}` src=`/imgs/icons/settings.png`)
+                                img(class=`postCard__setting--back hidden` data-postID=`${post._id}` data-move-back-to="post" data-currently-at="menu" src=`/imgs/icons/arrow-u-down-left.png`)
+
+
+                        if `${post.author._id}` === `${loggedUser._id}`
+                            div(class="postCard__settings hidden animate__animated animate__fadeIn" data-postID=`${post._id}`)
+                                h2(class="settings__description" data-postID=`${post._id}` data-type="heading") Settings
+                                div(class="settings__menu animate__animated animate__fadeIn" data-postID=`${post._id}`)
+                                    button(class="menu__option" data-postID=`${post._id}` data-open-menu="description") Change description 
+                                    button(class="menu__option" data-postID=`${post._id}` data-open-menu="Visibility-Privacy") Visibility/Privacy settings 
+                                    button(class="menu__option" data-postID=`${post._id}` data-open-menu="ban-users") Ban users from seeing this post
+                                    button(class="menu__option" data-postID=`${post._id}` data-open-menu="delete-post") Delete this Post
+                                
+                                
+                                div(class="settings__description hidden animate__animated animate__fadeIn " data-type="section"  data-postID=`${post._id}`)
+                                    h3(class="description__heading" data-postID=`${post._id}`) Change the post's description:
+                                    textarea(class="description__textarea" data-postID=`${post._id}` placeholder=`${post.postText}`)
+                                    button(class="description__submit" data-postID=`${post._id}`) Submit
+
+                                div(class="settings__Visibility-Privacy hidden animate__animated animate__fadeIn" data-type="section" data-postID=`${post._id}`)
+                                    div(class="V-P__post" data-postID=`${post._id}`)
+                                        h4(class="V-P__dsc") Who can see this post?
+                                        select(class="V-P__select" data-postid=`${post._id}` data-select-type="whoCanSeePost")
+                                            if post.whoCanSeePost === "everyone"
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeePost" value="everyone") everyone
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeePost" value="friends-only") Friends only
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeePost" value="friends-and-their-friends-only") Friends and their friends 
+
+                                            if post.whoCanSeePost === "friends-only"
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeePost" value="friends-only") Friends only
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeePost" value="everyone") everyone
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeePost" value="friends-and-their-friends-only") Friends and their friends
+
+                                            if post.whoCanSeePost === "friends-and-their-friends-only"
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeePost" value="friends-and-their-friends-only") Friends and their friends                                                
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeePost" value="everyone") everyone
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeePost" value="friends-only") Friends only
+
+                                    
+                                    div(class="V-P__comments" data-postID=`${post._id}`)
+                                        h4(class="V-P__dsc" ) Who can see this post's comments?
+                                        select(class="V-P__select" data-postid=`${post._id}` data-select-type="whoCanSeeComments")
+                                            if post.whoCanSeeComments === "everyone"
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeeComments" value="everyone") everyone
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeeComments" value="friends-only") Friends only
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeeComments" value="friends-and-their-friends-only") Friends and their friends
+
+                                            if post.whoCanSeeComments === "friends-only"
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeeComments" value="friends-only") Friends only
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeeComments" value="everyone") everyone
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeeComments" value="friends-and-their-friends-only") Friends and their friends
+
+
+                                            if post.whoCanSeeComments === "friends-and-their-friends-only"
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeeComments" value="friends-and-their-friends-only") Friends and their friends                                                
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeeComments" value="everyone") everyone
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanSeeComments" value="friends-only") Friends only
+
+
+                                    div(class="V-P__interactions" data-postID=`${post._id}`)
+                                        h4(class="V-P__dsc" data-postid=`${post._id}`) Who can interact with this post?
+                                        select(class="V-P__select" data-postid=`${post._id}` data-select-type="whoCanInteract")
+                                            if post.whoCanInteract === "everyone"
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanInteract" value="everyone") everyone
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanInteract" value="friends-only") Friends only
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanInteract" value="friends-and-their-friends-only") Friends and their friends     
+                                            if post.whoCanInteract === "friends-only"
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanInteract" value="friends-only") Friends only
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanInteract" value="everyone") everyone
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanInteract" value="friends-and-their-friends-only") Friends and their friends  
+
+                                            if post.whoCanInteract === "friends-and-their-friends-only"
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanInteract" value="friends-and-their-friends-only") Friends and their friends                                                  
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanInteract" value="everyone") everyone
+                                                option(class="V-P__option " data-postid=`${post._id}` data-select-type="whoCanInteract" value="friends-only") Friends only
+
+                                    button(class="V-P__submit" data-postid=`${post._id}`) Submit
+
+                                div(class="settings__ban-users hidden animate__animated animate__fadeIn " data-type="section" data-postID=`${post._id}`)
+                                    div(class="ban-users__top" data-postID=`${post._id}`)
+                                        h3(class="ban-users__header") Choose who can't see this post.
+                                        input(class="ban-users__input" data-postid=`${post._id}` placeholder="Type user's name")
+
+                                        div(class="ban-users__cards" data-postid=`${post._id}` data-card-side="choose")
+
+                                            
+
+
+
+
+
+                                    div(class="ban-users__bottom" data-postID=`${post._id}`)
+                                        h3(class="ban-users__header") People who can't see this post
+                                        div(class="ban-users__cards" data-postid=`${post._id}` data-card-side="choosed")
+                                            for user in post.cantBeDisplayedBy
+                                                
+                                                div(class="ban-users__card" data-postid=`${post._id}` data-user-id=`${user._id}` data-card-side=`choosed`)
+                                                    button(class="ban-users__btn" data-postid=`${post._id}` data-user-id=`${user._id}` data-card-side=`choosed`)
+                                                        img(src="/imgs/icons/x-circle-red.png" data-postid=`${post._id}` data-user-id=`${user._id}` data-card-side=`choosed`)
+                                                    div(class="ban-users__content" data-postid=`${post._id}` data-user-id=`${user._id}` data-card-side=`choosed`)
+                                                        img(class="ban-users__img" src=`${user.profileImage}` data-postid=`${post._id}` data-user-id=`${user._id}` data-card-side=`choosed`)
+                                                        h3(class="ban-users__name" data-postid=`${post._id}` data-user-id=`${user._id}` data-card-side=`choosed`)=`${user.firstName} ${user.lastName}`
+
+
+                                    div(class="ban-users__submit" data-postID=`${post._id}`)  
+                                        button(class="submit__btn" data-postID=`${post._id}`) Submit
+                                        p(class="submit__dsc" data-postID=`${post._id}`) *As soon as you click submit, the users that you choosed, will not be able to see this post
+                                div(class="settings__delete-post hidden animate__animated animate__fadeIn" data-type="section" data-postID=`${post._id}`)
+                                    h3(class="delete-post__text" data-postID=`${post._id}`)=`Are you sure?`
+
+                                    div(class="delete-post__btns" data-postid=`${post.id}`)
+                                        button(class="delete-post__cancel" data-postid=`${post.id}`) No, take me back.
+                                        button(class="delete-post__submit" data-postid=`${post.id}`) Yes, delete this post.
+                        h1(class=`postCard__postText`  data-postID=`${post._id}`)=`${post.postText}`
+
+
+                        div(class=`postCard__interactions` data-postID=`${post._id}`)
+
+                            div(class=`interactions__reactions ${didLikeThePost === false ? "" : "hidden"}  animate__animated animate__bounceIn` 
+                            data-postID=`${post._id}` 
+                            data-reaction-type="like"
+                            role="button" 
+                            tabindex="0"
+                            data-status="not-active" 
+                            data-level="thread")
+
+
+                                img(class=`interactions__icon ` 
+                                data-postID=`${post._id}` 
+                                src="/imgs/icons/thumbsUp.png", 
+                                alt="")
+
+
+                                h1(class=`interactions__text interactions__text--green` 
+                                data-reaction-type="like" 
+                                data-status="not-active" 
+                                data-level="thread" 
+                                data-postID=`${post._id}`)=post.reactions.likes.count
+
+                            div(class=`interactions__reactions ${didLikeThePost === false ? "hidden" : ""}  animate__animated animate__tada` 
+                            data-postID=`${post._id}` 
+                            role="button"
+                            data-reaction-type="like" 
+                            tabindex="0"
+                            data-level="thread" 
+                            data-status="active")
+    
+                                img(class=`interactions__icon ` 
+                                data-postID=`${post._id}` 
+                                src="/imgs/icons/thumbsUp-filled.png", 
+                                alt="")
+
+                                h1(class=`interactions__text interactions__text--green` 
+                                data-level="thread" 
+                                data-reaction-type="like" 
+                                data-status="active" 
+                                data-postID=`${post._id}`) I like it!
+
+
+                            div(class=`interactions__comments` data-postID=`${post._id}`)
+                                img(class=`interactions__icon` data-postID=`${post._id}` src="/imgs/icons/messages.png")
+                                h1(class=`interactions__text` data-postID=`${post._id}` ) Comments
+
+
+                            div(class=`interactions__reactions ${didDisikeThePost === false ? "" : "hidden"}  animate__animated animate__flipInX` 
+                            data-postID=`${post._id}` 
+                            data-reaction-type="dislike"
+                            data-status="active"
+                            )
+                                img(class=`interactions__icon` 
+                                data-postID=`${post._id}` 
+                                data-reaction-type="dislike" 
+                                src="/imgs/icons/thumbs-down.png", 
+                                alt="")
+
+
+                                h1(class=`interactions__text interactions__text--red` 
+                                data-postID=`${post._id}` 
+                                data-reaction-type="dislike" )=post.reactions.disLikes.count
+
+
+                            div(class=`interactions__reactions ${didDisikeThePost === false ? "hidden" : ""} animate__animated  animate__wobble` 
+                            data-postID=`${post._id}` 
+                            data-reaction-type="dislike" 
+                            data-level="thread" 
+                            data-status="not-active")
+
+                                img(class=`interactions__icon` 
+                                data-postID=`${post._id}` 
+                                data-reaction-type="dislike" 
+                                data-level="thread" 
+                                src="/imgs/icons/thumbs-down-filled.png", 
+                                alt="")
+
+                                h1(class=`interactions__text interactions__text--red` 
+                                data-postID=`${post._id}` 
+                                data-level="thread" 
+                                data-reaction-type="dislike" 
+                                data-status="active") I don't like it!
+
+
+
+                                //- 
+                    div(class=`postCard__comments hidden` data-postID=`${post._id}`)
+                        if canInteract === true
+                            form(class=`comments__form comments__form--main` data-postID=`${post._id}` data-level="root" data-tree-id=`${treeID}`)
+                                div(class=`form__profile` data-postID=`${post._id}`)
+                                    img(class=`form__avatar` data-postID=`${post._id}` src=`${loggedUser.profileImage}`)
+
+                                div(class=`form__content ` data-postID=`${post._id}` data-level="root" data-tree-id=`${treeID}`)
+                                    textarea(name="", cols="120"  class=`form__textarea form__textarea--medium` data-postID=`${post._id}` data-level="root" data-tree-id=`${treeID}` maxlength="2000" placeholder="Hey, whats going on?")
+                                    div(class="content__container content__container--margin")
+                                        div(class="form__tag hidden"    
+                                            data-postID=`${post._id}` 
+                                            data-level="thread" 
+                                        )
+
+                                            a(class="tag__text" 
+                                            data-postID=`${post._id}` 
+                                            data-level="thread" 
+                                            ) 
+                                        div(class="container__labels")
+                                            label(for="hiddenInputs__photos" class="form__photos")
+                                                img(src="/imgs/icons/camera.png", alt="Choose file", class="form__image" srcset="") 
+                                            label(for="hiddenInputs__submit" class=`form__submit` data-postID=`${post._id}` data-level="root" )
+                                                img(src="/imgs/icons/send.png", alt="Choose file", class="form__image" srcset="") 
+
+
+                                div(class="form__hiddenInputs")
+                                    input(class=`hiddenInputs__photos` data-postID=`${post._id}`  type="file", name="" id="hiddenInputs__photos") 
+                                    input(class=`hiddenInputs__submit` data-postID=`${post._id}` id="hiddenInputs__submit" type="submit", value="Submit")  
+
+                        each commentObj in post.comments 
+
+                            - const tree = commentObj.tree
+
+                            - const rootAuthor = tree.author
+                            - const treeID = commentObj._id
+                            - const rootID = tree._id;
+                            - let didLikeTheComment = false;
+                            - let didDisLikeTheComment = false;
+                            for user in tree.reactions.likes.users 
+                                if `${user._id}` === `${loggedUser._id}`
+                                    - didLikeTheComment = true;
+                            for user in tree.reactions.disLikes.users 
+                                if `${user._id}` === `${loggedUser._id}`
+                                    - didDisLikeTheComment = true;
+                            //-    
+                            div(class=`comments__tree` data-postID=`${post._id}` data-level="thread" data-comment-id=`${rootID}` data-tree-id=`${treeID}`)
+                                //- root comment
+                                - const attributes = `data-postid="${post._id}" data-level="root" data-comment-id=""`
+
+                                div(class=`commentCard`)  
+                                    div(class=`commentCard__details` data-postID=`${post._id}` data-level="root" data-comment-id=`${rootID}` data-tree-id=`${treeID}`)
+                                        a(href="x")
+                                            img(class=`commentCard__avatar` data-level="root" src=`${rootAuthor.profileImage}`)
+                                        div(class=`commentCard__content`)
+
+                                            a(class=`commentCard__name` href="xx"
+                                            data-postID=`${post._id}` 
+                                            data-level="root" 
+                                            data-comment-id=`${rootID}` 
+                                            data-author-id=`${rootAuthor._id}` 
+                                            data-tree-id=`${treeID}`
+                                            )=`${rootAuthor.firstName} ${rootAuthor.lastName}`
+
+                                            h3(class=`commentCard__text`)=tree.text
+                                    div(class=`commentCard__interactions`)
+                                        //- h4(class=`root__createdAt`)=`11/12/2022 at 11:42`
+                                        if canInteract === false
+                                            h1(class=`interactions__replies` data-postID=`${post._id}` data-level="root" data-comment-id=`${rootID}` data-tree-id=`${treeID}`) replies
+
+                                        if canInteract === true
+                                            div(class=`interactions` 
+                                            data-postID=`${post._id}` 
+                                            data-level="root" 
+                                            data-comment-id=`${rootID}` 
+                                            data-tree-id=`${treeID}`) 
+
+                                                //- Like card - active 
+                                                div(
+                                                    class=`interactions__card  animate__animated animate__tada ${didLikeTheComment === false ? "hidden" : ""} `
+                                                    data-postID=`${post._id}`
+                                                    data-level="root" 
+                                                    data-comment-id=`${rootID}`
+                                                    data-tree-id=`${treeID}`
+                                                    data-interactions-type="like"
+                                                    data-interactions-status="active"
+                                                    data-author-id=`${rootAuthor._id}`
+                                                    )                                                     
+                                                    img(
+                                                        class="card__icon"
+                                                        data-postID=`${post._id}`
+                                                        data-level="root" 
+                                                        data-comment-id=`${rootID}`
+                                                        data-tree-id=`${treeID}`
+                                                        data-interactions-type="like"
+                                                        data-interactions-status="active"
+                                                        src="/imgs/icons/thumbsUp-filled.png"
+                                                        data-author-id=`${rootAuthor._id}`
+                                                        )
+                                                    h4(
+                                                        class="card__text"
+                                                        data-postID=`${post._id}`
+                                                        data-level="root" 
+                                                        data-comment-id=`${rootID}`
+                                                        data-tree-id=`${treeID}`
+                                                        data-interactions-type="like"
+                                                        data-interactions-status="active"
+                                                        data-author-id=`${rootAuthor._id}`
+                                                        )=tree.reactions.likes.count                                                       
+                                                //- Like card - not-active 
+                                                div(
+                                                    class=`interactions__card animate__animated animate__flipInX ${didLikeTheComment === false ? "" : "hidden"}`
+                                                    data-postID=`${post._id}`
+                                                    data-level="root" 
+                                                    data-comment-id=`${rootID}`
+                                                    data-tree-id=`${treeID}`
+                                                    data-interactions-type="like"
+                                                    data-interactions-status="not-active"
+                                                    data-author-id=`${rootAuthor._id}`
+                                                    )                                                     
+                                                    img(
+                                                        class="card__icon"
+                                                        data-postID=`${post._id}`
+                                                        data-level="root" 
+                                                        data-comment-id=`${rootID}`
+                                                        data-tree-id=`${treeID}`
+                                                        data-interactions-type="like"
+                                                        data-interactions-status="not-active"
+                                                        src="/imgs/icons/thumbsUp.png"
+                                                        data-author-id=`${rootAuthor._id}`
+                                                        )
+                                                    h4(
+                                                        class="card__text"
+                                                        data-postID=`${post._id}`
+                                                        data-level="root" 
+                                                        data-comment-id=`${rootID}`
+                                                        data-tree-id=`${treeID}`
+                                                        data-interactions-type="like"
+                                                        data-interactions-status="not-active"
+                                                        data-author-id=`${rootAuthor._id}`
+                                                        )=tree.reactions.likes.count                                                         
+                                                //- DisLike card - active 
+                                                div(
+                                                    class=`interactions__card  animate__animated  animate__wobble ${didDisLikeTheComment === false ? "hidden": ""}` 
+                                                    data-postID=`${post._id}`
+                                                    data-level="root" 
+                                                    data-comment-id=`${rootID}`
+                                                    data-tree-id=`${treeID}`
+                                                    data-interactions-type="disLike"
+                                                    data-interactions-status="active"
+                                                    data-author-id=`${rootAuthor._id}`
+                                                    )                                                     
+                                                    img(
+                                                        class="card__icon"
+                                                        data-postID=`${post._id}`
+                                                        data-level="root" 
+                                                        data-comment-id=`${rootID}`
+                                                        data-tree-id=`${treeID}`
+                                                        data-interactions-type="disLike"
+                                                        data-interactions-status="active"
+                                                        src="/imgs/icons/thumbs-down-filled.png"
+                                                        data-author-id=`${rootAuthor._id}`
+                                                        )
+                                                    h4(
+                                                        class="card__text"
+                                                        data-postID=`${post._id}`
+                                                        data-level="root" 
+                                                        data-comment-id=`${rootID}`
+                                                        data-tree-id=`${treeID}`
+                                                        data-interactions-type="disLike"
+                                                        data-interactions-status="active"
+                                                        data-author-id=`${rootAuthor._id}`
+                                                        )=tree.reactions.disLikes.count                                                        
+                                                //- DisLike card - not-active 
+                                                div(
+                                                    class=`interactions__card animate__animated animate__flipInX ${didDisLikeTheComment === false ? "": "hidden"}`
+                                                    data-postID=`${post._id}`
+                                                    data-level="root" 
+                                                    data-comment-id=`${rootID}`
+                                                    data-tree-id=`${treeID}`
+                                                    data-interactions-type="disLike"
+                                                    data-interactions-status="not-active"
+                                                    data-author-id=`${rootAuthor._id}`
+                                                    )                                                     
+                                                    img(
+                                                        class="card__icon"
+                                                        data-postID=`${post._id}`
+                                                        data-level="root" 
+                                                        data-comment-id=`${rootID}`
+                                                        data-tree-id=`${treeID}`
+                                                        data-interactions-type="disLike"
+                                                        data-interactions-status="not-active"
+                                                        src="/imgs/icons/thumbs-down.png"
+                                                        data-author-id=`${rootAuthor._id}`
+                                                        )
+                                                    h4(
+                                                        class="card__text"
+                                                        data-postID=`${post._id}`
+                                                        data-level="root" 
+                                                        data-comment-id=`${rootID}`
+                                                        data-tree-id=`${treeID}`
+                                                        data-interactions-type="disLike"
+                                                        data-interactions-status="not-active"
+                                                        data-author-id=`${rootAuthor._id}`
+                                                        )=tree.reactions.disLikes.count
+
+
+                                            h1(class=`interactions__replies` data-postID=`${post._id}` data-level="root" data-comment-id=`${rootID}` data-tree-id=`${treeID}`) replies
+                                            h1( class=`interactions__reply ` 
+                                            data-postID=`${post._id}` 
+                                            data-level="root" 
+                                            data-comment-id=`${rootID}` 
+                                            data-author-id=`${rootAuthor._id}`
+                                            data-tree-id=`${treeID}`) reply
+
+                                        //- root comment responds container
+                                    div(class=`commentCard__nested-data` data-level="reply" data-postID=`${post._id}` data-tree-id=`${treeID}`)
+                                        //- root comment respond
+
+
+                                        form(class=`comments__form comments__form--reply hidden` 
+                                        data-postID=`${post._id}` 
+                                        data-level="reply" 
+                                        data-replies-to-user=`${rootAuthor._id}`
+                                        data-replies-to-comment=`${rootID}`
+                                        data-tree-id=`${treeID}`)
+
+                                            div(class=`form__profile` data-postID=`${post._id}` data-tree-id=`${treeID}`)
+                                                img(class=`form__avatar` data-postID=`${post._id}` src=`${loggedUser.profileImage}` data-tree-id=`${treeID}`)
+
+                                            div(class=`form__content ` 
+                                            data-postID=`${post._id}` 
+                                            data-level="reply" 
+                                            data-replies-to-user=`${rootAuthor._id}`
+                                            data-replies-to-comment=`${rootID}`
+                                            data-tree-id=`${treeID}`)
+
+                                                textarea(name="", cols="120"  class=`form__textarea form__textarea--medium` 
+                                                data-postID=`${post._id}` 
+                                                data-level="reply" 
+                                                data-replies-to-user=`${rootAuthor._id}`
+                                                data-replies-to-comment=`${rootID}` 
+                                                maxlength="2000" 
+                                                placeholder="Hey, whats going on?"
+                                                data-tree-id=`${treeID}`)
+
+
+                                                div(class="content__container content__container--margin")
+                                                    div(class="form__tag" 
+                                                    data-postID=`${post._id}` 
+                                                    data-level="reply" 
+                                                    data-replies-to-user=`${rootAuthor._id}`
+                                                    data-replies-to-comment=`${rootID}`
+                                                    data-tree-id=`${treeID}`) 
+
+                                                        a(class="tag__text" 
+                                                        data-postID=`${post._id}` 
+                                                        data-level="reply" 
+                                                        data-replies-to-user=`${rootAuthor._id}`
+                                                        data-replies-to-comment=`${rootID}` 
+                                                        data-replies-to=""
+                                                        data-tree-id=`${treeID}`) 
+
+                                                    div(class="container__labels")
+                                                        label(for="hiddenInputs__photos" class="form__photos")
+                                                            img(src="/imgs/icons/camera.png", alt="Choose file", class="form__image" srcset="") 
+                                                        label(for="hiddenInputs__submit" class=`form__submit` 
+                                                            data-postID=`${post._id}` 
+                                                            data-level="reply" 
+                                                            data-replies-to-user=`${rootAuthor._id}`
+                                                            data-replies-to-comment=`${rootID}` 
+                                                            data-replies-to=""
+                                                            data-tree-id=`${treeID}`
+                                                            )
+                                                            img(src="/imgs/icons/send.png", alt="Choose file", class="form__image" srcset="") 
+
+
+                                            div(class="form__hiddenInputs")
+                                                input(class=`hiddenInputs__photos` data-postID=`${post._id}`  type="file", name="" id="hiddenInputs__photos") 
+                                                input(class=`hiddenInputs__submit` data-postID=`${post._id}` id="hiddenInputs__submit" type="submit", value="Submit")     
+
+
+                                        each reply in tree.replies
+                                            - const replyAuthor = reply.author
+                                            - const replyID = reply._id;
+                                            - let didLikeTheComment = false;
+                                            - let didDisLikeTheComment = false;
+                                            for user in reply.reactions.likes.users 
+                                                if `${user._id}` === `${loggedUser._id}`
+                                                    - didLikeTheComment = true;
+                                            for user in reply.reactions.disLikes.users 
+                                                if `${user._id}` === `${loggedUser._id}`
+                                                    - didDisLikeTheComment = true;
+
+                                            div(class=`commentCard hidden` 
+                                            data-postID=`${post._id}` 
+                                            data-level="reply" 
+                                            data-replies-to-user=`${rootAuthor._id}`
+                                            data-replies-to-comment=`${rootID}`
+                                            data-tree-id=`${treeID}`
+                                            data-comment-id=`${replyID}` 
+                                            )
+
+
+                                                div(class=`commentCard__details`)
+                                                    img(class=`commentCard__avatar ` data-level="reply" src=`${replyAuthor.profileImage}`)
+                                                    div(class=`commentCard__content`)
+                                                        h1(class=`commentCard__name`
+                                                            data-postID=`${post._id}` 
+                                                            data-level="reply" 
+                                                            data-comment-id=`${replyID}`
+                                                            data-author-id=`${replyAuthor._id}`
+                                                            data-replies-to-user=`${rootAuthor._id}`
+                                                            data-replies-to-comment=`${rootID}` 
+                                                            data-tree-id=`${treeID}`
+
+
+                                                        )=`${replyAuthor.firstName} ${replyAuthor.lastName}`
+                                                        //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+                                                        h1(class=`commentCard__text`)=reply.text
+                                                div(class=`commentCard__interactions`)
+                                                    if canInteract === false
+                                                        h1(class=`interactions__replies` 
+                                                        data-postID=`${post._id}` 
+                                                        data-level="reply"
+                                                        data-replies-to-user=`${rootAuthor._id}`
+                                                        data-replies-to-comment=`${rootID}`
+                                                        data-comment-id=`${replyID}`
+                                                        ata-tree-id=`${treeID}`
+                                                        ) replies
+                                                    if canInteract === true 
+                                                        div(class=`interactions` 
+                                                        data-postID=`${post._id}` 
+                                                        data-level="reply" 
+                                                        data-comment-id=`${replyID}` 
+                                                        data-tree-id=`${treeID}`) 
+
+                                                            //- Like card - active 
+                                                            div(
+                                                                class=`interactions__card  animate__animated animate__tada  ${didLikeTheComment === false ? "hidden" :""}`
+                                                                data-postID=`${post._id}`
+                                                                data-level="reply" 
+                                                                data-comment-id=`${replyID}`
+                                                                data-tree-id=`${treeID}`
+                                                                data-interactions-type="like"
+                                                                data-interactions-status="active"
+                                                                data-author-id=`${replyAuthor._id}`
+                                                                data-replies-to-user=`${rootAuthor._id}`
+                                                                data-replies-to-comment=`${rootID}`
+                                                                )                                                     
+                                                                img(
+                                                                    class="card__icon"
+                                                                    data-postID=`${post._id}`
+                                                                    data-level="reply" 
+                                                                    data-comment-id=`${replyID}`
+                                                                    data-tree-id=`${treeID}`
+                                                                    data-interactions-type="like"
+                                                                    data-interactions-status="active"
+                                                                    src="/imgs/icons/thumbsUp-filled.png"
+                                                                    data-author-id=`${replyAuthor._id}`
+                                                                    )
+                                                                h4(
+                                                                    class="card__text"
+                                                                    data-postID=`${post._id}`
+                                                                    data-level="reply" 
+                                                                    data-comment-id=`${replyID}`
+                                                                    data-tree-id=`${treeID}`
+                                                                    data-interactions-type="like"
+                                                                    data-interactions-status="active"
+                                                                    data-author-id=`${replyAuthor._id}`
+                                                                    )=reply.reactions.likes.count                                                       
+                                                            //- Like card - not-active 
+                                                            div(
+                                                                class=`interactions__card animate__animated animate__flipInX ${didLikeTheComment === false ? "" :"hidden"}`
+                                                                data-postID=`${post._id}`
+                                                                data-level="reply" 
+                                                                data-comment-id=`${replyID}`
+                                                                data-tree-id=`${treeID}`
+                                                                data-interactions-type="like"
+                                                                data-interactions-status="not-active"
+                                                                data-author-id=`${replyAuthor._id}`
+                                                                data-replies-to-user=`${rootAuthor._id}`
+                                                                data-replies-to-comment=`${rootID}`
+                                                                )                                                     
+                                                                img(
+                                                                    class="card__icon"
+                                                                    data-postID=`${post._id}`
+                                                                    data-level="reply" 
+                                                                    data-comment-id=`${replyID}`
+                                                                    data-tree-id=`${treeID}`
+                                                                    data-interactions-type="like"
+                                                                    data-interactions-status="not-active"
+                                                                    src="/imgs/icons/thumbsUp.png"
+                                                                    data-author-id=`${replyAuthor._id}`
+                                                                    )
+                                                                h4(
+                                                                    class="card__text"
+                                                                    data-postID=`${post._id}`
+                                                                    data-level="reply" 
+                                                                    data-comment-id=`${replyID}`
+                                                                    data-tree-id=`${treeID}`
+                                                                    data-interactions-type="like"
+                                                                    data-interactions-status="not-active"
+                                                                    data-author-id=`${replyAuthor._id}`
+                                                                    )=reply.reactions.likes.count                                                         
+                                                            //- DisLike card - active 
+                                                            div(
+                                                                class=`interactions__card  animate__animated  animate__wobble ${didDisLikeTheComment === false ? "hidden" : ""}` 
+                                                                data-postID=`${post._id}`
+                                                                data-level="reply" 
+                                                                data-comment-id=`${replyID}`
+                                                                data-tree-id=`${treeID}`
+                                                                data-interactions-type="disLike"
+                                                                data-interactions-status="active"
+                                                                data-author-id=`${replyAuthor._id}`
+                                                                data-replies-to-user=`${rootAuthor._id}`
+                                                                data-replies-to-comment=`${rootID}`
+                                                                )                                                     
+                                                                img(
+                                                                    class="card__icon"
+                                                                    data-postID=`${post._id}`
+                                                                    data-level="reply" 
+                                                                    data-comment-id=`${replyID}`
+                                                                    data-tree-id=`${treeID}`
+                                                                    data-interactions-type="disLike"
+                                                                    data-interactions-status="active"
+                                                                    src="/imgs/icons/thumbs-down-filled.png"
+                                                                    data-author-id=`${replyAuthor._id}`
+                                                                    )
+                                                                h4(
+                                                                    class="card__text"
+                                                                    data-postID=`${post._id}`
+                                                                    data-level="reply" 
+                                                                    data-comment-id=`${replyID}`
+                                                                    data-tree-id=`${treeID}`
+                                                                    data-interactions-type="disLike"
+                                                                    data-interactions-status="active"
+                                                                    data-author-id=`${replyAuthor._id}`
+                                                                    )=reply.reactions.disLikes.count                                                        
+                                                            //- DisLike card - not-active 
+                                                            div(
+                                                                class=`interactions__card animate__animated animate__flipInX ${didDisLikeTheComment === false ? "" : "hidden"} `
+                                                                data-postID=`${post._id}`
+                                                                data-level="reply" 
+                                                                data-comment-id=`${replyID}`
+                                                                data-tree-id=`${treeID}`
+                                                                data-interactions-type="disLike"
+                                                                data-interactions-status="not-active"
+                                                                data-author-id=`${replyAuthor._id}`
+                                                                data-replies-to-user=`${rootAuthor._id}`
+                                                                data-replies-to-comment=`${rootID}`
+                                                                )                                                     
+                                                                img(
+                                                                    class="card__icon"
+                                                                    data-postID=`${post._id}`
+                                                                    data-level="reply" 
+                                                                    data-comment-id=`${replyID}`
+                                                                    data-tree-id=`${treeID}`
+                                                                    data-interactions-type="disLike"
+                                                                    data-interactions-status="not-active"
+                                                                    src="/imgs/icons/thumbs-down.png"
+                                                                    data-author-id=`${replyAuthor._id}`
+                                                                    )
+                                                                h4(
+                                                                    class="card__text"
+                                                                    data-postID=`${post._id}`
+                                                                    data-level="reply" 
+                                                                    data-comment-id=`${replyID}`
+                                                                    data-tree-id=`${treeID}`
+                                                                    data-interactions-type="disLike"
+                                                                    data-interactions-status="not-active"
+                                                                    data-author-id=`${replyAuthor._id}`
+                                                                    )=reply.reactions.disLikes.count
+
+
+
+                                                        h1(class=`interactions__replies ` 
+                                                        data-postID=`${post._id}` 
+                                                        data-level="reply"
+                                                        data-replies-to-user=`${rootAuthor._id}`
+                                                        data-replies-to-comment=`${rootID}`
+                                                        data-comment-id=`${replyID}`
+                                                        data-tree-id=`${treeID}`
+                                                        ) replies
+
+
+                                                        h1( class=`interactions__reply` 
+                                                        data-postID=`${post._id}` 
+                                                        data-level="reply"
+                                                        data-replies-to-user=`${rootAuthor._id}`
+                                                        data-replies-to-comment=`${rootID}`
+                                                        data-author-id=`${replyAuthor._id}`
+                                                        data-comment-id=`${replyID}`
+                                                        ) reply
+
+
+                                                div(class=`commentCard__nested-data` 
+                                                data-postID=`${post._id}`)
+                                                    //- respond of the root comment respond
+                                                    form(class=`comments__form comments__form--subReply hidden` 
+                                                    data-postID=`${post._id}` 
+                                                    data-level="subReply" 
+                                                    data-replies-to-user=`${replyAuthor._id}`
+                                                    data-replies-to-comment=`${replyID}`
+                                                    data-tree-id=`${treeID}`)
+
+
+                                                        div(class=`form__profile` 
+                                                        data-postID=`${post._id}`)
+
+                                                            img(class=`form__avatar` 
+                                                            data-postID=`${post._id}`
+                                                            src=`${loggedUser.profileImage}`)
+
+                                                        div(class=`form__content`)
+                                                            textarea(name="", cols="120"  class=`form__textarea form__textarea--medium` 
+                                                            data-postID=`${post._id}` 
+                                                            data-level="subReply" 
+                                                            data-replies-to-user=`${replyAuthor._id}`
+                                                            data-replies-to-comment=`${replyID}`
+                                                            data-tree-id=`${treeID}` 
+                                                            placeholder="Hey, whats going on?")
+
+
+
+
+                                                            div(class="content__container content__container--margin")
+                                                                div(class="form__tag" 
+                                                                data-postID=`${post._id}` 
+                                                                data-level="subReply" 
+                                                                data-replies-to-user=`${replyAuthor._id}`
+                                                                data-replies-to-comment=`${replyID}`
+                                                                data-tree-id=`${treeID}`) 
+
+                                                                    a(class="tag__text" 
+                                                                    data-postID=`${post._id}` 
+                                                                    data-level="subReply" 
+                                                                    data-replies-to-user=`${replyAuthor._id}`
+                                                                    data-replies-to-comment=`${replyID}` 
+                                                                    data-tree-id=`${treeID}`) 
+
+                                                                div(class="container__labels")
+
+                                                                    label(for="hiddenInputs__photos" class="form__photos")
+                                                                        img(src="/imgs/icons/camera.png", alt="Choose file", class="form__image" srcset="") 
+                                                                    label(for="hiddenInputs__submit" class=`form__submit` 
+                                                                    data-postID=`${post._id}` 
+                                                                    data-level="subReply" 
+                                                                    data-replies-to-user=`${replyAuthor._id}`
+                                                                    data-replies-to-comment=`${replyID}`
+                                                                    data-tree-id=`${treeID}`)
+                                                                        img(src="/imgs/icons/send.png", alt="Choose file", class="form__image" srcset="") 
+
+
+                                                        div(class="form__hiddenInputs")
+                                                            input(class=`hiddenInputs__photos` data-postID=`${post._id}`  type="file", name="" id="hiddenInputs__photos") 
+                                                            input(class=`hiddenInputs__submit` data-postID=`${post._id}` id="hiddenInputs__submit" type="submit", value="Submit")                                                                                                         
+                                                    each subReply in reply.subReplies
+                                                        - const author = subReply.author
+                                                        - const subReplyCommentID = subReply._id
+                                                        - let didLikeTheComment = false;
+                                                        - let didDisLikeTheComment = false;
+                                                        for user in subReply.reactions.likes.users 
+                                                            if `${user._id}` === `${loggedUser._id}`
+                                                                - didLikeTheComment = true;
+                                                        for user in subReply.reactions.disLikes.users 
+                                                            if `${user._id}` === `${loggedUser._id}`
+                                                                - didDisLikeTheComment = true;
+
+
+                                                        div(class=`commentCard hidden` 
+                                                        data-postID=`${post._id}` 
+                                                        data-level="subReply" 
+                                                        data-comment-id=`${subReply._id}`
+                                                        data-author-id=`${author._id}`
+                                                        data-tree-id=`${treeID}`
+                                                        data-comment-over=`${replyID}`
+                                                        )             
+                                                            div(class=`commentCard__details`)
+                                                                img(class=`commentCard__avatar` 
+                                                                src=`${author.profileImage}`
+                                                                data-postID=`${post._id}` 
+                                                                data-level="subReply_" 
+                                                                data-comment-id=`${subReply._id}`
+                                                                data-author-id=`${author._id}`                                                           
+                                                                
+                                                                )
+                                                                div(class=`commentCard__content`)
+                                                                    h1(
+                                                                        
+                                                                        data-postID=`${post._id}` 
+                                                                        data-level="subReply_" 
+                                                                        data-comment-id=`${subReply._id}`
+                                                                        data-author-id=`${author._id}`                                                                        
+                                                                        class=`commentCard__name`
+                                                                    )=`${author.firstName} ${author.lastName}`
+                                                                    //- h1(class="commentTree__commentCard__container__createdAt") 17 september 2022
+                                                                    h1(class=`commentCard__text`)=subReply.text
+                                                            div(class=`commentCard__interactions `)
+                                                                div(class=`interactions` 
+                                                                data-postID=`${post._id}` 
+                                                                data-level="subReply_" 
+                                                                data-comment-id=`${subReply._id}` 
+                                                                data-tree-id=`${treeID}`) 
+
+                                                                    //- Like card - active 
+                                                                    div(
+                                                                        class=`interactions__card  animate__animated animate__tada ${didLikeTheComment === false ? "hidden": ""}`
+                                                                        data-postID=`${post._id}`
+                                                                        data-level="subReply_" 
+                                                                        data-comment-id=`${subReply._id}`
+                                                                        data-tree-id=`${treeID}`
+                                                                        data-interactions-type="like"
+                                                                        data-interactions-status="active"
+                                                                        data-author-id=`${author._id}`
+                                                                        data-replies-to-user=`${replyAuthor._id}`
+                                                                        data-replies-to-comment=`${replyID}`
+                                                                        )                                                     
+                                                                        img(
+                                                                            class="card__icon"
+                                                                            data-postID=`${post._id}`
+                                                                            data-level="subReply_" 
+                                                                            data-comment-id=`${subReply._id}`
+                                                                            data-tree-id=`${treeID}`
+                                                                            data-interactions-type="like"
+                                                                            data-interactions-status="active"
+                                                                            src="/imgs/icons/thumbsUp-filled.png"
+                                                                            data-author-id=`${author._id}`
+                                                                            data-replies-to-user=`${replyAuthor._id}`
+                                                                            data-replies-to-comment=`${replyID}`
+                                                                            )
+                                                                        h4(
+                                                                            class="card__text"
+                                                                            data-postID=`${post._id}`
+                                                                            data-level="subReply_" 
+                                                                            data-comment-id=`${subReply._id}`
+                                                                            data-tree-id=`${treeID}`
+                                                                            data-interactions-type="like"
+                                                                            data-interactions-status="active"
+                                                                            data-author-id=`${author._id}`
+                                                                            data-replies-to-user=`${replyAuthor._id}`
+                                                                            data-replies-to-comment=`${replyID}`
+                                                                            )=subReply.reactions.likes.count                                                       
+                                                                    //- Like card - not-active 
+                                                                    div(
+                                                                        class=`interactions__card animate__animated animate__flipInX ${didLikeTheComment === false ? "": "hidden"}`
+                                                                        data-postID=`${post._id}`
+                                                                        data-level="subReply_" 
+                                                                        data-comment-id=`${subReply._id}`
+                                                                        data-tree-id=`${treeID}`
+                                                                        data-interactions-type="like"
+                                                                        data-interactions-status="not-active"
+                                                                        data-author-id=`${author._id}`
+                                                                        data-replies-to-user=`${replyAuthor._id}`
+                                                                        data-replies-to-comment=`${replyID}`
+                                                                        )                                                     
+                                                                        img(
+                                                                            class="card__icon"
+                                                                            data-postID=`${post._id}`
+                                                                            data-level="subReply_" 
+                                                                            data-comment-id=`${subReply._id}`
+                                                                            data-tree-id=`${treeID}`
+                                                                            data-interactions-type="like"
+                                                                            data-interactions-status="not-active"
+                                                                            src="/imgs/icons/thumbsUp.png"
+                                                                            data-author-id=`${author._id}`
+                                                                            data-replies-to-user=`${replyAuthor._id}`
+                                                                            data-replies-to-comment=`${replyID}`
+                                                                            )
+                                                                        h4(
+                                                                            class="card__text"
+                                                                            data-postID=`${post._id}`
+                                                                            data-level="subReply_" 
+                                                                            data-comment-id=`${subReply._id}`
+                                                                            data-tree-id=`${treeID}`
+                                                                            data-interactions-type="like"
+                                                                            data-interactions-status="not-active"
+                                                                            data-author-id=`${author._id}`
+                                                                            data-replies-to-user=`${replyAuthor._id}`
+                                                                            data-replies-to-comment=`${replyID}`
+                                                                            )=subReply.reactions.likes.count                                                         
+                                                                    //- DisLike card - active 
+                                                                    div(
+                                                                        class=`interactions__card  animate__animated  animate__wobble ${didDisLikeTheComment === false ? "hidden" : ""} `
+                                                                        data-postID=`${post._id}`
+                                                                        data-level="subReply_" 
+                                                                        data-comment-id=`${subReply._id}`
+                                                                        data-tree-id=`${treeID}`
+                                                                        data-interactions-type="disLike"
+                                                                        data-interactions-status="active"
+                                                                        data-author-id=`${author._id}`
+                                                                        data-replies-to-user=`${replyAuthor._id}`
+                                                                        data-replies-to-comment=`${replyID}`
+                                                                        )                                                     
+                                                                        img(
+                                                                            class="card__icon"
+                                                                            data-postID=`${post._id}`
+                                                                            data-level="subReply_" 
+                                                                            data-comment-id=`${subReply._id}`
+                                                                            data-tree-id=`${treeID}`
+                                                                            data-interactions-type="disLike"
+                                                                            data-interactions-status="active"
+                                                                            src="/imgs/icons/thumbs-down-filled.png"
+                                                                            data-author-id=`${author._id}`
+                                                                            data-replies-to-user=`${replyAuthor._id}`
+                                                                            data-replies-to-comment=`${replyID}`
+                                                                            )
+                                                                        h4(
+                                                                            class="card__text"
+                                                                            data-postID=`${post._id}`
+                                                                            data-level="subReply_" 
+                                                                            data-comment-id=`${subReply._id}`
+                                                                            data-tree-id=`${treeID}`
+                                                                            data-interactions-type="disLike"
+                                                                            data-interactions-status="active"
+                                                                            data-author-id=`${author._id}`
+                                                                            data-replies-to-user=`${replyAuthor._id}`
+                                                                            data-replies-to-comment=`${replyID}`
+                                                                            )=subReply.reactions.disLikes.count                                                        
+                                                                    //- DisLike card - not-active 
+                                                                    div(
+                                                                        class=`interactions__card animate__animated animate__flipInX ${didDisLikeTheComment === false ? "" : "hidden"}`
+                                                                        data-postID=`${post._id}`
+                                                                        data-level="subReply_" 
+                                                                        data-comment-id=`${subReply._id}`
+                                                                        data-tree-id=`${treeID}`
+                                                                        data-interactions-type="disLike"
+                                                                        data-interactions-status="not-active"
+                                                                        data-author-id=`${author._id}`
+                                                                        data-replies-to-user=`${replyAuthor._id}`
+                                                                        data-replies-to-comment=`${replyID}`
+                                                                        )                                                     
+                                                                        img(
+                                                                            class="card__icon"
+                                                                            data-postID=`${post._id}`
+                                                                            data-level="subReply_" 
+                                                                            data-comment-id=`${subReply._id}`
+                                                                            data-tree-id=`${treeID}`
+                                                                            data-interactions-type="disLike"
+                                                                            data-interactions-status="not-active"
+                                                                            src="/imgs/icons/thumbs-down.png"
+                                                                            data-author-id=`${author._id}`
+                                                                            data-replies-to-user=`${replyAuthor._id}`
+                                                                            data-replies-to-comment=`${replyID}`
+                                                                            )
+                                                                        h4(
+                                                                            class="card__text"
+                                                                            data-postID=`${post._id}`
+                                                                            data-level="subReply_" 
+                                                                            data-comment-id=`${subReply._id}`
+                                                                            data-tree-id=`${treeID}`
+                                                                            data-interactions-type="disLike"
+                                                                            data-interactions-status="not-active"
+                                                                            data-author-id=`${author._id}`
+                                                                            data-replies-to-user=`${replyAuthor._id}`
+                                                                            data-replies-to-comment=`${replyID}`
+                                                                            )=subReply.reactions.disLikes.count
+
+                                                                h1(class="interactions__reply"  
+                                                                data-postID=`${post._id}` 
+                                                                data-level="subReply_" 
+                                                                data-comment-id=`${subReply._id}`
+                                                                data-author-id=`${author._id}`
+                                                                data-tree-id=`${treeID}`
+                                                                data-replies-to-user=`${replyAuthor._id}`
+                                                                
+                                                                ) Reply
+
+
+                                                    form(class=`comments__form comments__form--subReply_ hidden` 
+                                                        data-postID=`${post._id}` 
+                                                        data-level="subReply_" 
+                                                        data-replies-to-user=``
+                                                        data-replies-to-comment=``
+                                                        data-tree-id=`${treeID}`)
+
+
+                                                            div(class=`form__profile` 
+                                                            data-postID=`${post._id}`)
+
+                                                                img(class=`form__avatar` 
+                                                                data-postID=`${post._id}`
+                                                                src=`${loggedUser.profileImage}`)
+
+                                                            div(class=`form__content`)
+                                                                textarea(name="", cols="120"  class=`form__textarea form__textarea--medium` 
+                                                                data-postID=`${post._id}` 
+                                                                data-level="subReply_" 
+                                                                data-replies-to-user=``
+                                                                data-replies-to-comment=``
+                                                                data-tree-id=`${treeID}` 
+                                                                placeholder="Hey, whats going on?")
+
+
+
+
+                                                                div(class="content__container content__container--margin")
+                                                                    div(class="form__tag" 
+                                                                    data-postID=`${post._id}` 
+                                                                    data-level="subReply_" 
+                                                                    data-replies-to-user=``
+                                                                    data-replies-to-comment=``
+                                                                    data-tree-id=`${treeID}`) 
+
+                                                                        a(class="tag__text" 
+                                                                        data-postID=`${post._id}` 
+                                                                        data-level="subReply_" 
+                                                                        data-replies-to-user=``
+                                                                        data-replies-to-comment=`` 
+                                                                        data-tree-id=`${treeID}`) 
+
+                                                                    div(class="container__labels")
+
+                                                                        label(for="hiddenInputs__photos" class="form__photos")
+                                                                            img(src="/imgs/icons/camera.png", alt="Choose file", class="form__image" srcset="") 
+                                                                        label(for="hiddenInputs__submit" class=`form__submit` 
+                                                                        data-postID=`${post._id}` 
+                                                                        data-level="subReply_" 
+                                                                        data-replies-to-user=``
+                                                                        data-replies-to-comment=``
+                                                                        data-tree-id=`${treeID}`)
+                                                                            img(src="/imgs/icons/send.png", alt="Choose file", class="form__image" srcset="") 
+
+
+                                                            div(class="form__hiddenInputs")
+                                                                input(class=`hiddenInputs__photos` data-postID=`${post._id}`  type="file", name="" id="hiddenInputs__photos") 
+                                                                input(class=`hiddenInputs__submit` data-postID=`${post._id}` id="hiddenInputs__submit" type="submit", value="Submit")                      
+
+
+
+
+            if post.postImages.length === 1
+
+
+
+
+
+
+

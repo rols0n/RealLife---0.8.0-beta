@@ -1,0 +1,33 @@
+{
+  "name": "rl",
+  "version": "0.7.0",
+  "description": "RL (Real Life) is a social media platfrom, similiar to Facebook.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "author": "Patryk ROLSON R.",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "git": "^0.1.5",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^5.13.15",
+    "multer": "^1.4.5-lts.1",
+    "prettier": "^2.8.4",
+    "sharp": "^0.31.1",
+    "socket.io": "^4.6.0",
+    "socket.io-client": "^4.6.0",
+    "ws": "^8.12.0"
+  },
+  "devDependencies": {
+    "pug": "^3.0.2"
+  },
+  "prettier": {
+    "printWidth": 80
+  }
+}

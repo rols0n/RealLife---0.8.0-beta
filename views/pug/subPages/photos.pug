@@ -1,0 +1,39 @@
+include ../utils/_header.pug
+include ../utils/_navbar.pug
+include ../utils/_postCreator.pug
+html 
+    head 
+        block header
+
+        link(rel="stylesheet", href="/css/userPage/userPage.css")
+        link(rel="stylesheet", href="/css/userPage/topContent.css")
+        link(rel="stylesheet", href="/css/userPage/profileConfigMenu.css")
+        link(rel="stylesheet", href="/css/userPage/subPages/photos.css")
+
+
+        title Real Life | User Page
+    body.body
+        block ../navbar
+        block ../postCreator
+        include ../utils/_profileTopContent.pug
+            
+        div(class="content__userPage content__userPage--informations content__userPage__posts")
+            //- Photos 
+            div(class="content__userPage__images")
+                if user.privacySettings.photos === "public"
+                    div(class="content__userPage__images__navbar")
+                        div(class="content__userPage__images__navbar__leftSide")
+                            h1(class="content__userPage__images__navbar__leftSide__option content__userPage__images__navbar__leftSide__option--active") Your photos 
+                            h1(class="content__userPage__images__navbar__leftSide__option") Albums
+                        div(class="content__userPage__images__navbar__rightSide")
+                            h1(class="content__userPage__images__navbar__rightSide__upload") Upload photo/movie
+                    div(class="content__userPage__images__imageCard")
+                        for image in user.images 
+                            a(class="content__userPage__images__imageCard__image" href=`/userPage/${user._id}/image/${image.split('/')[4]}`)
+                                img(class="" src=`${image}`)
+                        //- img(class="content__userPage__images__imageCard__image" src=`${user.profileImage}`, alt="image")
+                        //- img(class="content__userPage__images__imageCard__image" src=`${user.bannerImage}`, alt="image")
+                else if user.privacySettings.photos === "private"
+                    div(class="privateMessageContainer")
+                        h1.privateMessage=`User's photos are set to private`
+        script(src="/js/subPages/photos.js")

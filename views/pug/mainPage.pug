@@ -1,0 +1,48 @@
+include utils/_header.pug
+include utils/_navbar.pug
+include utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/mainPage/mainPage.css")
+        link(rel="stylesheet", href="/css/mainPage/leftSideBar.css")
+        link(rel="stylesheet", href="/css/mainPage/rightSideBar.css")
+        link(rel="stylesheet", href="/css/utils/_postCreator.css")
+        link(rel="stylesheet", href="/css/utils/_postCreatorDisplayer.css")
+        link(rel="stylesheet", href="/css/utils/_posts.css")
+        link(rel="stylesheet", href="/css/utils/_comments.css")
+
+
+        title Real Life | Main Page
+
+    body(class="body--mainPage" data-loggedUser-id=`${loggedUser._id}` style="display: grid")
+        block navbar
+        block postCreator
+     
+
+        div(class="content content--mainPage")
+            include utils/_leftSideBar.pug
+
+            main(class="mainContent")
+                div(class="content__userPage__rightContent")
+                div(class="postCreatorDisplayer postCreatorDisplayer--mainPage")
+                    include utils/_postCreatorDisplayer.pug
+                    
+
+
+                div(class="activityStatus")
+                    img(class="activityStatus__image" src="/imgs/faces/face1.jpg")
+                    img(class="activityStatus__image" src="/imgs/faces/face2.jpg")
+                    img(class="activityStatus__image" src="/imgs/faces/face3.jpg")
+                    img(class="activityStatus__image" src="/imgs/faces/face4.jpg")
+                    img(class="activityStatus__image" src="/imgs/faces/face5.jpg")
+
+                div(class="posts")
+            //-         include utils/_posts.pug                
+
+            include utils/_rightSideBar.pug
+        
+
+        script(type="module" src="/js/mainPage.js" ) 
+        script(src="/js/_postCreator.js") 
+        script(src="/js/utils/_postCreatorClassManager.js") 

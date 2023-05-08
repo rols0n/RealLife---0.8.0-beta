@@ -1,0 +1,48 @@
+if overview.friends === false
+    - let btnName = "add";
+    //- 1) loop over logged user sent requests and see if theres an mutualMember._id
+    for req in loggedUser.sentRequests
+        if `${req._id}` === `${mutualMember._id}`
+            - btnName = "cancel"
+
+        if `${req._id}` === `${loggedUser._id}`
+            - btnName = 'none'
+
+    //- 2) loop over logged user received requests and see if theres an mutualMember._id
+    for req in loggedUser.receivedRequests
+        if `${req._id}` === `${mutualMember._id}`
+            - btnName = "accept/reject"
+
+
+        if `${req._id}` === `${loggedUser._id}`
+            - btnName = 'none'
+
+
+    if btnName === "accept/reject"
+        button(class=`userCard__btn userCard__btn--accept userID_${mutualMember._id}`) 
+            img(class="btn__image" src="/imgs/icons/user-plus.png")
+            span.span--btn Accept
+
+        button(class=`userCard__btn userCard__btn--reject userID_${mutualMember._id}`) 
+            img(class="btn__image" src="/imgs/icons/user-minus.png")
+            span(class="span--btn span--btn--2nd") Reject
+
+
+    if btnName === "cancel"
+        button(class=`userCard__btn userCard__btn--cancel userID_${mutualMember._id}`) 
+            img(class="btn__image" src="/imgs/icons/user-minus.png")
+            span.span--btn Cancel Request
+
+
+    if btnName === "add"
+        button(class=`userCard__btn userCard__btn--add userID_${mutualMember._id}`) 
+            img(class="btn__image" src="/imgs/icons/user-plus.png")
+            span.span--btn Add Friend  
+
+
+
+
+if overview.friends === true
+    button(class=`userCard__btn userCard__btn--delete userID_${mutualMember._id}`) 
+        img(class="btn__image" src="/imgs/icons/user-minus.png")
+        span.span--btn Delete Friend

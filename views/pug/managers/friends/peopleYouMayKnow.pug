@@ -1,0 +1,63 @@
+include ../../utils/_header.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/requestsManagers/groups&friends.css")
+        link(rel="stylesheet", href="/css/userPage/topContent.css")
+        link(rel="stylesheet", href="/css/userPage/profileConfigMenu.css")
+        link(rel="stylesheet", href="/css/userPage/userPage.css")
+
+        link(rel="stylesheet", href="/css/utils/_postCreator.css")
+        link(rel="stylesheet", href="/css/utils/_postCreatorDisplayer.css")
+        link(rel="stylesheet", href="/css/utils/_posts.css")
+        link(rel="stylesheet", href="/css/utils/_comments.css")
+        title Real Life | Friends Page
+
+    body.friendsBody
+        include ../../utils/_navbar.pug
+
+        div(class="container")
+            div(class="leftSide")
+                a(class="leftSide__btn" data-btn-type="not-active" href="/friends")
+                    img(class="leftSide__icon" src="/imgs/icons/home-white.png")
+                    h3(class="leftSide__text") Home
+
+
+                a(class="leftSide__btn" data-btn-type="not-active" style="margin-top: 20px; margin-bottom: 0px;" href=`/friends/sent`)
+                    img(class="leftSide__icon" src="/imgs/icons/users-white.png")
+                    h3(class="leftSide__text") Sent friend requests
+                a(class="leftSide__btn" data-btn-type="not-active" href=`/friends/received`)
+                    img(class="leftSide__icon" src="/imgs/icons/user-plus-white.png")
+                    h3(class="leftSide__text") Received friend requests
+
+                a(class="leftSide__btn" data-btn-type="active" href=`/friends/people-you-may-know`)
+                    img(class="leftSide__icon" src="/imgs/icons/users-three-white.png")
+                    h3(class="leftSide__text") People you may know                
+
+                div(class="leftSide__receivedRequests")
+                    for receivedRequest in loggedUser.receivedRequests 
+
+                        div(class=`leftSide__receivedRequest id_${receivedRequest._id}` data-card-type="sent" style=`${`${receivedRequest._id}` === `${user._id}` ? "background-color: #e9e9eb; border-color: #e9e9eb;" : ""}`)
+                            img(class="leftSide__profileImage" src=`${receivedRequest.profileImage}`)
+                            div(class="leftSide__container")
+                                h1(class="leftSide__userName")=`${receivedRequest.firstName} ${receivedRequest.lastName}`
+                                div(class="leftSide__buttons")
+                                    button(class=`leftSide__reject id_${receivedRequest._id}`) Reject 
+                                    button(class=`leftSide__accept id_${receivedRequest._id}`) Accept 
+
+
+ 
+
+
+
+
+
+            div(class="rightSide" style="width: 100%;padding-top: 0;")
+                if user._id !== loggedUser._id
+                    include ../../utils/_profilePreview.pug
+
+
+
+        script(src="/js/friends.js") 
+        script(src="/js/userPage.js")         
+        

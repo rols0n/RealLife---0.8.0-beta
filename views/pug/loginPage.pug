@@ -1,0 +1,24 @@
+include utils/_header.pug
+
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/login&signup.css")
+        
+        title Real Life | Login Page
+
+    body.loginPageBody
+        div(class="loginContent")
+            img(class="loginContent__logo" src="/imgs/icons/logoLoginPage.png", alt="", srcset="")
+            form(class="loginForm" id="loginForm" onsubmit="provide()")
+
+
+                div(class="loginFrom__email")
+                    input(type="email" id="email"  placeholder="Email" required)
+                div(class="loginForm__password")
+                    input(type="password" id="password" name="password" placeholder="Password (8char+)"
+           minlength="8" required)
+                div.buttons
+                    <input class="submit" type="submit" id="submit" value="Log in" style="margin-left: 1.5%">
+                    button(class="signupButton" id="signupButton") Sign up
+            script(src="/js/logIn.js") 

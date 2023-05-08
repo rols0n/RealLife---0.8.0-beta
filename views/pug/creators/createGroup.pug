@@ -1,0 +1,159 @@
+include ../utils/_header.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/requestsManagers/groups&friends.css")
+
+
+        link(rel="stylesheet", href="/css/creators/groupCreator.css")
+
+        link(rel="stylesheet", href="/css/groupPage/groupPage.css")
+        link(rel="stylesheet", href="/css/groupPage/utils/_sideBar.css")
+
+        link(rel="stylesheet", href="/css/utils/_postCreator.css")
+        link(rel="stylesheet", href="/css/utils/_postCreatorDisplayer.css")
+        link(rel="stylesheet", href="/css/utils/_posts.css")
+        link(rel="stylesheet", href="/css/utils/_comments.css")
+        //- link(rel="stylesheet" href)
+        title Real Life | Group Creator
+
+    body(class="friendsBody" data-loggedUser-id=`${loggedUser._id}`)
+        include ../utils/_navbar.pug
+
+        div(class="container")
+            div(class="leftSide leftSide__create-group")
+                a(class="leftSide__btn" data-btn-type="not-active" href="/groups")
+                    img(class="leftSide__icon" src="/imgs/icons/home-white.png")
+                    h3(class="leftSide__text") Home
+
+      
+                a(class="leftSide__btn" data-btn-type="active" href=`/groups/create-group`)
+                    img(class="leftSide__icon" src="/imgs/icons/users-three-white.png")
+                    h3(class="leftSide__text") Create your own group
+
+                
+
+                //- 
+                div(class="creator__section" data-section-type="input-file")
+                    h3(class="creator__header") Upload Group's Banner:
+                    input(type="file", id="creator__fileInput" accept="image/*")
+
+                div(class="creator__section")
+                    h3(class="creator__header") Set Group's Name:
+                    input(type="text", class="creator__input" style="border-color: var(--red)" minlength="5" maxlength="70" data-input-type="group's-name" placeholder="Your group's name")
+
+                div(class="creator__section")
+                    h3(class="creator__header") Set Group's Description: 
+                    input(type="text", class="creator__input" data-input-type="group's-description" minlength="15" maxlength="180" placeholder="This is description of the group.")
+
+                
+                div(class="creator__section" data-section-type="select")
+                    h3(class="creator__header") Set Group's Privacy settings:
+                    select(class="creator__select" data-select-type="privacy")
+                        option(value="private") Private.
+                        option(value="public-interactions-off") Public with interactions for strangers turned off.
+                        option(value="public-interactions-on") Public with interactions for strangers turned on.
+
+                div(class="creator__section" data-section-type="select")
+                    h3(class="creator__header") Set Group's Visibility settings:
+                    select(class="creator__select" data-select-type="visibility")
+                        option(value="anyone-can-find") Anyone can find. 
+                        option(value="public-interactions-off") Only members can find this group. 
+                        option(value="public-interactions-on") Only members and their friends can find this group.
+
+                
+                div(class="creator__section" data-section-type="select")
+                    h3(class="creator__header") Set Group's requests policy:
+                    select(class="creator__select" data-select-type="requests")
+                        option(value="anyone-can-send") Anyone can send requests.
+                        option(value="only-friends-of-members-and-members") Only members and their friends.
+                                                   
+
+                div(class="creator__buttons")
+                    a(href="/groups")
+                        button(class="creator__cancel") Cancel 
+                    button(class="creator__submit") Create                                  
+             
+
+            
+            
+            div(class="rightSide rightSide--creator")
+                content(class=`group group--creator `)
+                    div(class="group__topContent")
+                        img( alt="group's background" src="/imgs/icons/group-banner-placeholder.png" class="group__backgroundImage")
+                        div(class="topContent__container")
+                            div(class="topContent__details")
+                                h1(class="topContent__name") Your group's name
+                                div(class="topContent__details__bottom")
+                                    div(class="topContent__privacy")
+                                        img(class="topContent__icon icon--small" src="/imgs/icons/lock-fill-closed.png" alt="privacy")
+                                        h1(class="topContent__description description--privacy") Private
+                                    h1(class="topContent__description")=`0 members` 
+                            include ../subPages/groups/utils/buttons.pug
+                        div(class="topContent__navbar")
+                            //- if not the member - about--active
+                            a(class="topContent__element topContent__element--active" ) About
+                            a(class="topContent__element" ) Discussion  
+
+
+                            a(class="topContent__element" ) Members         
+                    div(class="group__mainContent group__mainContent--about")
+                        div(class="mainContent__section section--about")
+                            div(class="section__top")
+                                h1(class="section__header") About this group
+                            div(class="section__midContent")
+                                h1(class="midContent__groupDescription")=`This is description of the group.`
+                                div(class="midContent__informations")
+                                 
+                                    div(class="midContent__information")
+                                        img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/lock-fill-closed.png")
+                                        div(class="midContent__rightSide")
+                                            h1(class="midContent__header") Private 
+                                            h2(class="midContent__description") This group is private
+                                 
+
+                                    div(class="midContent__information")
+                                        img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/clock-fill.png")
+                                        div(class="midContent__rightSide")
+                                            h1(class="midContent__header") History 
+                                            h2(class="midContent__description" data-dsc="createdAt")=`Group created at `
+
+                                    div(class="midContent__information")
+                                        img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/map-pin-fill.png")
+                                        div(class="midContent__rightSide")
+                                            h1(class="midContent__header") Poland
+
+                        div(class="mainContent__section section--members")
+                            div(class="section__top")
+                                h1(class="section__header") Members · 
+                                    span(style="color: var(--white60tint)")=0
+                            div(class="section__midContent")
+                          
+
+
+                        div(class="mainContent__section section--activity")
+                            div(class="section__top")
+                                h1(class="section__header") Activity
+                            div(class="section__midContent")
+                                div(class="midContent__informations")
+                                    div(class="midContent__information")
+                                        img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/chat-centered-text-duotone.png")
+                                        div(class="midContent__rightSide")
+                                            h1(class="midContent__header")=`0 new posts today` 
+                                            h2(class="midContent__description")=`0 in last month.`
+
+                                    div(class="midContent__information")
+                                        img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/user-list-duotone.png")
+                                        div(class="midContent__rightSide")
+                                            h1(class="midContent__header")=`0 total members` 
+                                            h2(class="midContent__description")=`0 new members in last week`
+
+                                    div(class="midContent__information")
+                                        img(class="midContent__icon" alt="Privacy icon" src="/imgs/icons/clock-fill.png")
+                                        div(class="midContent__rightSide")
+                                            h1(class="midContent__header")=`Created today.`
+
+
+        
+        script(src="/js/creators/createGroup.js")
+    

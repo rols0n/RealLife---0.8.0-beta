@@ -1,0 +1,37 @@
+include ../utils/_header.pug
+include ../utils/_navbar.pug
+include ../utils/_postCreator.pug
+html 
+    head 
+        block header
+
+        link(rel="stylesheet", href="/css/userPage/userPage.css")
+        link(rel="stylesheet", href="/css/userPage/topContent.css")
+        link(rel="stylesheet", href="/css/userPage/profileConfigMenu.css")
+        link(rel="stylesheet", href="/css/userPage/subPages/movies.css")
+
+
+        title Real Life | User Page
+    body.body
+        block ../navbar
+        block ../postCreator
+        include ../utils/_profileTopContent.pug
+     
+
+        div(class="content__userPage content__userPage--informations content__userPage__posts")
+            //- Movies
+            div(class="content__userPage__movies")
+                div(class="content__userPage__movies__navbar")
+                    div(class="content__userPage__movies__navbar__leftSide")
+                        h1(class="content__userPage__movies__navbar__leftSide__option content__userPage__movies__navbar__leftSide__option--active") Your movies 
+                        h1(class="content__userPage__movies__navbar__leftSide__option") Albums
+                    div(class="content__userPage__movies__navbar__rightSide")
+                        h1(class="content__userPage__movies__navbar__rightSide__upload") Upload photo/movie
+                div(class="content__userPage__movies__movieCard")
+                    img(class="content__userPage__movies__movieCard__movie" src="/imgs/pictures/e60.jpg", alt="movie")
+                    img(class="content__userPage__movies__movieCard__movie" src="/imgs/pictures/bugatti.jpg", alt="movie")
+                    img(class="content__userPage__movies__movieCard__movie" src="/imgs/pictures/e63.jpg", alt="movie")
+                    img(class="content__userPage__movies__movieCard__movie" src="/imgs/pictures/tupac.jpg", alt="movie")
+                    img(class="content__userPage__movies__movieCard__movie" src="/imgs/pictures/e39.jpg", alt="movie")
+                    img(class="content__userPage__movies__movieCard__movie" src="/imgs/pictures/e60.jpg", alt="movie")      
+        script(src="/js/subPages/movies.js")  

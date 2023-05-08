@@ -1,0 +1,81 @@
+include ../../../utils/_header.pug
+include ../../../utils/_navbar.pug
+include ../../../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/userPage/userPage.css")
+        link(rel="stylesheet", href="/css/userPage/topContent.css")
+        link(rel="stylesheet", href="/css/userPage/profileConfigMenu.css")
+        link(rel="stylesheet", href="/css/userPage/subPages/informations.css")
+
+
+
+        title Real Life | User Page
+    body(class=`body userID_${user._id}`)
+        //- block ../../../../navbar
+        block ../../../postCreator
+        include ../../../utils/_profileTopContent.pug
+       
+            
+        div(class=" content content--informations")
+            div(class="content__settings content__settings--informations")
+                div(class="settings__navbar")
+                    h2(class="settings__header")=`${loggedIn === true ? "Settings" : "Informations"}` 
+                    a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations`)
+                        button(class="navbar__btn")=`${loggedIn === true ? "Basic Settings" : "Basic Informations"}`
+                    
+                    button(class="navbar__btn navbar__btn--active")=`${loggedIn === true ? "Advanced Settings" : "Advanced Info"}`
+                    if loggedIn === true
+                        a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations/manage_friends`)    
+                            button(class="navbar__btn") Manage Friends
+                        a(href=`http://127.0.0.1:3000/userPage/${user._id}/informations/block_list`)    
+                            button(class="navbar__btn") Block List
+
+
+
+                - const allSettings = ['Feed', 'Friends', 'Informations Tab', 'Photos Tab', 'Movies Tab'] 
+                - const setTo = [loggedUser.privacySettings.visibilityOfFeed, loggedUser.privacySettings.visibilityOfFriends, loggedUser.privacySettings.visibilityOfInformationsTab,loggedUser.privacySettings.visibilityOfPhotosTab , loggedUser.privacySettings.visibilityOfMoviesTab ]
+                - const allOptions = ['public', 'friends-and-their-friends-only', 'friends-only', 'private']
+
+                div(class="settings__content settings__content--advanced_settings")
+                    - let settingIndex = 0;
+                    for setting in allSettings 
+                        - const settingClass = setting.replace(' ', '-').toLowerCase()
+
+                        div(class=`content__setting content__setting--${settingClass}_visibility`)
+                            div(class="setting__navbar")
+                                h2(class="navbar__header")=`Who can see ${loggedIn === true ? "your" : `${user.firstName}'s`} ${setting}?`  
+                            div(class=`setting__content setting__content--${settingClass}_visibility`)
+                                if loggedIn === true
+                                    select(class=`content__select content__select--${settingClass}_visibility`) 
+                                        - const currentSetting = setTo[settingIndex];
+                                        option(value=`${currentSetting}`)=`${currentSetting === 'public' ? 'everyone' : currentSetting}`
+                                        for option in allOptions 
+                                            if option !== currentSetting
+                                                option(value=`${option}`)=`${option === 'public' ? 'everyone' : option}`
+                                if loggedIn === false 
+                                    select(class=`content__select content__select--${settingClass}_visibility` disabled) 
+                                        - const currentSetting = setTo[settingIndex];
+                                        option(value=`${currentSetting}`)=`${currentSetting === 'public' ? 'everyone' : currentSetting}`
+                                        for option in allOptions 
+                                            if option !== currentSetting
+                                                option(value=`${option}`)=`${option === 'public' ? 'everyone' : option}`                                
+                        - settingIndex++;
+
+
+                    if loggedIn === true
+                        div(class="content__confirmation content__confirmation--advanced_settings")
+                            button(class="confirmation__btn confirmation__btn--cancel") Cancel 
+                            button(class="confirmation__btn confirmation__btn--submit") Submit
+
+
+
+            if user.privacySettings.informations === "private"
+                div(class="privateMessageContainer")
+                    h1.privateMessage=`User's informations page is set to private`
+        
+        
+        script(src="/js/subPages/informations.js") 
+        
+        script(type="module" src="/js/subPages/settings/advanced_settings.js")

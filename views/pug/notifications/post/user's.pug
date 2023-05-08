@@ -1,0 +1,77 @@
+include ../../utils/_header.pug
+include ../../utils/_navbar.pug
+include ../../utils/_postCreator.pug
+html 
+    head 
+        block header
+
+        
+        link(rel="stylesheet", href="/css/mainPage/mainPage.css")
+        script(await type="module" src="/js/notifications/post/generatePost.js" )
+        link(rel="stylesheet", href="/css/mainPage/leftSideBar.css")
+        link(rel="stylesheet", href="/css/mainPage/rightSideBar.css")
+        
+        link(rel="stylesheet", href="/css/utils/_postCreatorDisplayer.css")
+        
+        link(rel="stylesheet", href="/css/userPage/topContent.css")
+        link(rel="stylesheet", href="/css/userPage/profileConfigMenu.css")
+        link(rel="stylesheet", href="/css/userPage/userPage.css")
+
+        link(rel="stylesheet", href="/css/utils/_postCreator.css")
+        
+        link(rel="stylesheet", href="/css/utils/_posts.css")
+        link(rel="stylesheet", href="/css/utils/_comments.css")
+      
+        
+
+
+
+
+
+
+              
+        
+
+
+
+        //- ####
+
+        title Real Life | post's reply
+
+    body(class="body--mainPage" data-loggedUser-id=`${loggedUser._id}`)
+        block navbar
+        
+
+
+        div(class="curtain animate__animated animate__bounceOut   ")
+            img(class="curtain__logo" src="/imgs/icons/longLogoLogin.png")
+        div(class="content content--mainPage")
+            include ../../utils/_leftSideBar.pug
+
+            main(class="mainContent")
+                div(class="content__userPage__rightContent")
+                
+                    
+
+
+                
+
+                div(class="posts posts-notification" style="margin-top=124px")
+                //-     include ../../utils/_posts.pug                
+
+            include ../../utils/_rightSideBar.pug
+
+        
+        
+        //- script(src="/js/_postsController.js" type="module" ) 
+       
+        script(src="/js/utils/_postCreatorClassManager.js" ) 
+        script(src="/js/utils/_inputSizeAdjuster.js" )  
+         script(type="module" src="/js/reactionsController.js" defer)
+       
+        //- script(type="module" src="/js/commentReactions.js" defer)
+
+
+        
+         
+

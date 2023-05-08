@@ -1,0 +1,94 @@
+include ../../../../utils/_header.pug
+include ../../../../utils/_navbar.pug
+include ../../../../utils/_postCreator.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/groupPage/groupPage.css")
+        link(rel="stylesheet", href="/css/groupPage/utils/_sideBar.css")
+        link(rel="stylesheet", href="/css/groupPage/subPages/settings.css")
+        link(rel="stylesheet", href="/css/groupPage/subPages/advanced_settings.css")
+        link(rel="stylesheet", href="/css/requestsManagers/groups&friends.css")
+
+
+
+        title=`${group.name} | Requests`
+    body(class="bodyGroupPage" data-loggedUser-id=`${loggedUser._id}` data-group-id=`${group._id}`)
+        block navbar
+        include ../../../../utils/groups/_groupSideBar.pug
+
+        div(class="rightSide" style="margin-top: 41px;padding-left: 26px")
+            div(class="group__topContent")
+                img(src=`${group.bannerImage}` alt="group's background" class="group__backgroundImage")
+                div(class="topContent__container")
+                    div(class="topContent__details")
+                        h1(class="topContent__name")=group.name
+                        div(class="topContent__details__bottom")
+                            div(class="topContent__privacy")
+                                - let imgSrc = "/imgs/icons/lock-closed.png";
+                                - let text = "Private group"
+                                if group.settings.privacy !== "private"
+                                    - imgSrc = "/imgs/icons/lock-open.png"
+                                    - text = "Public group"
+                                img(class="topContent__icon icon--small" src=`${imgSrc}` alt="privacy")
+                                h1(class="topContent__description description--privacy")=text
+                            h1(class="topContent__description")=`${group.members.length} Members` 
+                    include ./../../utils/buttons.pug
+                div(class="topContent__navbar")
+                    //- if not the member - about--active
+                    a(class="topContent__element" href=`/group/${group._id}/about`) About
+                    a(class="topContent__element" href=`/group/${group._id}/discussion`) Discussion  
+                    a(class="topContent__element" href=`/group/${group._id}/members`) Members         
+                    a(class="topContent__element topContent__element--active" href=`/group/${group._id}/manageRequests`) Requests
+            div(class="rightSide__content")
+
+                div(class="section__top")
+                    h1(class="section__header") Requests 
+                if group.requests.received.length > 0 
+                    div(class="rightSide__section" data-section-type="received")
+                        div(class="section__heading" data-section-type="received")
+                            h3(class="rightSide__header" data-section-type="received") Received requests
+                        div(class="rightSide__cards" data-section-type="received")
+                            for request in group.requests.received
+                                - const user = request.user
+                               
+
+                                div(class="rightSide__card" style="transform: scale(0.80); background-color: transparent; height: auto; padding-bottom: 12px" data-section-type="received" data-user-id=`${user._id}`)
+                                    a(href=`/userPage/${user._id}`)
+                                        img(class="rightSide__avatar" data-section-type="received" data-user-id=`${user._id}` src=`${user.profileImage}`)
+                                    a(href=`/userPage/${user._id}`)
+                                        h4(class="rightSide__name" data-section-type="received" data-user-id=`${user._id}`)=`${user.firstName} ${user.lastName}`
+                                    button(class="rightSide__btn" data-btn-type="confirm" data-section-type="received" data-user-id=`${user._id}`) Confirm
+                                    button(class="rightSide__btn" data-btn-type="remove" data-section-type="received"  data-user-id=`${user._id}`) Remove
+
+
+
+                if group.requests.sent.length !== 0 || undefined 
+                    div(class="rightSide__section" data-section-type="sent")
+                        div(class="section__heading" data-section-type="sent")
+                            h3(class="rightSide__header" data-section-type="sent") Sent group invitations
+
+
+                        div(class="rightSide__cards" data-section-type="sent")
+
+                            for request in group.requests.sent
+                                - const user = request.user
+
+                                div(class="rightSide__card" style="transform: scale(0.80); background-color: transparent; height: auto; padding-bottom: 12px"  data-section-type="sent" data-user-id=`${user._id}`)
+                                    a(href=`/userPage/${user._id}`)
+                                        img(class="rightSide__avatar" data-section-type="sent" data-user-id=`${user._id}` src=`${user.profileImage}`)
+                                    a(href=`/userPage/${user._id}`)
+                                        h4(class="rightSide__name" data-section-type="sent" data-user-id=`${user._id}`)=`${user.firstName} ${user.lastName}`
+                                    button(class="rightSide__btn" data-btn-type="cancel" data-section-type="sent" data-user-id=`${user._id}`) Cancel
+
+
+
+                div(class="rightSide__section" data-section-type="invite")
+                    div(class="section__heading" data-section-type="invite")
+                        h3(class="rightSide__header" data-section-type="invite") Invite someone to your group
+                    input(class="rightSide__input" data-section-type="invite" placeholder="Type user's name")
+                    div(class="rightSide__cards" data-section-type="invite")
+        script(src="/js/groups/requests/managers/groupInvitesManager.js" type="module") 
+        script(src="/js/groups/requests/managers/cardsContainersFix.js" type="module") 
+        script(src="/js/groups/requests/managers/InvitesCancelationManager.js" type="module") 
+        script(src="/js/groups/requests/managers/acceptAndRejectManager.js" type="module") 

@@ -1,0 +1,33 @@
+include utils/_header.pug
+html 
+    head 
+        block header
+        link(rel="stylesheet", href="/css/login&signup.css")
+        
+        title Real Life | Signup Page
+        
+
+    body.loginPageBody
+        div(class="loginContent")
+            img(class="loginContent__logo" src="/imgs/icons/logoSignupPage.png", alt="", srcset="")
+            
+            h(class="loginForm__warning" id="loginForm__warning" style="color: white") User with this email already exists
+            form(class="loginForm" id="loginForm")
+                div(class="Form__name")
+                    input(type="text" id="firstName"  placeholder="First Name" required)
+                    input(class="Form__name__lastName" required type="text" id="lastName"  placeholder="Last Name")
+
+                div(class="Form__birthdate")
+                    label(for="birthdate") Birthdate: 
+                    input(type="date" id="birthdate" name="birthdate" class="birthdate"
+
+       min="1900-01-01" max="2009-10-23" required)
+                div(class="loginFrom__email")
+                    input(type="email" id="email"  placeholder="Email" required)
+                div(class="loginForm__password")
+                    input(type="password" id="password" name="password" placeholder="Password (8char+)"
+           minlength="8" required)
+                div.buttons
+                    <input class="submit" type="submit" id="submit" value="Sign up">
+                    button(class="loginButton" id="loginButton") Log in
+            script(src="/js/signup.js") 
