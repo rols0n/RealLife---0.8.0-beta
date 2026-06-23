@@ -206,11 +206,11 @@ const userSchema = new mongoose.Schema({
   ],
 
   activityStatus: {
-    lastTimeOnline: { type: Date, defualt: Date.now(), required: true },
+    lastTimeOnline: { type: Date, default: Date.now(), required: true },
     status: {
       type: "string",
       enum: ["online", "offline"],
-      defualt: "online",
+      default: "online",
       required: true,
     },
   },
@@ -229,9 +229,7 @@ userSchema.methods.correctPassword = async function (
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-// userSchema.pre("find", function () {
-//   this.populate("posts");
-// });
+
 
 const User = mongoose.model("User", userSchema);
 

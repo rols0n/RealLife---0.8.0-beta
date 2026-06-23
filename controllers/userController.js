@@ -140,7 +140,7 @@ exports.resizeProfilePicture = async (req, res, next) => {
     .resize(500, 500)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    .toFile(`views/imgs/users/${user._id}/profilePicture/${req.file.filename}`);
+    .toFile(`public/imgs/users/${user._id}/profilePicture/${req.file.filename}`);
 
   next();
 };
@@ -159,7 +159,7 @@ exports.resizeBannerPicture = async (req, res, next) => {
     .resize(1200, 628)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    .toFile(`views/imgs/users/${user._id}/bannerPicture/${req.file.filename}`);
+    .toFile(`public/imgs/users/${user._id}/bannerPicture/${req.file.filename}`);
 
   next();
 };
@@ -187,9 +187,9 @@ exports.getAllUsers = async (req, res) => {
 
 exports.createUser = async (req, res) => {
   const user = await User.create(req.body);
-  fs.mkdirSync(`./views/imgs//users/${user._id}`);
-  fs.mkdirSync(`./views/imgs/users/${user._id}/profilePicture`);
-  fs.mkdirSync(`./views/imgs/users/${user._id}/bannerPicture`);
+  fs.mkdirSync(`./public/imgs//users/${user._id}`);
+  fs.mkdirSync(`./public/imgs/users/${user._id}/profilePicture`);
+  fs.mkdirSync(`./public/imgs/users/${user._id}/bannerPicture`);
 
   // 2) Creating token
   const token = createJWTtoken(
@@ -277,7 +277,7 @@ exports.deleteUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
     await User.findByIdAndRemove(req.params.id);
-    const dir = `./views/imgs/users/${user._id}`;
+    const dir = `./public/imgs/users/${user._id}`;
     await fs.rm(dir, { recursive: true, force: true }, (err) => {
       if (err) {
         console.log("error");

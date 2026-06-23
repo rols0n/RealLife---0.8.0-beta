@@ -1,4 +1,4 @@
-// import { app } from "./app";
+// imPORT { app } from "./app";
 const app = require("./app");
 const cors = require("cors");
 const dotenv = require("dotenv");
@@ -9,12 +9,39 @@ const User = require("./models/userModel");
 const decodingToken = require("./utils/decodingToken");
 const server = new WebSocket.Server({ port: 8080 });
 
+
+const dns = require("dns");
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
+
+
 dotenv.config({ path: "./config.env" });
-const PORT = process.env.PORT;
-const dbConnectionString = process.env.DATABASE_CONNECTION_STRING.replace(
-  "<password>",
-  process.env.DATABASE_PASSWORD
-);
+const PORT = process.env.PORT || 3000;
+const dbConnectionString = process.env.DATABASE_CONNECTION_STRING
+
+
+
+
+mongoose
+  .connect(dbConnectionString, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 5000,
+  })
+  .then(() => {
+    console.log("DB connected");
+
+    app.listen(PORT, () => {
+      console.log(`Server is running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("DB connection failed:");
+    console.error(err.message);
+    process.exit(1);
+  });
+
+
 
 app.use(function (req, res, next) {
 
@@ -35,19 +62,10 @@ app.use(function (req, res, next) {
   
   res.setHeader("Access-Control-Allow-Credentials", true);
 
-  /
+  
   next();
 });
-mongoose.connect(
-  dbConnectionString,
-  {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true,
-  },
-  () => console.log("DB connected")
-);
+
 
 const clients = [];
 
@@ -58,8 +76,7 @@ server.on("connection", async function connection(ws, req) {
   let receivedData = null;
   ws.on("message", async function (event) {
     const data = JSON.parse(event.toString());
-    // console.log("received from client:", data);
-
+    
     if (data.eventCategory) {
       for (let i = 0; i < clients.length; i++) {
         clients[i].send(JSON.stringify(data));
@@ -68,6 +85,3 @@ server.on("connection", async function connection(ws, req) {
   });
 });
 
-http.listen(PORT, () => {
-  console.log("server is running");
-});

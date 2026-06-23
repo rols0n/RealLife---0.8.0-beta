@@ -5,37 +5,37 @@ const decodingToken = require("../utils/decodingToken");
 const generatePage = require("../utils/generatePage");
 
 exports.getMainPage = async (req, res, next) => {
-  generatePage(req, res, "mainPage", "pug/mainPage");
+  generatePage(req, res, "mainPage", "mainPage");
 };
 
 exports.userPage = async (req, res, next) => {
   try {
     if (req.params.id === "undefined" || undefined)
       throw "SOmething went wrong";
-    generatePage(req, res, "userPage", "pug/userPage");
+    generatePage(req, res, "userPage", "userPage");
   } catch (err) {
     const error = "500 internal server error";
     const description =
       "Something went wrong, wait a moment and refresh the page.";
     console.log(err);
-    return res.status(404).render("pug/error.pug", { error, description });
+    return res.status(404).render("error.pug", { error, description });
   }
 };
 
 exports.friends = async (req, res) => {
-  generatePage(req, res, "userPage", "pug/subPages/friends.pug");
+  generatePage(req, res, "userPage", "subPages/friends.pug");
 };
 exports.friends_birthdays = async (req, res) => [
   generatePage(
     req,
     res,
     "userPage",
-    "pug/subPages/userPage/friends/birthdays.pug"
+    "subPages/userPage/friends/birthdays.pug"
   ),
 ];
 
 exports.informations = async (req, res) => {
-  generatePage(req, res, "userPage", "pug/subPages/informations");
+  generatePage(req, res, "userPage", "subPages/informations");
 };
 
 exports.advancedSettings = async (req, res) => {
@@ -43,7 +43,7 @@ exports.advancedSettings = async (req, res) => {
     req,
     res,
     "userPage",
-    "pug/subPages/userPage/informations/advanced_settings.pug"
+    "subPages/userPage/informations/advanced_settings.pug"
   );
 };
 
@@ -52,7 +52,7 @@ exports.manage_friends = async (req, res) => {
     req,
     res,
     "userPage",
-    "pug/subPages/userPage/informations/manage_friends.pug"
+    "subPages/userPage/informations/manage_friends.pug"
   );
 };
 
@@ -61,7 +61,7 @@ exports.delete_friend = async (req, res) => {
     req,
     res,
     "userPage",
-    "pug/subPages/userPage/informations/friends/delete_friend.pug"
+    "subPages/userPage/informations/friends/delete_friend.pug"
   );
 };
 
@@ -70,7 +70,7 @@ exports.blockList = async (req, res) => {
     req,
     res,
     "userPage",
-    "pug/subPages/userPage/informations/blockList/blockList.pug"
+    "subPages/userPage/informations/blockList/blockList.pug"
   );
 };
 
@@ -79,16 +79,16 @@ exports.bL_manage_list = async (req, res) => {
     req,
     res,
     "userPage",
-    "pug/subPages/userPage/informations/blockList/manage_list.pug"
+    "subPages/userPage/informations/blockList/manage_list.pug"
   );
 };
 
 exports.movies = async (req, res) => {
-  generatePage(req, res, "userPage", "pug/subPages/movies");
+  generatePage(req, res, "userPage", "subPages/movies");
 };
 
 exports.photos = async (req, res) => {
-  generatePage(req, res, "userPage", "pug/subPages/photos");
+  generatePage(req, res, "userPage", "subPages/photos");
 };
 
 exports.friendsPage = async (req, res, next) => {
@@ -98,11 +98,11 @@ exports.friendsPage = async (req, res, next) => {
     .populate({ path: "sentRequests" });
   res
     .status(200)
-    .render("pug/friends", { loggedUser: user, user, preview: false });
+    .render("friends", { loggedUser: user, user, preview: false });
 };
 
 exports.friendsWithPreview = async (req, res, next) => {
-  generatePage(req, res, "userPage", "pug/friendsCopy");
+  generatePage(req, res, "userPage", "friendsCopy");
 };
 
 exports.friendsPage_sent = async (req, res) => {
@@ -110,7 +110,7 @@ exports.friendsPage_sent = async (req, res) => {
   const user = await User.findById(decoded.id)
     .populate({ path: "receivedRequests" })
     .populate({ path: "sentRequests" });
-  res.status(200).render("pug/managers/friends/sent", {
+  res.status(200).render("managers/friends/sent", {
     loggedUser: user,
     user,
     preview: false,
@@ -118,13 +118,13 @@ exports.friendsPage_sent = async (req, res) => {
 };
 exports.friendsPage_sent_preview = async (req, res) => {
   try {
-    generatePage(req, res, "userPage", "pug/managers/friends/sent");
+    generatePage(req, res, "userPage", "managers/friends/sent");
   } catch (err) {
     const error = "500 internal server error";
     const description =
       "Something went wrong, wait a moment and refresh the page.";
     console.log(err);
-    return res.status(404).render("pug/error.pug", { error, description });
+    return res.status(404).render("error.pug", { error, description });
   }
 };
 
@@ -133,14 +133,14 @@ exports.friendsPage_received = async (req, res) => {
   const user = await User.findById(decoded.id)
     .populate({ path: "receivedRequests" })
     .populate({ path: "sentRequests" });
-  res.status(200).render("pug/managers/friends/received", {
+  res.status(200).render("managers/friends/received", {
     loggedUser: user,
     user,
     preview: false,
   });
 };
 exports.friendsPage_received_preview = async (req, res) => {
-  generatePage(req, res, "userPage", "pug/managers/friends/received");
+  generatePage(req, res, "userPage", "managers/friends/received");
 };
 
 exports.friendsPage_pYmK = async (req, res) => {
@@ -148,22 +148,22 @@ exports.friendsPage_pYmK = async (req, res) => {
   const user = await User.findById(decoded.id)
     .populate({ path: "receivedRequests" })
     .populate({ path: "sentRequests" });
-  res.status(200).render("pug/managers/friends/peopleYouMayKnow", {
+  res.status(200).render("managers/friends/peopleYouMayKnow", {
     loggedUser: user,
     user,
     preview: false,
   });
 };
 exports.friendsPage_pYmK_preview = async (req, res, next) => {
-  generatePage(req, res, "userPage", "pug/managers/friends/peopleYouMayKnow");
+  generatePage(req, res, "userPage", "managers/friends/peopleYouMayKnow");
 };
 
 exports.loginPage = async (req, res, next) => {
-  res.status(200).render("pug/loginPage");
+  res.status(200).render("loginPage");
 };
 
 exports.signupPage = async (req, res, next) => {
-  res.status(200).render("pug/singupPage");
+  res.status(200).render("singupPage");
 };
 
 // GROUPS
@@ -172,28 +172,28 @@ exports.createGroup = async (req, res) => {
   try {
     const decoded = await decodingToken(req);
     const loggedUser = await User.findById(decoded.id);
-    res.status(200).render("pug/creators/createGroup.pug", { loggedUser });
+    res.status(200).render("creators/createGroup.pug", { loggedUser });
   } catch (err) {
     const error = "500 internal server error";
     const description =
       "Something went wrong, wait a moment and refresh the page.";
     console.log(err);
-    return res.status(404).render("pug/error.pug", { error, description });
+    return res.status(404).render("error.pug", { error, description });
   }
 };
 
 exports.groupPage = async (req, res) => {
-  generatePage(req, res, "groupPage", "pug/subPages/groups/discussion");
+  generatePage(req, res, "groupPage", "subPages/groups/discussion");
   // try {
   // const group = await Groups.findById(req.params.id);
   // console.log(group);
-  // res.status(200).render("pug/subPages/groups/discussion", { group });
+  // res.status(200).render("subPages/groups/discussion", { group });
   // } catch (err) {
   //   const error = "500 internal server error";
   //   const description =
   //     "Something went wrong, wait a moment and refresh the page.";
   //   console.log(err);
-  //   return res.status(404).render("pug/error.pug", { error, description });
+  //   return res.status(404).render("error.pug", { error, description });
   // }
 };
 
@@ -202,13 +202,13 @@ exports.groupPageRequestsMangaer = async (req, res) => {
     req,
     res,
     "groupPage",
-    "pug/subPages/groups/subPages/requests/manageRequests.pug"
+    "subPages/groups/subPages/requests/manageRequests.pug"
   );
 };
 
 exports.aboutSubPage = async (req, res) => {
   try {
-    generatePage(req, res, "groupPage", "pug/subPages/groups/about");
+    generatePage(req, res, "groupPage", "subPages/groups/about");
   } catch (error) {
     res.status(404).json({ status: "fail", error });
   }
@@ -216,7 +216,7 @@ exports.aboutSubPage = async (req, res) => {
 
 exports.discussionSubPage = async (req, res) => {
   try {
-    generatePage(req, res, "groupPage", "pug/subPages/groups/discussion");
+    generatePage(req, res, "groupPage", "subPages/groups/discussion");
   } catch (error) {
     res.status(404).json({ status: "fail", error });
   }
@@ -224,7 +224,7 @@ exports.discussionSubPage = async (req, res) => {
 
 exports.membersSubPage = async (req, res) => {
   try {
-    generatePage(req, res, "groupPage", "pug/subPages/groups/members");
+    generatePage(req, res, "groupPage", "subPages/groups/members");
   } catch (error) {
     res.status(404).json({ status: "fail", error });
   }
@@ -237,7 +237,7 @@ exports.administration = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/administration"
+      "subPages/groups/subPages/administration"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -250,7 +250,7 @@ exports.commonMembers = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/commonMembers"
+      "subPages/groups/subPages/commonMembers"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -263,7 +263,7 @@ exports.newToGroup = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/newToGroup"
+      "subPages/groups/subPages/newToGroup"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -306,7 +306,7 @@ exports.groupsManager = async (req, res) => {
       },
     });
 
-  res.status(200).render("pug/groupsManager", {
+  res.status(200).render("groupsManager", {
     loggedUser: user,
     user,
     preview: false,
@@ -353,7 +353,7 @@ exports.groupsManagerWithPreview = async (req, res) => {
 
     const previewingGroup = await Groups.findById(req.params.id);
 
-    res.status(200).render("pug/groupsManager", {
+    res.status(200).render("groupsManager", {
       loggedUser: user,
       user,
       preview: false,
@@ -366,7 +366,7 @@ exports.groupsManagerWithPreview = async (req, res) => {
 
 exports.groupSettings = async (req, res) => {
   try {
-    generatePage(req, res, "groupPage", "pug/subPages/groups/settings");
+    generatePage(req, res, "groupPage", "subPages/groups/settings");
   } catch (error) {
     res.status(404).json({ status: "fail", error });
   }
@@ -378,7 +378,7 @@ exports.manage_administration = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/settings/manage_administration"
+      "subPages/groups/subPages/settings/manage_administration"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -391,7 +391,7 @@ exports.adminsManager = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/settings/subPages/admins"
+      "subPages/groups/subPages/settings/subPages/admins"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -404,7 +404,7 @@ exports.modsManager = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/settings/subPages/mods"
+      "subPages/groups/subPages/settings/subPages/mods"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -419,7 +419,7 @@ exports.manage_members = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/settings/manage_members"
+      "subPages/groups/subPages/settings/manage_members"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -432,7 +432,7 @@ exports.remove_member = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/settings/subPages/remove_member"
+      "subPages/groups/subPages/settings/subPages/remove_member"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -445,7 +445,7 @@ exports.advanced_settings = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/settings/advanced_settings"
+      "subPages/groups/subPages/settings/advanced_settings"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -458,7 +458,7 @@ exports.rules = async (req, res) => {
       req,
       res,
       "groupPage",
-      "pug/subPages/groups/subPages/settings/rules"
+      "subPages/groups/subPages/settings/rules"
     );
   } catch (error) {
     res.status(404).json({ status: "fail", error });
@@ -469,13 +469,13 @@ exports.notifications_post = async (req, res) => {
   try {
     const decoded = await decodingToken(req);
     const loggedUser = await User.findById(decoded.id);
-    res.status(200).render("pug/notifications/post/user's", { loggedUser });
+    res.status(200).render("notifications/post/user's", { loggedUser });
   } catch (err) {
     const error = "500 internal server error";
     const description =
       "Something went wrong, wait a moment and refresh the page.";
     console.log(err);
-    return res.status(404).render("pug/error.pug", { error, description });
+    return res.status(404).render("error.pug", { error, description });
   }
 };
 
@@ -484,12 +484,12 @@ exports.chats = async (req, res) => {
   try {
     const decoded = await decodingToken(req);
     const loggedUser = await User.findById(decoded.id);
-    res.status(200).render("pug/chats/chats.pug", { loggedUser });
+    res.status(200).render("chats/chats.pug", { loggedUser });
   } catch (err) {
     const error = "500 internal server error";
     const description =
       "Something went wrong, wait a moment and refresh the page.";
     console.log(err);
-    return res.status(404).render("pug/error.pug", { error, description });
+    return res.status(404).render("error.pug", { error, description });
   }
 };

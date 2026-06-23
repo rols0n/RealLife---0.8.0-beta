@@ -58,19 +58,21 @@ exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    // 1)  Checking if EMAIL && PASSWORD exists
+    // 1) Checking if EMAIL && PASSWORD exists
     if (!email || !password) {
-      res.status(400).json({
-        status: "error",
+      return res.status(400).json({
+        status: "fail",
+        message: "Please provide email and password",
       });
     }
+
     // 2) Checking if USER exists && PASSWORD is correct
     const user = await User.findOne({ email }).select("+password");
 
     if (!user || !(await user.correctPassword(password, user.password))) {
-      res.status(404).json({
+      return res.status(401).json({
         status: "fail",
-        message: "incorrect email or password",
+        message: "Incorrect email or password",
       });
     }
 
@@ -81,25 +83,28 @@ exports.login = async (req, res, next) => {
       process.env.JWT_EXPIRES_IN
     );
 
-    // 4) Singing JWT token to the cookie
+    // 4) Saving JWT token to cookie
     const jwtExpiresIn = new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     );
 
     res.cookie("jwt", token, {
-      expiresIn: jwtExpiresIn,
+      expires: jwtExpiresIn,
       httpOnly: true,
     });
 
-    // 5) Sending the TOKEN to the CLIENT
-    res.status(201).json({
+    // 5) Sending response
+    return res.status(200).json({
       status: "success",
       token,
     });
   } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      token,
+    console.error("Login error:", err);
+
+    return res.status(500).json({
+      status: "error",
+      place: "authController | login",
+      message: err.message,
     });
   }
 };

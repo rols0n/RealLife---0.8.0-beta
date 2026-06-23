@@ -1,3 +1,8 @@
 /JSONTEMPLATES
 /templates
 /TODO
+
+node_modules/
+config.env
+.env
+users/
