@@ -11,8 +11,8 @@ const requests = document.getElementsByClassName("selector--requests")[0];
 
 const groupID = document
   .getElementsByClassName("mainContent__settings")[0]
-  .classList[1].split("_")[1];
-
+  .classList[2].split("_")[1];
+console.log(groupID)
 submit.addEventListener("click", async (event) => {
   event.preventDefault();
 

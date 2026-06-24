@@ -24,14 +24,20 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 
-app.use("/", viewRouter);
+
 
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/comments", commentsRouter);
 app.use("/api/v1/posts", postRouter);
+
+
+
+
 app.use("/api/v1/groups", groupsRouter);
 app.use("/api/v1/searchEngine", searchRouter);
 
 app.use("/api/v1/notifications", notifications);
 app.use("/api/v1/chats", chats);
+
+app.use("/", viewRouter);
 module.exports = app;

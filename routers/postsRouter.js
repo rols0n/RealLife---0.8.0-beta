@@ -9,6 +9,12 @@ router
   .get(postController.getAllPosts)
   .post(postController.createPost);
 
+// router.post("/", (req, res) => {
+//   console.log("CREATE POST ROUTE HIT");
+//   res.json({ status: "ok" });
+// });
+
+
 router
   .route("/:id")
   .patch(authController.protect, postController.updatePost)

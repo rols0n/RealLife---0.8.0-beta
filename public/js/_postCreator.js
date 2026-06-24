@@ -112,8 +112,9 @@ const createPost = async () => {
       credentials: "same-origin",
     };
 
+    // console.log(cp_Raw);
     const cp_Response = await fetch(
-      "http://127.0.0.1:3000/api/v1/posts",
+      "/api/v1/posts",
       cp_RequestOptions
     );
     const cp_Result = await cp_Response.json();
@@ -153,6 +154,8 @@ const createPost = async () => {
         location.reload();
       }
     } else {
+
+      console.log(cp_Result)
       window.alert("Something went wrong with creating post");
     }
   }

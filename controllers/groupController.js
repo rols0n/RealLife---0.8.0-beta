@@ -476,9 +476,9 @@ module.exports.createGroup = async (req, res) => {
     const user = await User.findById(decoded.id);
 
     const freshGroup = await Group.findOne({ _id: group._id });
-    fs.mkdirSync(`./views/imgs/groups/${group._id}`);
-    fs.mkdirSync(`./views/imgs/groups/${group._id}/avatars`);
-    fs.mkdirSync(`./views/imgs/groups/${group._id}/banners`);
+    fs.mkdirSync(`./public/imgs/groups/${group._id}`);
+    fs.mkdirSync(`./public/imgs/groups/${group._id}/avatars`);
+    fs.mkdirSync(`./public/imgs/groups/${group._id}/banners`);
 
     res.status(200).json({
       status: "success",
@@ -926,7 +926,7 @@ exports.resizeAvatarImage = async (req, res, next) => {
     .resize(500, 500)
     .toFormat("jpeg")
     .jpeg({ quality: 95 })
-    .toFile(`views/imgs/groups/${group._id}/avatars/${req.file.filename}`);
+    .toFile(`public/imgs/groups/${group._id}/avatars/${req.file.filename}`);
 
   next();
 };
@@ -970,7 +970,7 @@ exports.resizeBannerImage = async (req, res, next) => {
     .resize(1250, 500)
     .toFormat("jpeg")
     .jpeg({ quality: 95 })
-    .toFile(`views/imgs/groups/${group._id}/banners/${req.file.filename}`);
+    .toFile(`public/imgs/groups/${group._id}/banners/${req.file.filename}`);
 
   next();
 };

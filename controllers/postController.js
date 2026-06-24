@@ -32,7 +32,7 @@ exports.resizePostImage = async (req, res, next) => {
     .resize(600, 350)
     .toFormat("jpeg")
     .jpeg({ quality: 90 })
-    .toFile(`views/imgs/posts/${post._id}/first--${req.file.filename}`);
+    .toFile(`public/imgs/posts/${post._id}/first--${req.file.filename}`);
 
   next();
 };
@@ -125,7 +125,7 @@ exports.deletePost = async (req, res) => {
     if (`${post.author._id}` !== `${decoded.id}`)
       throw `User needs to be author of  post to delete the post.`;
 
-    const dir = `./views/imgs/posts/${post._id}`;
+    const dir = `./public/imgs/posts/${post._id}`;
     await fs.rm(dir, { recursive: true, force: true }, (err) => {
       if (err) {
         console.log("error");
@@ -177,7 +177,7 @@ exports.createPost = async (req, res) => {
     const user = await User.findById(decoded.id).select("friends");
     req.body.author = user._id;
     const post = await Post.create(req.body);
-    fs.mkdirSync(`./views/imgs/posts/${post._id}`);
+    fs.mkdirSync(`./public/imgs/posts/${post._id}`);
 
     if (req.body.place === "userPage") {
       await User.findByIdAndUpdate(decoded.id, {

@@ -413,6 +413,8 @@ class postController {
       window.alert("Something went wrong. Try again later");
     }
 
+
+    console.log(result)
     const moveBack = document.querySelectorAll(
       `.postCard__setting--back[data-postid="${postID}"]`
     )[0];
@@ -488,6 +490,8 @@ class postController {
         userIDs.push(card.getAttribute("data-user-id"));
       });
 
+
+      console.log("List of users that are not allowed: ", userIDs)
       const raw = JSON.stringify({
         cantBeDisplayedBy: userIDs,
       });
@@ -733,6 +737,7 @@ class postController {
   };
 
   code = async (post) => {
+
     const postID = post.getAttribute("data-postid");
     this.level = "root";
     const attributes = `[data-postid="${postID}"]`;
