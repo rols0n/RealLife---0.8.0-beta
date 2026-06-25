@@ -1,6 +1,12 @@
 const express = require("express");
 
-const userController = require("../controllers/userController");
+const userController = require("../controllers/user/index");
+const userProfileController = require("../controllers/user/profile.controller")
+const userFriendsController = require("../controllers/user/friends.controller")
+const userGroupsController = require("../controllers/user/groups.controller")
+const userSearchEngineController = require("../controllers/user/searchEngine.controller")
+const userFeedController = require("../controllers/user/feed.controller")
+
 const authController = require("../controllers/authController");
 
 const router = express.Router();
@@ -13,7 +19,7 @@ router
   .post(userController.createUser)
   .get(userController.getAllUsers);
 
-router.route("/generateFeedPosts").get(userController.generateFeedContent);
+router.route("/generateFeedPosts").get(userFeedController.generateFeedContent);
 
 router
   .route("/:id")
@@ -32,69 +38,75 @@ router
 router
   .route("/updateProfilePicture/:random")
   .patch(
-    userController.uploadProfilePicture,
-    userController.resizeProfilePicture,
-    userController.updateProfilePicture
+    userProfileController.uploadProfilePicture,
+    userProfileController.resizeProfilePicture,
+    userProfileController.updateProfilePicture
   );
 
 router
   .route("/updateBannerPicture/:id")
   .patch(
-    userController.uploadBannerPicture,
-    userController.resizeBannerPicture,
-    userController.updateBannerPicture
+    userProfileController.uploadBannerPicture,
+    userProfileController.resizeBannerPicture,
+    userProfileController.updateBannerPicture
   );
 
 router
   .route("/sendFriendsRequest/:id")
-  .patch(authController.protect, userController.sendFriendsRequest);
+  .patch(authController.protect, userFriendsController.sendFriendsRequest);
 
 router
   .route("/acceptFriendsRequest/:id")
-  .patch(authController.protect, userController.acceptFriendsRequest);
+  .patch(authController.protect, userFriendsController.acceptFriendsRequest);
 
 router
   .route("/rejectFriendsRequest/:id")
-  .patch(authController.protect, userController.rejectFriendsRequest);
+  .patch(authController.protect, userFriendsController.rejectFriendsRequest);
 
 router
   .route("/cancelFriendsRequest/:id")
-  .patch(authController.protect, userController.cancelFriendsRequest);
+  .patch(authController.protect, userFriendsController.cancelFriendsRequest);
 
 router
   .route("/deleteFriend/:id")
-  .patch(authController.protect, userController.deleteFriend);
+  .patch(authController.protect, userFriendsController.deleteFriend);
+
+
+router
+  .route("/birthdays/:id")
+  .get(authController.protect, userFriendsController.birthdays);
+
+
+
 
 router
   .route("/groups/sendRequest/:id")
-  .post(authController.protect, userController.sendGroupsRequests);
+  .post(authController.protect, userGroupsController.sendGroupsRequests);
 
 router
   .route("/groups/cancelRequest/:id")
-  .patch(authController.protect, userController.cancelGroupsRequests);
+  .patch(authController.protect, userGroupsController.cancelGroupsRequests);
 
 router
   .route("/groups/acceptRequest/:id")
-  .patch(authController.protect, userController.acceptGroupsRequests);
+  .patch(authController.protect, userGroupsController.acceptGroupsRequests);
 
 router.route(
   "/groups/rejectRequest/:id",
   authController.protect,
-  userController.rejectGroupsRequests
+  userGroupsController.rejectGroupsRequests
 );
 
 router
   .route("/:id/searchEngine/friends")
-  .post(userController.searchEngine_friends);
+  .post(userSearchEngineController.searchEngine_friends);
 
-router
-  .route("/birthdays/:id")
-  .get(authController.protect, userController.birthdays);
+  // ###########
+  // People You May Know
+  router
+    .route("/peopleYouMayKnow_alreadySeen/add")
+    .post(authController.protect, userSearchEngineController.pYmK_aS_ADD);
 
-// ###########
-// People You May Know
-router
-  .route("/peopleYouMayKnow_alreadySeen/add")
-  .post(authController.protect, userController.pYmK_aS_ADD);
+
 
 module.exports = router;
