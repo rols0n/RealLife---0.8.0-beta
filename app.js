@@ -10,6 +10,10 @@ const searchRouter = require("./routers/searchRouter");
 const notifications = require("./routers/notificationsRouter");
 const chats = require("./routers/chatRouter");
 
+
+const notFoundHandler = require("./middlewares/notFoundHandler")
+const errorHandler = require("./middlewares/errorHandler")
+
 const app = express();
 
 app.engine("pug", require("pug").__express);
@@ -40,4 +44,14 @@ app.use("/api/v1/notifications", notifications);
 app.use("/api/v1/chats", chats);
 
 app.use("/", viewRouter);
+
+
+
+app.use(notFoundHandler);
+
+app.use(errorHandler);
+
+
 module.exports = app;
+
+
