@@ -1,7 +1,7 @@
 const Group = require("../../models/groupModel");
 const User = require("../../models/userModel");
 
-const addNewMember = require("./utils/addNewMember")
+const addNewMember = require("./services/groupRole.service.")
 const removeMember = require("./utils/removeMember")
 const roleValidation = require("./utils/roleValidation")
 
