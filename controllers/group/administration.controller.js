@@ -1,13 +1,14 @@
 const Group = require("../../models/groupModel");
 const User = require("../../models/userModel");
 
-const addNewMember = require("utils/addNewMember")
-const removeMember = require("utils/removeMember")
-const roleValidation = require("utils/roleValidation")
+const addNewMember = require("./utils/addNewMember")
+const removeMember = require("./utils/removeMember")
+const roleValidation = require("./utils/roleValidation")
 
 const handlerController = require("../handlerController");
 const authController = require("../authController");
 
+const decodingToken = require("../../utils/decodingToken");
 
 module.exports.addNewAdmin = async (req, res) => {
   try {
