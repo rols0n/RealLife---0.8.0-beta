@@ -184,17 +184,7 @@ exports.createGroup = async (req, res) => {
 
 exports.groupPage = async (req, res) => {
   generatePage(req, res, "groupPage", "subPages/groups/discussion");
-  // try {
-  // const group = await Groups.findById(req.params.id);
-  // console.log(group);
-  // res.status(200).render("subPages/groups/discussion", { group });
-  // } catch (err) {
-  //   const error = "500 internal server error";
-  //   const description =
-  //     "Something went wrong, wait a moment and refresh the page.";
-  //   console.log(err);
-  //   return res.status(404).render("error.pug", { error, description });
-  // }
+
 };
 
 exports.groupPageRequestsMangaer = async (req, res) => {

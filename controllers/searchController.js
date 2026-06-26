@@ -174,33 +174,7 @@ exports.peopleYouMayKnow = async (req, res) => {
         }
       }
 
-    // for (let i = 0; i < 10; i++) {
-    //   if (matched.length < 8) {
-    //     const randomNum = Math.floor(Math.random() * users.length);
-    //     const randomUser = users[randomNum];
-    //     let canContinue = true;
-    //     const obj = {
-    //       user: {
-    //         _id: randomUser._id,
-    //         firstName: randomUser.firstName,
-    //         lastName: randomUser.firstName,
-    //         profileImage: randomUser.profileImage,
-    //       },
-    //     };
-    //     notAllowed.forEach((el) => {
-    //       if (`${el}` === `${randomUser._id}`) canContinue = false;
-    //     });
-    //     if (canContinue && `${randomUser._id}` !== `${user._id}`) {
-    //       if (randomUser.cityHome === user.cityHome) {
-    //         matched.push(obj);
-    //       } else if (randomUser.country === user.country) {
-    //         matched.push(obj);
-    //       }
-    //     }
-    //   }
-    // }
 
-    // console.log(count, u);
     res.status(200).json({
       status: "success",
       data: { length: matched.length, matched },
