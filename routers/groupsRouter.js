@@ -1,68 +1,81 @@
 const express = require("express");
 
 const authController = require("../controllers/authController");
-const groupsController = require("../controllers/groupController");
+const groupController = require("../controllers/group/index");
+
+const groupAdministrationController = require("../controllers/group/administration.controller");
+const groupMembershipController = require("../controllers/group/membership.controller")
+const groupMediaController = require("../controllers/group/media.controller")
+
 const router = express.Router();
 
 router
   .route("/")
-  .get(authController.protect, groupsController.getAllGroups)
-  .post(authController.protect, groupsController.createGroup);
+  .get(authController.protect, groupController.getAllGroups)
+  .post(authController.protect, groupController.createGroup);
 
 router
   .route("/:id")
-  .get(authController.protect, groupsController.getGroupById)
-  .delete(authController.protect, groupsController.deleteGroup)
-  .patch(authController.protect, groupsController.updateGroup);
-
-router
-  .route("/:id/administrators")
-  .post(authController.protect, groupsController.addNewAdmin)
-  .delete(authController.protect, groupsController.removeAdmin);
-router
-  .route("/:id/moderators")
-  .post(authController.protect, groupsController.addNewModerator)
-  .delete(authController.protect, groupsController.deleteModerator);
-
-router
-  .route("/removeMember/:id")
-  .delete(authController.protect, groupsController.removeUser);
+  .get(authController.protect, groupController.getGroupById)
+  .delete(authController.protect, groupController.deleteGroup)
+  .patch(authController.protect, groupController.updateGroup);
 
 router
   .route("/leaveGroup/:id")
-  .patch(authController.protect, groupsController.leaveGroup);
+  .patch(authController.protect, groupController.leaveGroup);
+
+
+// =====
+
+router
+  .route("/:id/administrators")
+  .post(authController.protect, groupAdministrationController.addNewAdmin)
+  .delete(authController.protect, groupAdministrationController.removeAdmin);
+router
+  .route("/:id/moderators")
+  .post(authController.protect, groupAdministrationController.addNewModerator)
+  .delete(authController.protect, groupAdministrationController.deleteModerator);
+
+router
+  .route("/removeMember/:id")
+  .delete(authController.protect, groupAdministrationController.removeUser);
+
+
+// ======================
 
 router
   .route("/request/sendInvitation/:id")
-  .post(authController.protect, groupsController.sendGroupInvitation);
+  .post(authController.protect, groupMembershipController.sendGroupInvitation);
 
 router
   .route("/request/cancelInvitation/:id")
-  .patch(authController.protect, groupsController.cancelGroupInvitation);
+  .patch(authController.protect, groupMembershipController.cancelGroupInvitation);
 
 router
   .route("/request/acceptGroupRequest/:id")
-  .patch(authController.protect, groupsController.acceptGroupRequest);
+  .patch(authController.protect, groupMembershipController.acceptGroupRequest);
 
 router
   .route("/request/rejectGroupRequest/:id")
-  .patch(authController.protect, groupsController.rejectGroupRequest);
+  .patch(authController.protect, groupMembershipController.rejectGroupRequest);
 
-// IMAGES
+
+
+//==================================
 router
   .route("/updateAvatarImage/:id")
   .patch(
-    groupsController.uploadAvatarImage,
-    groupsController.resizeAvatarImage,
-    groupsController.updateAvatarImage
+    groupMediaController.uploadAvatarImage,
+    groupMediaController.resizeAvatarImage,
+    groupMediaController.updateAvatarImage
   );
 
 router
   .route("/updateBannerImage/:id")
   .patch(
-    groupsController.uploadBannerImage,
-    groupsController.resizeBannerImage,
-    groupsController.updateBannerImage
+    groupMediaController.uploadBannerImage,
+    groupMediaController.resizeBannerImage,
+    groupMediaController.updateBannerImage
   );
 
 module.exports = router;
