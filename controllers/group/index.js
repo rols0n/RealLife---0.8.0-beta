@@ -8,6 +8,9 @@ const roleValidation = require("./utils/roleValidation")
 const handlerController = require("../handlerController");
 const authController = require("../authController");
 
+const asyncHandler = require("../../middlewares/utils/asyncHandler")
+const AppError = require("../../middlewares/utils/AppError")
+
 const decodingToken = require("../../utils/decodingToken");
 const fs = require("fs");
 
@@ -17,15 +20,15 @@ const fs = require("fs");
 
 
 
-module.exports.getAllGroups = async (req, res) => {
+module.exports.getAllGroups = asyncHandler(async (req, res,next) => {
   handlerController.getAll(req, res, Group);
-};
-module.exports.getGroupById = async (req, res) => {
+});
+module.exports.getGroupById = asyncHandler(async (req, res, next) => {
   handlerController.getById(req, res, Group);
-};
+});
 
-module.exports.createGroup = async (req, res) => {
-  try {
+module.exports.createGroup = asyncHandler(async (req, res, next) => {
+ 
     const decoded = await decodingToken(req);
     if (req.body.users) {
       Array.prototype.forEach.call(req.body.users, async (userId) => {
@@ -90,12 +93,10 @@ module.exports.createGroup = async (req, res) => {
         user,
       },
     });
-  } catch (error) {
-    res.status(404).json({ status: "fail", error });
-  }
-};
+  
+});
 
-module.exports.leaveGroup = async (req, res) => {
+module.exports.leaveGroup = asyncHandler(async (req, res, next) => {
   const decoded = await decodingToken(req);
   req.body.user = decoded.id;
 
@@ -115,10 +116,10 @@ module.exports.leaveGroup = async (req, res) => {
   if (isAdmin !== true && isModerator !== true) {
     removeMember(req, res, User, Group, "user");
   }
-};
+});
 
-module.exports.deleteGroup = async (req, res) => {
-  try {
+module.exports.deleteGroup = asyncHandler(async (req, res, next) => {
+  
     await authController.isAdminOrMod(req, "admin");
 
     const clearUsersFields = async function (users) {
@@ -162,20 +163,22 @@ module.exports.deleteGroup = async (req, res) => {
     await Group.findByIdAndDelete(req.params.id);
 
     res.status(200).json({});
-  } catch (error) {
-    res.status(404).json({ status: "fail", error });
-  }
-};
+
+});
 
 
-module.exports.updateGroup = async (req, res) => {
-  try {
+module.exports.updateGroup = asyncHandler(async (req, res, next) => {
+  
     const decoded = await decodingToken(req);
     const data = await roleValidation(decoded.id, req.params.id, ["admin"]);
-    if (data !== true) throw `User needs to be an admin, to perfom this action`;
+    if (data !== true)  next(new AppError(
+  "User needs to be an admin to perform this action",
+  403,
+  "ADMIN_REQUIRED"
+));
 
     if (req.body.name !== req.body.confirmName)
-      throw `Name and confirmName are not the same`;
+      next(new AppError(`Name and confirmName are not the same`, 400, "NAME_CONFIRMATION_MISMATCH"));
 
     const group = await Group.findById(req.params.id);
 
@@ -183,10 +186,8 @@ module.exports.updateGroup = async (req, res) => {
 
     const updatedGroup = await Group.findById(req.params.id);
     res.status(200).json({ status: "success", data: { group: updatedGroup } });
-  } catch (error) {
-    res.status(404).json({ status: "fail", error });
-  }
-};
+  
+});
 
 
 
