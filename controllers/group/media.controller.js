@@ -1,12 +1,7 @@
 const Group = require("../../models/groupModel");
 const User = require("../../models/userModel");
 
-const addNewMember = require("./services/groupRole.service.")
-const removeMember = require("./utils/removeMember")
-const roleValidation = require("./utils/roleValidation")
 
-const handlerController = require("../handlerController");
-const authController = require("../authController");
 
 const asyncHandler = require("../../middlewares/utils/asyncHandler")
 const AppError = require("../../middlewares/utils/AppError")
