@@ -8,6 +8,9 @@ const roleValidation = require("./utils/roleValidation")
 const handlerController = require("../handlerController");
 const authController = require("../authController");
 
+const asyncHandler = require("../../middlewares/utils/asyncHandler")
+const AppError = require("../../middlewares/utils/AppError")
+
 
 
 const multer = require("multer");
@@ -28,37 +31,31 @@ const upload = multer({
 });
 
 
-exports.uploadAvatarImage = upload.single("avatarImage");
-exports.resizeAvatarImage = async (req, res, next) => {
-  if (!req.file) return next();
-
+const resizeImage = async (type, size, req,res,next) => {
+  if(!req.file) next(new AppError("File not found", 404, "NOT_FOUND"));
   const group = await Group.findById(req.params.id);
-
-  req.file.filename = `avatar-image-${group._id}.jpeg`;
+  req.file.filename = `${type}-image-${group._id}.jpeg`;
   await sharp(req.file.buffer)
-    .resize(500, 500)
+    .resize(size[0], size[1])
     .toFormat("jpeg")
-    .jpeg({ quality: 95 })
-    .toFile(`public/imgs/groups/${group._id}/avatars/${req.file.filename}`);
-
+    .jpeg({quality: 95})
+    .toFile(`public/imgs/groups/${group._id}/${type}/${req.file.filename}`)
   next();
-};
+  }
 
-exports.updateAvatarImage = async (req, res) => {
-  try {
-    // 3) Checking if GROUP still exists
+const uploadImage = async (type, field, req,res,next) => {
+ 
+    
     const group = await Group.findById(req.params.id);
     if (group) {
       if (!req.file) {
-        res.status(404).json({
-          status: "fail",
-          message: "This route is only for changing user images",
-        });
+        next(new AppError("This route is only for changing group images", 400, "BAD_REQUEST"))
+        
       }
 
-      const imagePath = `/imgs/groups/${group._id}/avatars/${req.file.filename}`;
+      const imagePath = `/imgs/groups/${group._id}/${type}/${req.file.filename}`;
       await Group.findByIdAndUpdate(group._id, {
-        avatarImage: imagePath,
+        field: imagePath,
       });
 
       res.status(200).json({
@@ -66,51 +63,21 @@ exports.updateAvatarImage = async (req, res) => {
         data: { imagePath },
       });
     }
-  } catch (err) {
-    res.status(404).json({ status: "fail", error: err });
-  }
-};
+  
+}
+
+
+exports.uploadAvatarImage = upload.single("avatarImage");
+exports.resizeAvatarImage = async (req, res, next) => resizeImage("avatars", [500, 500], req,res,next);
+
+exports.updateAvatarImage = asyncHandler(async (req, res, next) => {
+  await uploadImage("avatars", avatarImage, req,res,next)
+});
 
 // Banner
 exports.uploadBannerImage = upload.single("bannerImage");
-exports.resizeBannerImage = async (req, res, next) => {
-  if (!req.file) return next();
+exports.resizeBannerImage = async (req, res, next) => resizeImage("banners", [1250, 500], req,res,next);;
 
-  const group = await Group.findById(req.params.id);
-
-  req.file.filename = `banners-image-${group._id}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(1250, 500)
-    .toFormat("jpeg")
-    .jpeg({ quality: 95 })
-    .toFile(`public/imgs/groups/${group._id}/banners/${req.file.filename}`);
-
-  next();
-};
-
-exports.updateBannerImage = async (req, res) => {
-  try {
-    // 3) Checking if GROUP still exists
-    const group = await Group.findById(req.params.id);
-    if (group) {
-      if (!req.file) {
-        res.status(404).json({
-          status: "fail",
-          message: "This route is only for changing user images",
-        });
-      }
-
-      const imagePath = `/imgs/groups/${group._id}/banners/${req.file.filename}`;
-      await Group.findByIdAndUpdate(group._id, {
-        bannerImage: imagePath,
-      });
-
-      res.status(200).json({
-        status: "success",
-        data: { imagePath },
-      });
-    }
-  } catch (err) {
-    res.status(404).json({ status: "fail", error: err });
-  }
-};
+exports.updateBannerImage = asyncHandler(async (req, res, next) => {
+  await uploadImage("banners", bannerImage, req,res,next)
+});
