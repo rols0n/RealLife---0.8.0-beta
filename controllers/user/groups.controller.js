@@ -33,7 +33,7 @@ const getData = async (req) => {
   return { decoded, user, group };
 };
 
-const hasRequest = (requests, groupId) => {
+const hasRequest = (requests = [], groupId) => {
   return requests.some(
     (request) => request.group.toString() === groupId.toString()
   );
@@ -46,6 +46,12 @@ const getFreshData = async (decoded, req) => {
   ]);
 
   return { user, group };
+};
+
+const isMember = (members = [], userId) => {
+  return members.some(
+    (member) => member._id.toString() === userId.toString()
+  );
 };
 
 module.exports.sendGroupsRequests = asyncHandler(async (req, res, next) => {
@@ -61,6 +67,16 @@ module.exports.sendGroupsRequests = asyncHandler(async (req, res, next) => {
       )
     );
   }
+
+  if (isMember(group.members, decoded.id)) {
+  return next(
+    new AppError(
+      "User is already a member of this group",
+      400,
+      "ALREADY_GROUP_MEMBER"
+    )
+  );
+}
 
   const didReceive = hasRequest(user.groups.requests.received, group._id);
   if (didReceive) {
