@@ -1,78 +1,112 @@
 const User = require("../../models/userModel");
 const decodingToken = require("../../utils/decodingToken");
+const AppError = require("../../middlewares/utils/AppError");
+const asyncHandler = require("../../middlewares/utils/asyncHandler")
 
-// ---------------------------
-// SEARCH ENGINES
-// How should engine work:
-// 1) Based on the string, query the database for the someone with given name
-
-exports.searchEngine_friends = async (req, res) => {
-  const user = await User.findById(req.params.id);
-  await user.populate({ path: "friends" }).execPopulate();
-  const queryString = req.body.queryString.toLowerCase();
-
-  const foundFriends = [];
-
-  // 1. Loop over the friends of user
-  const decoded = await decodingToken(req);
-  const loggedUser = await User.findById(decoded.id);
-  Array.prototype.forEach.call(user.friends, async (friend) => {
-    const commonFriends = [];
-    const friendsName = `${friend.firstName} ${friend.lastName}`.toLowerCase();
-    if (friendsName.startsWith(queryString)) {
-      loggedUser.friends.forEach((friendOfLoggedUser) => {
-        friend.friends.forEach((friendOfFriend) => {
-          if (`${friendOfFriend._id}` === `${friendOfLoggedUser._id}`) {
-            commonFriends.push(friendOfFriend);
-          }
-        });
-      });
-
-      foundFriends.push({ friend, commonFriends });
-    }
-  });
-
-  res.status(200).json({ status: "success", data: foundFriends });
+const escapeRegex = (string) => {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 };
 
-
-// ##########
-// People You May Know - SEEN
-// pYmK_aS_ADD stands for peopleYoumayKnow_alreadySeen_ADD
-module.exports.pYmK_aS_ADD = async (req, res) => {
-  try {
-    if (!req.body.users) throw `No data at req.body.users`;
+exports.searchFriends = asyncHandler(async (req, res, next) => {
+  
     const decoded = await decodingToken(req);
-    const user = await User.findById(decoded.id);
 
-    const matched = [];
-    const users = Array.from(req.body.users);
-    const pYmK = Array.from(user.peopleYouMayKnow__alreadySeen);
+    const queryString = String(req.body.queryString || "").trim();
 
-    if (pYmK.length !== 0)
-      users.forEach((el) => {
-        pYmK.forEach((elem) => {
-          console.log(el, elem);
-          if (`${el}` === `${elem}` && el !== "") return;
-          matched.push(el);
-          matched.push(elem);
-          console.log("c");
-        });
+    if (queryString.length < 2) {
+      return res.status(200).json({
+        status: "success",
+        results: 0,
+        data: [],
       });
-    else {
-      matched.push(...users);
     }
 
-    await User.findOneAndUpdate(
-      { _id: decoded.id },
-      {
-        peopleYouMayKnow__alreadySeen: matched,
-      }
-    );
-    console.log(matched);
+    const loggedUser = await User.findById(decoded.id)
+      .select("friends")
+      .lean();
 
-    res.status(200).json({ status: "success", data: { matched } });
-  } catch (err) {
-    res.status(404).json({ status: "fail", err });
-  }
-};
+    if (!loggedUser) {
+      return next(new AppError("User not found", 404, "USER_NOT_FOUND"));
+    }
+
+    const loggedUserFriendIds = loggedUser.friends.map((id) => String(id));
+    const loggedUserFriendSet = new Set(loggedUserFriendIds);
+
+    const regex = new RegExp(`^${escapeRegex(queryString)}`, "i");
+
+    const friends = await User.find({
+      _id: { $in: loggedUser.friends },
+      $or: [
+        { firstName: regex },
+        { lastName: regex },
+       
+      ],
+    })
+      .select("firstName lastName avatar friends")
+      .limit(10)
+      .lean();
+
+    const foundFriends = friends.map((friend) => {
+      const commonFriends = friend.friends.filter((friendOfFriendId) =>
+        loggedUserFriendSet.has(String(friendOfFriendId))
+      );
+
+      return {
+        friend: {
+          _id: friend._id,
+          firstName: friend.firstName,
+          lastName: friend.lastName,
+          avatar: friend.avatar,
+        },
+        commonFriends,
+        commonFriendsCount: commonFriends.length,
+      };
+    });
+
+    res.status(200).json({
+      status: "success",
+      results: foundFriends.length,
+      data: foundFriends,
+    });
+  
+});
+
+
+module.exports.addAlreadySeenPeopleYouMayKnow = asyncHandler(async (req, res, next) => {
+ 
+    const decoded = await decodingToken(req);
+
+    const users = Array.isArray(req.body.users)
+      ? req.body.users.filter(Boolean)
+      : [];
+
+    if (users.length === 0) {
+      return res.status(400).json({
+        status: "fail",
+        message: "No users provided",
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      decoded.id,
+      {
+        $addToSet: {
+          peopleYouMayKnow__alreadySeen: {
+            $each: users,
+          },
+        },
+      },
+      {
+        new: true,
+        runValidators: true,
+      }
+    ).select("peopleYouMayKnow__alreadySeen");
+
+    res.status(200).json({
+      status: "success",
+      data: {
+        alreadySeen: updatedUser.peopleYouMayKnow__alreadySeen,
+      },
+    });
+ 
+});

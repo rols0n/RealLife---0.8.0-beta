@@ -99,13 +99,14 @@ router.route(
 
 router
   .route("/:id/searchEngine/friends")
-  .post(userSearchEngineController.searchEngine_friends);
+  .post(userSearchEngineController.searchFriends);
 
   // ###########
   // People You May Know
   router
     .route("/peopleYouMayKnow_alreadySeen/add")
-    .post(authController.protect, userSearchEngineController.pYmK_aS_ADD);
+    .post(authController.protect,
+       userSearchEngineController.addAlreadySeenPeopleYouMayKnow);
 
 
 
