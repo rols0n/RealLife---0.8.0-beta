@@ -4,7 +4,7 @@ const multer = require("multer");
 const sharp = require("sharp");
 
 const decodingToken = require("../../utils/decodingToken");
-const asyncHandler = require("../../middlewares/utils/asyncHandler");
+const {asyncHandler} = require("../../middlewares/utils/asyncHandler");
 
 const AppError = require("../../middlewares/utils/AppError");
 

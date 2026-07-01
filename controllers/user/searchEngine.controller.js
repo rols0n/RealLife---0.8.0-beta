@@ -1,7 +1,7 @@
 const User = require("../../models/userModel");
 const decodingToken = require("../../utils/decodingToken");
 const AppError = require("../../middlewares/utils/AppError");
-const asyncHandler = require("../../middlewares/utils/asyncHandler")
+const {asyncHandler} = require("../../middlewares/utils/asyncHandler")
 
 const escapeRegex = (string) => {
   return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");

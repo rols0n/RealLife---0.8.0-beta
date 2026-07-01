@@ -5,7 +5,7 @@ const fs = require("fs/promises");
 const jwt = require("jsonwebtoken");
 
 const decodingToken = require("../../utils/decodingToken");
-const asyncHandler = require("../../middlewares/utils/asyncHandler");
+const {asyncHandler} = require("../../middlewares/utils/asyncHandler");
 
 const AppError = require("../../middlewares/utils/AppError");
 

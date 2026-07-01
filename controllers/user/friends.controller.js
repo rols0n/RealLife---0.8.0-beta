@@ -1,7 +1,7 @@
 const User = require("../../models/userModel");
 const decodingToken = require("../../utils/decodingToken");
 
-const asyncHandler = require("../../middlewares/utils/asyncHandler");
+const {asyncHandler} = require("../../middlewares/utils/asyncHandler");
 
 const AppError = require("../../middlewares/utils/AppError");
 

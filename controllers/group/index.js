@@ -8,7 +8,7 @@ const roleValidation = require("./utils/roleValidation")
 const handlerController = require("../handlerController");
 const authController = require("../authController");
 
-const asyncHandler = require("../../middlewares/utils/asyncHandler")
+const {asyncHandler} = require("../../middlewares/utils/asyncHandler")
 const AppError = require("../../middlewares/utils/AppError")
 
 const decodingToken = require("../../utils/decodingToken");

@@ -2,7 +2,7 @@ const Group = require("../../../models/groupModel");
 const User = require("../../../models/userModel");
 
 const decodingToken = require("../../../utils/decodingToken");
-const roleValidation = require("../../../utils/roleValidation");
+const roleValidation = require("../utils/roleValidation");
 
 const AppError = require("../../../middlewares/utils/AppError");
 

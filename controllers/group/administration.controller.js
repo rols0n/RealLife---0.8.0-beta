@@ -9,6 +9,7 @@ const handlerController = require("../handlerController");
 const authController = require("../authController");
 
 const decodingToken = require("../../utils/decodingToken");
+const {asyncHandler} = require("../../middlewares/utils/asyncHandler")
 
 module.exports.addNewAdmin = asyncHandler( async (req, res, next) => {
  

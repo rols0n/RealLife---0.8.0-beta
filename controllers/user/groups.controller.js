@@ -2,7 +2,7 @@ const User = require("../../models/userModel");
 const Group = require("../../models/groupModel");
 
 const decodingToken = require("../../utils/decodingToken");
-const asyncHandler = require("../../middlewares/utils/asyncHandler");
+const {asyncHandler} = require("../../middlewares/utils/asyncHandler");
 
 const AppError = require("../../middlewares/utils/AppError");
 

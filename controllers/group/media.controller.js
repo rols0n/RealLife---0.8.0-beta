@@ -1,5 +1,5 @@
 const Group = require("../../models/groupModel");
-const  asyncHandler  = require("../../middlewares/utils/asyncHandler");
+const  {asyncHandler}  = require("../../middlewares/utils/asyncHandler");
 const AppError = require("../../middlewares/utils/AppError");
 
 const multer = require("multer");
