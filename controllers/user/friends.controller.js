@@ -1,30 +1,74 @@
 const User = require("../../models/userModel");
 const decodingToken = require("../../utils/decodingToken");
 
-const {asyncHandler} = require("../../middlewares/utils/asyncHandler");
-
+const { asyncHandler } = require("../../middlewares/utils/asyncHandler");
 const AppError = require("../../middlewares/utils/AppError");
 
-const isInArray = (array, id) => {
+const hasId = (array = [], id) => {
   return array.some((element) => element.toString() === id.toString());
 };
 
-const addFriends = async (User1, User2) => {
-  const fixUser = async (user, user2Id) => {
-    await user.updateOne({
+const sendFreshUsers = async (res, userId, targetId, targetKey) => {
+  const [freshUser, freshTarget] = await Promise.all([
+    User.findById(userId),
+    User.findById(targetId),
+  ]);
+
+  return res.status(200).json({
+    status: "success",
+    data: {
+      user: freshUser,
+      [targetKey]: freshTarget,
+    },
+  });
+};
+
+const addFriends = async (user1, user2) => {
+  await Promise.all([
+    user1.updateOne({
       $pull: {
-        receivedRequests: user2Id,
-        sentRequests: user2Id,
+        receivedRequests: user2._id,
+        sentRequests: user2._id,
       },
-
       $addToSet: {
-        friends: user2Id,
+        friends: user2._id,
       },
-    });
-  };
+    }),
 
-  await fixUser(User1, User2._id);
-  await fixUser(User2, User1._id);
+    user2.updateOne({
+      $pull: {
+        receivedRequests: user1._id,
+        sentRequests: user1._id,
+      },
+      $addToSet: {
+        friends: user1._id,
+      },
+    }),
+  ]);
+};
+
+const removeFriendRequest = async (senderId, receiverId) => {
+  await Promise.all([
+    User.findByIdAndUpdate(senderId, {
+      $pull: { sentRequests: receiverId },
+    }),
+
+    User.findByIdAndUpdate(receiverId, {
+      $pull: { receivedRequests: senderId },
+    }),
+  ]);
+};
+
+const removeFriends = async (userId, friendId) => {
+  await Promise.all([
+    User.findByIdAndUpdate(userId, {
+      $pull: { friends: friendId },
+    }),
+
+    User.findByIdAndUpdate(friendId, {
+      $pull: { friends: userId },
+    }),
+  ]);
 };
 
 const authAndPullUsers = async (req) => {
@@ -42,8 +86,10 @@ const authAndPullUsers = async (req) => {
     );
   }
 
-  const user = await User.findById(decoded.id);
-  const requestor = await User.findById(req.params.id);
+  const [user, requestor] = await Promise.all([
+    User.findById(decoded.id),
+    User.findById(req.params.id),
+  ]);
 
   if (!user) {
     throw new AppError("User doesn't exist", 404, "USER_NOT_FOUND");
@@ -59,59 +105,40 @@ const authAndPullUsers = async (req) => {
 module.exports.sendFriendsRequest = asyncHandler(async (req, res, next) => {
   const { requestor: reqReceiver, user, decoded } = await authAndPullUsers(req);
 
-  if (isInArray(reqReceiver.friends, user._id)) {
+  if (hasId(reqReceiver.friends, user._id)) {
     return next(
       new AppError("These users are already friends", 400, "ALREADY_FRIENDS")
     );
   }
 
-  if (isInArray(reqReceiver.receivedRequests, user._id)) {
+  if (hasId(reqReceiver.receivedRequests, user._id)) {
     return next(
       new AppError("Friend request already sent", 400, "REQUEST_ALREADY_SENT")
     );
   }
 
-  if (isInArray(reqReceiver.sentRequests, user._id)) {
+  if (hasId(reqReceiver.sentRequests, user._id)) {
     await addFriends(user, reqReceiver);
-
-    const freshUser = await User.findById(decoded.id);
-    const freshReqReceiver = await User.findById(req.params.id);
-
-    return res.status(200).json({
-      status: "success",
-
-      data: {
-        user: freshUser,
-        reqReceiver: freshReqReceiver,
-      },
-    });
+    return sendFreshUsers(res, decoded.id, req.params.id, "reqReceiver");
   }
 
-  await reqReceiver.updateOne({
-    $addToSet: { receivedRequests: user._id },
-  });
+  await Promise.all([
+    reqReceiver.updateOne({
+      $addToSet: { receivedRequests: user._id },
+    }),
 
-  await user.updateOne({
-    $addToSet: { sentRequests: req.params.id },
-  });
+    user.updateOne({
+      $addToSet: { sentRequests: req.params.id },
+    }),
+  ]);
 
-  const freshUser = await User.findById(decoded.id);
-  const freshReqReceiver = await User.findById(req.params.id);
-
-  res.status(200).json({
-    status: "success",
-
-    data: {
-      user: freshUser,
-      reqReceiver: freshReqReceiver,
-    },
-  });
+  return sendFreshUsers(res, decoded.id, req.params.id, "reqReceiver");
 });
 
 module.exports.acceptFriendsRequest = asyncHandler(async (req, res, next) => {
   const { requestor: reqSender, user, decoded } = await authAndPullUsers(req);
 
-  if (!isInArray(user.receivedRequests, reqSender._id)) {
+  if (!hasId(user.receivedRequests, reqSender._id)) {
     return next(
       new AppError("Friend request doesn't exist", 400, "REQUEST_NOT_FOUND")
     );
@@ -119,164 +146,103 @@ module.exports.acceptFriendsRequest = asyncHandler(async (req, res, next) => {
 
   await addFriends(user, reqSender);
 
-  const freshUser = await User.findById(decoded.id);
-  const freshReqSender = await User.findById(req.params.id);
-
-  res.status(200).json({
-    status: "success",
-
-    data: {
-      user: freshUser,
-      reqSender: freshReqSender,
-    },
-  });
+  return sendFreshUsers(res, decoded.id, req.params.id, "reqSender");
 });
 
 module.exports.rejectFriendsRequest = asyncHandler(async (req, res, next) => {
   const { requestor: reqSender, user, decoded } = await authAndPullUsers(req);
 
-  if (!isInArray(user.receivedRequests, reqSender._id)) {
+  if (!hasId(user.receivedRequests, reqSender._id)) {
     return next(
       new AppError("Friend request doesn't exist", 400, "REQUEST_NOT_FOUND")
     );
   }
 
-  await User.findByIdAndUpdate(decoded.id, {
-    $pull: { receivedRequests: reqSender._id },
-  });
+  await removeFriendRequest(reqSender._id, user._id);
 
-  await User.findByIdAndUpdate(req.params.id, {
-    $pull: { sentRequests: user._id },
-  });
-
-  res.status(200).json({
-    status: "success",
-
-    data: {
-      user: await User.findById(decoded.id),
-      reqSender: await User.findById(req.params.id),
-    },
-  });
+  return sendFreshUsers(res, decoded.id, req.params.id, "reqSender");
 });
 
 module.exports.cancelFriendsRequest = asyncHandler(async (req, res, next) => {
   const { requestor: reqReceiver, user, decoded } = await authAndPullUsers(req);
 
-  if (!isInArray(user.sentRequests, reqReceiver._id)) {
+  if (!hasId(user.sentRequests, reqReceiver._id)) {
     return next(
       new AppError("Friend request doesn't exist", 400, "REQUEST_NOT_FOUND")
     );
   }
 
-  await User.findByIdAndUpdate(decoded.id, {
-    $pull: { sentRequests: reqReceiver._id },
-  });
+  await removeFriendRequest(user._id, reqReceiver._id);
 
-  await User.findByIdAndUpdate(req.params.id, {
-    $pull: { receivedRequests: user._id },
-  });
-
-  res.status(200).json({
-    status: "success",
-
-    data: {
-      user: await User.findById(decoded.id),
-      reqReceiver: await User.findById(req.params.id),
-    },
-  });
+  return sendFreshUsers(res, decoded.id, req.params.id, "reqReceiver");
 });
 
 module.exports.deleteFriend = asyncHandler(async (req, res, next) => {
   const { requestor: friend, user, decoded } = await authAndPullUsers(req);
 
-  if (!isInArray(user.friends, friend._id)) {
+  if (!hasId(user.friends, friend._id)) {
     return next(new AppError("These users aren't friends", 400, "NOT_FRIENDS"));
   }
 
-  await User.findByIdAndUpdate(decoded.id, {
-    $pull: { friends: friend._id },
-  });
+  await removeFriends(user._id, friend._id);
 
-  await User.findByIdAndUpdate(req.params.id, {
-    $pull: { friends: user._id },
-  });
-
-  res.status(200).json({
-    status: "success",
-
-    data: {
-      user: await User.findById(decoded.id),
-      friend: await User.findById(req.params.id),
-    },
-  });
+  return sendFreshUsers(res, decoded.id, req.params.id, "friend");
 });
 
 // ###############
-
 // Birthdays
 
-const sortObj = (obj, path, value) => {
-  obj.forEach((element) => {
-    element[path].sort(function (a, b) {
-      return a[value] - b[value];
-    });
-  });
-};
+const months = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 module.exports.birthdays = asyncHandler(async (req, res, next) => {
-  const user = await User.findById(req.params.id)
-    .populate({
-      path: "friends",
-    })
-    .sort({ "friends.birthDate": -1 });
+  const user = await User.findById(req.params.id).populate({
+    path: "friends",
+  });
 
   if (!user) {
     return next(new AppError("User doesn't exist", 404, "USER_NOT_FOUND"));
   }
 
-  const friends = Array.from(user.friends);
+  const curYear = new Date().getFullYear();
 
-  const bDates = [
-    { name: "January", data: [] },
-    { name: "February", data: [] },
-    { name: "March", data: [] },
-    { name: "April", data: [] },
-    { name: "May", data: [] },
-    { name: "June", data: [] },
-    { name: "July", data: [] },
-    { name: "August", data: [] },
-    { name: "September", data: [] },
-    { name: "October", data: [] },
-    { name: "November", data: [] },
-    { name: "December", data: [] },
-  ];
+  const bDates = months.map((month) => ({
+    name: month,
+    data: [],
+  }));
 
-  // Signing users to bDates obj based on their bDate
-  friends.forEach((friend) => {
+  user.friends.forEach((friend) => {
     if (!friend.birthDate) return;
 
-    const year = friend.birthDate.split("-")[0] * 1;
-    const curYear = new Date(Date.now()).getFullYear();
-
-    const month = friend.birthDate.split("-")[1] * 1;
-    const day = friend.birthDate.split("-")[2] * 1;
-
-    const willBeTheAgeOf = curYear - year;
+    const [year, month, day] = friend.birthDate.split("-").map(Number);
 
     bDates[month - 1].data.push({
       user: friend,
       day,
-      willBeTheAgeOf,
+      willBeTheAgeOf: curYear - year,
     });
   });
 
-  // Sorting the data objects
+  bDates.forEach((month) => {
+    month.data.sort((a, b) => {
+      return a.day - b.day || a.willBeTheAgeOf - b.willBeTheAgeOf;
+    });
+  });
 
-  // by the day
-  sortObj(bDates, `data`, `day`);
-
-  // by the age
-  sortObj(bDates, `data`, `willBeTheAgeOf`);
-
-  res.status(200).json({ status: "success", bDates });
+  res.status(200).json({
+    status: "success",
+    bDates,
+  });
 });
