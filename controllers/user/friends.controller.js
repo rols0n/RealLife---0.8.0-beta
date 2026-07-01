@@ -1,6 +1,9 @@
 const User = require("../../models/userModel");
 const decodingToken = require("../../utils/decodingToken");
 
+const asyncHandler = require("../../middlewares/utils/asyncHandler")
+const AppError = require("../../middlewares/utils/AppError")
+
 
 const addFriends = async (User1, User2) => {
   const fixUser = async (user, user2Id) => {
@@ -31,17 +34,21 @@ const addFriends = async (User1, User2) => {
   await fixUser(User2, User1._id);
 };
 
-
-module.exports.sendFriendsRequest = async (req, res) => {
+const authAndPullUsers = async (req,res) => {
   if (!req.params.id) {
-    return res.status(404).json({
-      status: "fail",
-      message: "Something went wrong with sending friend request",
-    });
+    return next(new AppError("Missing ID", 404, "WRONG_REQUEST"))
   }
   const decoded = await decodingToken(req);
+  const requestor = await User.findById(req.params.id);
   const user = await User.findById(decoded.id);
-  const reqReceiver = await User.findById(req.params.id);
+
+  return {requestor, user};
+
+}
+
+
+module.exports.sendFriendsRequest = asyncHandler(async (req, res, next) => {
+  const {reqReceiver, user} = await authAndPullUsers(req,res);
 
   if (
     (await User.findOne({ _id: req.params.id, sentRequests: user._id })) ||
@@ -53,21 +60,26 @@ module.exports.sendFriendsRequest = async (req, res) => {
       status: "success",
       message: "",
     });
-  } else if (
+  } 
+  if (
     await User.findOne({
       _id: req.params.id,
       friends: user._id,
     })
   ) {
+
+    return next(new AppError("These users are alredy friends", 404, 'BAD_REQUEST'))
     return res
       .status(404)
       .json({ status: "fail", message: "These users are already friends" });
-  } else {
+  } 
+  
+  
     await reqReceiver.updateOne({
       $push: { receivedRequests: user._id },
     });
     await user.updateOne({ $push: { sentRequests: req.params.id } });
-  }
+  
 
   const freshUser = await User.findById(decoded.id);
   const freshReqReceiver = await User.findById(req.params.id);
@@ -79,18 +91,10 @@ module.exports.sendFriendsRequest = async (req, res) => {
       reqReceiver: freshReqReceiver,
     },
   });
-};
+});
 
-module.exports.acceptFriendsRequest = async (req, res) => {
-  if (!req.params.id) {
-    return res.status(404).json({
-      status: "fail",
-      message: "Something went wrong with sending friend request",
-    });
-  }
-  const decoded = await decodingToken(req);
-  const user = await User.findById(decoded.id);
-  const reqSender = await User.findById(req.params.id);
+module.exports.acceptFriendsRequest = asyncHandler(async (req, res, next) => {
+  const {reqSender, user} = await authAndPullUsers(req,res);
 
   await addFriends(user, reqSender);
 
@@ -103,18 +107,11 @@ module.exports.acceptFriendsRequest = async (req, res) => {
       reqSender: freshReqSender,
     },
   });
-};
+});
 
-module.exports.rejectFriendsRequest = async (req, res) => {
-  if (!req.params.id) {
-    return res.status(404).json({
-      status: "fail",
-      message: "You have to provide id via URL",
-    });
-  }
-  const decoded = await decodingToken(req);
-  const reqSender = await User.findById(req.params.id);
-  const user = await User.findById(decoded.id);
+module.exports.rejectFriendsRequest = asyncHandler(async (req, res, next) => {
+  
+  const {reqSender, user} = await authAndPullUsers(req,res);
 
   await User.findByIdAndUpdate(decoded.id, {
     $pull: { receivedRequests: reqSender._id },
@@ -131,18 +128,12 @@ module.exports.rejectFriendsRequest = async (req, res) => {
       reqSender: await User.findById(req.params.id),
     },
   });
-};
+});
 
-module.exports.cancelFriendsRequest = async (req, res) => {
-  if (!req.params.id) {
-    return res.status(404).json({
-      status: "fail",
-      message: "You have to provide id via URL",
-    });
-  }
-  const decoded = await decodingToken(req);
-  const reqReceiver = await User.findById(req.params.id);
-  const user = await User.findById(decoded.id);
+module.exports.cancelFriendsRequest = asyncHandler(async (req, res, next) => {
+   
+
+  const {reqReceiver, user} = await authAndPullUsers(req,res);
 
   await User.findByIdAndUpdate(decoded.id, {
     $pull: { sentRequests: reqReceiver._id },
@@ -158,18 +149,11 @@ module.exports.cancelFriendsRequest = async (req, res) => {
       reqReceiver: await User.findById(req.params.id),
     },
   });
-};
+});
 
-module.exports.deleteFriend = async (req, res) => {
-  if (!req.params.id) {
-    return res.status(404).json({
-      status: "fail",
-      message: "You have to provide id via URL",
-    });
-  }
-  const decoded = await decodingToken(req);
-  const friend = await User.findById(req.params.id);
-  const user = await User.findById(decoded.id);
+module.exports.deleteFriend = asyncHandler(async (req, res, next) => {
+  
+  const {friend, user} = await authAndPullUsers(req,res);
 
   await User.findByIdAndUpdate(decoded.id, {
     $pull: { friends: friend._id },
@@ -186,7 +170,7 @@ module.exports.deleteFriend = async (req, res) => {
       reqSender: await User.findById(req.params.id),
     },
   });
-};
+});
 
 
 // ###############
@@ -199,8 +183,8 @@ const sortObj = (obj, path, value) => {
   });
 };
 
-module.exports.birthdays = async (req, res) => {
-  try {
+module.exports.birthdays = asyncHandler(async (req, res, next) => {
+  
     const user = await User.findById(req.params.id)
       .populate({
         path: "friends",
@@ -246,7 +230,5 @@ module.exports.birthdays = async (req, res) => {
     sortObj(bDates, `data`, `willBeTheAgeOf`);
 
     res.status(200).json({ status: "success", bDates });
-  } catch (error) {
-    res.status(404).json({ status: "fail", error });
-  }
-};
+  
+});

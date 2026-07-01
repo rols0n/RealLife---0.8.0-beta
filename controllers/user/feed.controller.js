@@ -1,6 +1,11 @@
 const User = require("../../models/userModel");
 const decodingToken = require("../../utils/decodingToken");
 
+const asyncHandler = require("../../middlewares/utils/asyncHandler")
+
+
+
+
 const postPopulate = {
   path: "_id",
   select:
@@ -42,8 +47,8 @@ const friendsPostsPopulate = {
   },
 };
 
-exports.generateFeedContent = async (req, res) => {
-  try {
+exports.generateFeedContent = asyncHandler(async (req, res, next) => {
+  
     const isUserBannedFromPost = (post, userId) => {
       if (!post?.cantBeDisplayedBy) return false;
 
@@ -89,12 +94,5 @@ exports.generateFeedContent = async (req, res) => {
       status: "success",
       data: posts,
     });
-  } catch (err) {
-    console.error(err);
-
-    res.status(500).json({
-      status: "fail",
-      message: err.message,
-    });
-  }
-};
+  
+});
