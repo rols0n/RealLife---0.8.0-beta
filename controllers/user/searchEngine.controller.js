@@ -81,10 +81,7 @@ module.exports.addAlreadySeenPeopleYouMayKnow = asyncHandler(async (req, res, ne
       : [];
 
     if (users.length === 0) {
-      return res.status(400).json({
-        status: "fail",
-        message: "No users provided",
-      });
+      return next(new AppError("No users provided", 400, "NO_DATA"));
     }
 
     const updatedUser = await User.findByIdAndUpdate(
