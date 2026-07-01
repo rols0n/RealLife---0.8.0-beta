@@ -1,199 +1,227 @@
 const User = require("../../models/userModel");
+const Group = require("../../models/groupModel");
+
 const decodingToken = require("../../utils/decodingToken");
+const asyncHandler = require("../../middlewares/utils/asyncHandler");
 
+const AppError = require("../../middlewares/utils/AppError");
 
-module.exports.sendGroupsRequests = async (req, res) => {
-  try {
-    // 1. get the logged user
-    const decoded = await decodingToken(req);
-    const isUser = (await User.findById(decoded.id)) ? true : false;
-    if (isUser === false) {
-      throw `User wtih provided id doesnt exist`;
-    }
-    // 2. get the group by req.params.id and check if it exists
-    const isGroup = (await Group.findById(req.params.id)) ? true : false;
-    if (isGroup === false) {
-      throw `Group with provided id doesnt exist`;
-    }
+const getData = async (req) => {
+  const decoded = await decodingToken(req);
 
-    // IF user already sent request throw error
-    const didSend = (await User.findOne({
-      _id: decoded.id,
-      "groups.requests.sent.group": req.params.id,
-    }))
-      ? true
-      : false;
-    if (didSend === true) {
-      throw `You've already sent the request, you can cancel it"`;
-    }
+  const [user, group] = await Promise.all([
+    User.findById(decoded.id),
+    Group.findById(req.params.id),
+  ]);
 
-    // IF user, received request before, throw error
-    const didReceive = (await User.findOne({
-      _id: decoded.id,
-      "groups.requests.received.group": req.params.id,
-    }))
-      ? true
-      : false;
-    if (didReceive === true) {
-      throw `You've already received the invitation, you can accept it`;
-    }
-
-    // 3. findGroup with provied ID and push the userID to the requests.received
-    await Group.updateOne(
-      { _id: req.params.id },
-      { $push: { "requests.received": { user: decoded.id } } }
+  if (!user) {
+    throw new AppError(
+      "User with provided id doesn't exist",
+      404,
+      "USER_NOT_FOUND"
     );
-
-    // 4. update user's sent requests
-    await User.updateOne(
-      { _id: decoded.id },
-      {
-        $push: { "groups.requests.sent": { group: req.params.id } },
-      }
-    );
-
-    const user = await User.findById(decoded.id);
-    const group = await Group.findById(req.params.id);
-    res.status(200).json({ status: "success", data: { user, group } });
-  } catch (error) {
-    res.status(404).json({ status: "fail", error });
   }
-};
-module.exports.cancelGroupsRequests = async (req, res) => {
-  try {
-    // 1. get the logged user
-    const decoded = await decodingToken(req);
-    const isUser = (await User.findById(decoded.id)) ? true : false;
-    if (isUser === false) {
-      throw `User wtih provided id doesnt exist`;
-    }
-    // 2. get the group by req.params.id and check if it exists
-    const isGroup = (await Group.findById(req.params.id)) ? true : false;
-    if (isGroup === false) {
-      throw `Group with provided id doesnt exist`;
-    }
 
-    // IF user already sent request throw error
-    const didSend = (await User.findOne({
-      _id: decoded.id,
-      "groups.requests.sent.group": req.params.id,
-    }))
-      ? true
-      : false;
-    if (didSend === false) {
-      throw `You didnt send request, so you cant cancel it"`;
-    }
-
-    // 3. findGroup with provied ID and push the userID to the requests.received
-    await Group.findOneAndUpdate(
-      { _id: req.params.id },
-      { $pull: { "requests.received": { user: decoded.id } } }
+  if (!group) {
+    throw new AppError(
+      "Group with provided id doesn't exist",
+      404,
+      "GROUP_NOT_FOUND"
     );
-
-    // 4. update user's sent requests
-    await User.findOneAndUpdate(
-      { _id: decoded.id },
-      {
-        $pull: { "groups.requests.sent": { group: req.params.id } },
-      }
-    );
-
-    const user = await User.findById(decoded.id);
-    const group = await Group.findById(req.params.id);
-    res.status(200).json({ status: "success", data: { user, group } });
-  } catch (error) {
-    res.status(404).json({ status: "fail", error });
   }
+
+  return { decoded, user, group };
 };
-module.exports.acceptGroupsRequests = async (req, res) => {
-  try {
-    // 1. get the logged user
-    const decoded = await decodingToken(req);
-    const isUser = (await User.findById(decoded.id)) ? true : false;
-    if (isUser === false) {
-      throw `User wtih provided id doesnt exist`;
-    }
-    // 2. get the group by req.params.id and check if it exists
-    const isGroup = (await Group.findById(req.params.id)) ? true : false;
-    if (isGroup === false) {
-      throw `Group with provided id doesnt exist`;
-    }
-    // 3. findGroup with provied ID and push the userID to the requests.received
-    const didReceive = (await User.findOne({
-      "groups.requests.received.group": req.params.id,
-    }))
-      ? true
-      : false;
-    if (didReceive === false) throw `User didn't receive invite from the group`;
 
-    await Group.findOneAndUpdate(
-      { _id: req.params.id },
-      { $pull: { "requests.sent": { user: decoded.id } } }
-    );
+const hasRequest = (requests, groupId) => {
+  return requests.some(
+    (request) => request.group.toString() === groupId.toString()
+  );
+};
 
-    // 4. update user's sent requests
-    await User.findOneAndUpdate(
-      { _id: decoded.id },
-      {
-        $pull: { "groups.requests.received": { group: req.params.id } },
-      }
-    );
+const getFreshData = async (decoded, req) => {
+  const [user, group] = await Promise.all([
+    User.findById(decoded.id),
+    Group.findById(req.params.id),
+  ]);
 
-    await User.findOneAndUpdate(
-      { _id: decoded.id },
-      {
-        $push: { "groups.currentlyIn": { _id: req.params.id, role: "user" } },
-      }
-    );
+  return { user, group };
+};
 
-    await Group.findOneAndUpdate(
-      { _id: req.params.id },
-      { $push: { members: { _id: decoded.id, role: "user" } } }
+module.exports.sendGroupsRequests = asyncHandler(async (req, res, next) => {
+  const { decoded, user, group } = await getData(req);
+
+  const didSend = hasRequest(user.groups.requests.sent, group._id);
+  if (didSend) {
+    return next(
+      new AppError(
+        "You've already sent the request, you can cancel it",
+        400,
+        "REQUEST_ALREADY_SENT"
+      )
     );
-    const user = await User.findById(decoded.id);
-    const group = await Group.findById(req.params.id);
-    res.status(200).json({ status: "success", data: { user, group } });
-  } catch (error) {
-    res.status(404).json({ status: "fail", error });
   }
-};
-module.exports.rejectGroupsRequests = async (req, res) => {
-  try {
-    // 1. get the logged user
-    const decoded = await decodingToken(req);
-    const isUser = (await User.findById(decoded.id)) ? true : false;
-    if (isUser === false) {
-      throw `User wtih provided id doesnt exist`;
-    }
-    // 2. get the group by req.params.id and check if it exists
-    const isGroup = (await Group.findById(req.params.id)) ? true : false;
-    if (isGroup === false) {
-      throw `Group with provided id doesnt exist`;
-    }
-    // 3. findGroup with provied ID and push the userID to the requests.received
-    const didReceive = (await User.findOne({
-      "groups.requests.sent": { group: req.params.id },
-    }))
-      ? true
-      : false;
-    if (didReceive === false) throw `User didn't receive invite from the group`;
-    await Group.findOneAndUpdate(
-      { _id: req.params.id },
-      { $pull: { "requests.sent": { user: decoded.id } } }
-    );
 
-    // 4. update user's sent requests
-    await User.findOneAndUpdate(
+  const didReceive = hasRequest(user.groups.requests.received, group._id);
+  if (didReceive) {
+    return next(
+      new AppError(
+        "You've already received the invitation, you can accept it",
+        400,
+        "INVITATION_ALREADY_RECEIVED"
+      )
+    );
+  }
+
+  await Promise.all([
+    Group.updateOne(
+      { _id: req.params.id },
+      {
+        $addToSet: {
+          "requests.received": { user: decoded.id },
+        },
+      }
+    ),
+
+    User.updateOne(
       { _id: decoded.id },
       {
-        $pull: { "groups.requests.received": { group: req.params.id } },
+        $addToSet: {
+          "groups.requests.sent": { group: req.params.id },
+        },
       }
-    );
+    ),
+  ]);
 
-    const user = await User.findById(decoded.id);
-    const group = await Group.findById(req.params.id);
-    res.status(200).json({ status: "success", data: { user, group } });
-  } catch (error) {
-    res.status(404).json({ status: "fail", error });
+  const data = await getFreshData(decoded, req);
+
+  res.status(200).json({ status: "success", data });
+});
+
+module.exports.cancelGroupsRequests = asyncHandler(async (req, res, next) => {
+  const { decoded, user, group } = await getData(req);
+
+  const didSend = hasRequest(user.groups.requests.sent, group._id);
+  if (!didSend) {
+    return next(
+      new AppError(
+        "You didn't send request, so you can't cancel it",
+        400,
+        "REQUEST_NOT_FOUND"
+      )
+    );
   }
-};
+
+  await Promise.all([
+    Group.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        $pull: {
+          "requests.received": { user: decoded.id },
+        },
+      }
+    ),
+
+    User.findOneAndUpdate(
+      { _id: decoded.id },
+      {
+        $pull: {
+          "groups.requests.sent": { group: req.params.id },
+        },
+      }
+    ),
+  ]);
+
+  const data = await getFreshData(decoded, req);
+
+  res.status(200).json({ status: "success", data });
+});
+
+module.exports.acceptGroupsRequests = asyncHandler(async (req, res, next) => {
+  const { decoded, user, group } = await getData(req);
+
+  const didReceive = hasRequest(user.groups.requests.received, group._id);
+  if (!didReceive) {
+    return next(
+      new AppError(
+        "User didn't receive invite from the group",
+        400,
+        "INVITATION_NOT_FOUND"
+      )
+    );
+  }
+
+  await Promise.all([
+    Group.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        $pull: {
+          "requests.sent": { user: decoded.id },
+        },
+
+        $addToSet: {
+          members: { _id: decoded.id, role: "user" },
+        },
+      }
+    ),
+
+    User.findOneAndUpdate(
+      { _id: decoded.id },
+      {
+        $pull: {
+          "groups.requests.received": { group: req.params.id },
+        },
+
+        $addToSet: {
+          "groups.currentlyIn": {
+            _id: req.params.id,
+            role: "user",
+          },
+        },
+      }
+    ),
+  ]);
+
+  const data = await getFreshData(decoded, req);
+
+  res.status(200).json({ status: "success", data });
+});
+
+module.exports.rejectGroupsRequests = asyncHandler(async (req, res, next) => {
+  const { decoded, user, group } = await getData(req);
+
+  const didReceive = hasRequest(user.groups.requests.received, group._id);
+  if (!didReceive) {
+    return next(
+      new AppError(
+        "User didn't receive invite from the group",
+        400,
+        "INVITATION_NOT_FOUND"
+      )
+    );
+  }
+
+  await Promise.all([
+    Group.findOneAndUpdate(
+      { _id: req.params.id },
+      {
+        $pull: {
+          "requests.sent": { user: decoded.id },
+        },
+      }
+    ),
+
+    User.findOneAndUpdate(
+      { _id: decoded.id },
+      {
+        $pull: {
+          "groups.requests.received": { group: req.params.id },
+        },
+      }
+    ),
+  ]);
+
+  const data = await getFreshData(decoded, req);
+
+  res.status(200).json({ status: "success", data });
+});
