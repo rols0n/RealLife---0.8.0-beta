@@ -1,197 +1,164 @@
 const jwt = require("jsonwebtoken");
+
 const User = require("../models/userModel");
 const Group = require("../models/groupModel");
 
 const decodingToken = require("../utils/decodingToken");
 
-const createJWTtoken = (userId, secret, expiresIn) => {
+const { asyncHandler } = require("../middlewares/utils/asyncHandler");
+const AppError = require("../middlewares/utils/AppError");
+
+const createJWTToken = (userId) => {
   return jwt.sign(
+    { id: userId },
+    process.env.JWT_SECRET,
     {
-      id: userId,
-    },
-    secret,
-    {
-      expiresIn,
+      expiresIn: process.env.JWT_EXPIRES_IN,
     }
   );
 };
 
-exports.signup = async (req, res) => {
-  try {
-    // 1) Creating new User
-    const newUser = await User.create(req.body);
+const sendToken = (user, statusCode, res, data) => {
+  const token = createJWTToken(user._id);
 
-    // 2) Creating token
-    const token = createJWTtoken(
-      newUser._id,
-      process.env.JWT_SECRET,
-      process.env.JWT_EXPIRES_IN
-    );
+  const jwtExpiresIn = new Date(
+    Date.now() +
+      Number(process.env.JWT_COOKIE_EXPIRES_IN) *
+        24 *
+        60 *
+        60 *
+        1000
+  );
 
-    const jwtExpiresIn = new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
-    );
+  res.cookie("jwt", token, {
+    expires: jwtExpiresIn,
+    httpOnly: true,
+  });
 
-    res.cookie("jwt", token, {
-      expiresIn: jwtExpiresIn,
-      httpOnly: true,
-    });
-
-    // 3) Sending the response
-    res.status(201).json({
-      status: "success",
-      token,
-      data: {
-        data: newUser,
-      },
-    });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      place: "authController | signup",
-      err,
-    });
-  }
+  res.status(statusCode).json({
+    status: "success",
+    token,
+    ...(data && { data }),
+  });
 };
 
-exports.login = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
+exports.signup = asyncHandler(async (req, res) => {
+  const newUser = await User.create(req.body);
 
-    // 1) Checking if EMAIL && PASSWORD exists
-    if (!email || !password) {
-      return res.status(400).json({
-        status: "fail",
-        message: "Please provide email and password",
-      });
-    }
+  sendToken(newUser, 201, res, {
+    data: newUser,
+  });
+});
 
-    // 2) Checking if USER exists && PASSWORD is correct
-    const user = await User.findOne({ email }).select("+password");
+exports.login = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
 
-    if (!user || !(await user.correctPassword(password, user.password))) {
-      return res.status(401).json({
-        status: "fail",
-        message: "Incorrect email or password",
-      });
-    }
-
-    // 3) Creating token
-    const token = createJWTtoken(
-      user._id,
-      process.env.JWT_SECRET,
-      process.env.JWT_EXPIRES_IN
+  if (!email || !password) {
+    throw new AppError(
+      "Please provide email and password",
+      400,
+      "MISSING_CREDENTIALS"
     );
+  }
 
-    // 4) Saving JWT token to cookie
-    const jwtExpiresIn = new Date(
-      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user || !(await user.correctPassword(password, user.password))) {
+    throw new AppError(
+      "Incorrect email or password",
+      401,
+      "INVALID_CREDENTIALS"
     );
-
-    res.cookie("jwt", token, {
-      expires: jwtExpiresIn,
-      httpOnly: true,
-    });
-
-    // 5) Sending response
-    return res.status(200).json({
-      status: "success",
-      token,
-    });
-  } catch (err) {
-    console.error("Login error:", err);
-
-    return res.status(500).json({
-      status: "error",
-      place: "authController | login",
-      message: err.message,
-    });
   }
-};
 
-exports.protect = async (req, res, next) => {
-  try {
-    // 1) Getting JWT TOKEN from the User and checking, if the TOKEN is valid
-    let token;
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      token = req.headers.authorization.split(" ")[1];
-    } else if (req.headers.cookie.split("=")[1]) {
-      token = req.headers.cookie.split("=")[1];
-    }
+  sendToken(user, 200, res);
+});
 
-    if (!token) {
-      res.status(401).json({
-        status: "fail",
-        message: "Unauthroized",
-      });
-    }
+exports.protect = asyncHandler(async (req, res, next) => {
+  let token;
 
-    // 2) Verifing the TOKEN
-    const decoded = await decodingToken(req, token);
-
-    // 3) Checking if USER still exists
-    const freshUser = await User.findById(decoded.id);
-
-    if (!freshUser) {
-      throw `You are not logged in`;
-    }
-
-    next();
-  } catch (err) {
-    res.status(404).json({
-      err,
-    });
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer ")
+  ) {
+    token = req.headers.authorization.split(" ")[1];
+  } else if (req.cookies?.jwt) {
+    token = req.cookies.jwt;
   }
-};
+
+  if (!token) {
+    throw new AppError(
+      "Unauthorized",
+      401,
+      "UNAUTHORIZED"
+    );
+  }
+
+  const decoded = await decodingToken(req, token);
+
+  const freshUser = await User.findById(decoded.id);
+
+  if (!freshUser) {
+    throw new AppError(
+      "User belonging to this token no longer exists",
+      401,
+      "USER_NOT_FOUND"
+    );
+  }
+
+  next();
+});
 
 exports.isAdminOrMod = async (req, role) => {
-  // 1. get the user
   const decoded = await decodingToken(req);
 
-  const isUser = (await User.findById(decoded.id)) ? true : false;
-  if (isUser === false) {
-    throw `User with provided ID doesnt exist`;
+  const userExists = await User.exists({
+    _id: decoded.id,
+  });
+
+  if (!userExists) {
+    throw new AppError(
+      "User with provided ID doesn't exist",
+      404,
+      "USER_NOT_FOUND"
+    );
   }
 
-  const isGroup = (await Group.findById(req.params.id)) ? true : false;
-  if (isGroup === false) {
-    throw `Group with provided ID doesnt exist`;
-  }
-  if (role) {
-    const isRole = (await Group.findOne({
-      _id: req.params.id,
-      "members._id": decoded.id,
-      "members.role": role,
-    }))
-      ? true
-      : false;
-    if (isRole === false) {
-      throw `User needs to be ${role}, to perform this action`;
-    }
+  const groupExists = await Group.exists({
+    _id: req.params.id,
+  });
+
+  if (!groupExists) {
+    throw new AppError(
+      "Group with provided ID doesn't exist",
+      404,
+      "GROUP_NOT_FOUND"
+    );
   }
 
-  if (!role) {
-    const isModerator = (await Group.findOne({
-      _id: req.params.id,
-      "members._id": decoded.id,
-      "members.role": "moderator",
-    }))
-      ? true
-      : false;
+  const allowedRoles = role
+    ? [role]
+    : ["admin", "moderator"];
 
-    const isAdmin = (await Group.findOne({
-      _id: req.params.id,
-      "members._id": decoded.id,
-      "members.role": "admin",
-    }))
-      ? true
-      : false;
+  const hasRequiredRole = await Group.exists({
+    _id: req.params.id,
+    members: {
+      $elemMatch: {
+        _id: decoded.id,
+        role: {
+          $in: allowedRoles,
+        },
+      },
+    },
+  });
 
-    if (isModerator === false && isAdmin === false) {
-      throw `User needs to be at least moderator, to perform this action}`;
-    }
+  if (!hasRequiredRole) {
+    throw new AppError(
+      role
+        ? `User needs to be ${role} to perform this action`
+        : "User needs to be at least moderator to perform this action",
+      403,
+      "INSUFFICIENT_GROUP_ROLE"
+    );
   }
 };
