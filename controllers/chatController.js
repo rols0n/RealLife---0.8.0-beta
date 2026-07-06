@@ -1,248 +1,359 @@
 const User = require("../models/userModel");
 const Chat = require("../models/chatModel");
+
 const decodingToken = require("../utils/decodingToken");
 
-module.exports.create = async (req, res) => {
-  try {
-    const decoded = await decodingToken(req);
-    let loggedUser = await User.findById(decoded.id);
-    let { users } = req.body;
-    if (!loggedUser) throw `You need to be logged in.`;
-    users.push(decoded.id);
+const { asyncHandler } = require("../middlewares/utils/asyncHandler");
+const AppError = require("../middlewares/utils/AppError");
 
-    // Removing duplicates in users array
-    users = Array.from(new Set(users));
+const USER_SELECT =
+  "firstName lastName profileImage bannerImage activityStatus";
 
-    if (!users || users.length < 2)
-      throw `Chat can't be created for only 1 user. It requires at least 2 users.`;
-
-    if (await Chat.findOne({ users: { $all: users } })) {
-      throw `Chat for those users already exists`;
-    }
-
-    // Creating chat schema
-    let chat = await Chat.create({ users });
-
-    // Looping over provided users in req.body
-    Array.from(users).forEach(async (user) => {
-      await User.findByIdAndUpdate(user, {
-        $push: { chats: { $each: [chat._id], $position: 0 } },
-      });
-    });
-    chat = await Chat.findOne({ _id: chat._id });
-
-    res.status(200).json({ status: "success", data: chat });
-  } catch (err) {
-    res.status(404).json({ status: "fail", err });
-  }
+const populateChatContent = {
+  path: "content",
+  populate: {
+    path: "user",
+    select: USER_SELECT,
+  },
 };
 
-module.exports.uploadMessage = async (req, res) => {
-  try {
-    const decoded = await decodingToken(req);
-    const loggedUser = await User.findById(decoded.id);
-    if (!loggedUser) throw `You need to be logged in.`;
-    const { text, chatID, sentAt } = req.body;
-    if (!text || !chatID) throw `Fields: "text" and "chatID" are required.`;
-    if (text.length < 1) {
-      throw `Message cant be empty.`;
-    }
+const getLoggedUser = async (req) => {
+  const decoded = await decodingToken(req);
 
-    let chat = await Chat.findOne({
-      _id: chatID,
-      users: { $all: decoded.id },
-    });
-    if (!chat) throw "User can't manage chats that he's not in.";
-    const queryObj = {
-      user: loggedUser._id,
-      text: text,
-      contentType: "message",
-    };
-    if (sentAt) queryObj.sentAt = sentAt;
+  const user = await User.findById(decoded.id);
 
-    chat = await Chat.findOneAndUpdate(
-      { _id: chatID },
-      {
-        $push: {
-          content: {
-            $each: [queryObj],
-            $position: 0,
-          },
-        },
-      }
+  if (!user) {
+    throw new AppError(
+      "You need to be logged in.",
+      401,
+      "USER_NOT_LOGGED_IN"
     );
+  }
 
-    const { users } = chat;
+  return user;
+};
 
-    // Moving the chat._id to the user.chats[0],
-    // cause it is the newest message
-    Array.from(users).forEach(async (user) => {
-      await User.updateOne({ _id: user }, { $pull: { chats: chat._id } });
-      await User.updateOne(
-        { _id: user },
-        { $push: { chats: { $each: [chat._id], $position: 0 } } }
-      );
-    });
+const normalizeChatUsers = (users, loggedUserID) => {
+  if (!Array.isArray(users)) {
+    throw new AppError(
+      `"users" field is required and must be an array.`,
+      400,
+      "USERS_FIELD_REQUIRED"
+    );
+  }
 
-    chat = await Chat.findById(chat._id).populate({
-      path: "content",
-      populate: {
-        path: "user",
-        select: "firstName lastName profileImage bannerImage activityStatus ",
-      },
-    });
-    res.status(200).json({ status: "success", data: chat });
-  } catch (err) {
-    res.status(404).json({ status: "fail", err });
+  return [
+    ...new Set([...users.map((user) => user.toString()), loggedUserID.toString()]),
+  ];
+};
+
+const validateChatUsersCount = (users) => {
+  if (users.length < 2) {
+    throw new AppError(
+      "Chat requires at least 2 users.",
+      400,
+      "NOT_ENOUGH_CHAT_USERS"
+    );
   }
 };
 
-module.exports.findChat = async (req, res) => {
-  try {
-    // USECASE:
-    // This module is used for finding the conversation (chat) based by query of provided userID's,
-    // and if it doesnt find the converstation (chat), then it creates one and returns it
-    const decoded = await decodingToken(req);
-    const loggedUser = await User.findById(decoded.id);
-    if (!loggedUser) throw `You need to be logged in.`;
-    let { users } = req.body;
+const findChatByUsers = async (users) => {
+  return Chat.findOne({
+    users: {
+      $all: users,
+      $size: users.length,
+    },
+  });
+};
 
-    if (!users) throw `"users" field is required.`;
-    users.push(decoded.id);
-
-    // Removing duplicates in users array
-    users = Array.from(new Set(users));
-    if (users.length < 2)
-      throw `Chat can't be found for only 1 id in "users" field. It requires at least 2 users.`;
-    let chat = await Chat.findOne({ users: { $all: users } }).populate({
-      path: "content",
-      populate: {
-        path: "user",
-        select: "firstName lastName profileImage bannerImage activityStatus ",
-      },
-    });
-
-    if (!chat) {
-      // Creating chat
-      chat = await Chat.create({ users }).populate({
-        path: "content",
-        populate: {
-          path: "user",
-          select: "firstName lastName profileImage bannerImage  activityStatus",
+const addChatToUsers = async (users, chatID) => {
+  await User.updateMany(
+    {
+      _id: { $in: users },
+    },
+    {
+      $push: {
+        chats: {
+          $each: [chatID],
+          $position: 0,
         },
-      });
+      },
     }
-
-    res.status(200).json({ status: "success", chat });
-  } catch (err) {
-    res.status(404).json({ status: "fail", err });
-  }
+  );
 };
 
-module.exports.getChatByID = async (req, res) => {
-  try {
-    const decoded = await decodingToken(req);
-    let loggedUser = await User.findById(decoded.id);
-    let chatID = req.params.id;
-    if (!loggedUser) throw { code: 401, err: `You need to be logged in.` };
-    const chat = await Chat.findOne({
+const createChat = async (users) => {
+  const chat = await Chat.create({ users });
+
+  await addChatToUsers(users, chat._id);
+
+  return chat;
+};
+
+const getChatForUser = async (chatID, userID) => {
+  const chat = await Chat.findOne({
+    _id: chatID,
+    users: userID,
+  });
+
+  if (!chat) {
+    throw new AppError(
+      "User can't manage chats that he's not in.",
+      403,
+      "USER_NOT_IN_CHAT"
+    );
+  }
+
+  return chat;
+};
+
+const moveChatToTop = async (users, chatID) => {
+  await User.updateMany(
+    {
+      _id: { $in: users },
+    },
+    {
+      $pull: {
+        chats: chatID,
+      },
+    }
+  );
+
+  await User.updateMany(
+    {
+      _id: { $in: users },
+    },
+    {
+      $push: {
+        chats: {
+          $each: [chatID],
+          $position: 0,
+        },
+      },
+    }
+  );
+};
+
+module.exports.create = asyncHandler(async (req, res) => {
+  const loggedUser = await getLoggedUser(req);
+
+  const users = normalizeChatUsers(req.body.users, loggedUser._id);
+
+  validateChatUsersCount(users);
+
+  const existingChat = await findChatByUsers(users);
+
+  if (existingChat) {
+    throw new AppError(
+      "Chat for those users already exists.",
+      409,
+      "CHAT_ALREADY_EXISTS"
+    );
+  }
+
+  const chat = await createChat(users);
+
+  res.status(201).json({
+    status: "success",
+    data: chat,
+  });
+});
+
+module.exports.uploadMessage = asyncHandler(async (req, res) => {
+  const loggedUser = await getLoggedUser(req);
+
+  const { text, chatID, sentAt } = req.body;
+
+  if (!text || !chatID) {
+    throw new AppError(
+      `Fields "text" and "chatID" are required.`,
+      400,
+      "MESSAGE_FIELDS_REQUIRED"
+    );
+  }
+
+  if (!text.trim()) {
+    throw new AppError(
+      "Message can't be empty.",
+      400,
+      "MESSAGE_EMPTY"
+    );
+  }
+
+  const chat = await getChatForUser(chatID, loggedUser._id);
+
+  const message = {
+    user: loggedUser._id,
+    text,
+    contentType: "message",
+  };
+
+  if (sentAt) {
+    message.sentAt = sentAt;
+  }
+
+  await Chat.updateOne(
+    {
       _id: chatID,
-      users: { $all: decoded.id },
+    },
+    {
+      $push: {
+        content: {
+          $each: [message],
+          $position: 0,
+        },
+      },
+    }
+  );
+
+  await moveChatToTop(chat.users, chat._id);
+
+  const updatedChat = await Chat.findById(chat._id).populate(
+    populateChatContent
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: updatedChat,
+  });
+});
+
+module.exports.findChat = asyncHandler(async (req, res) => {
+  const loggedUser = await getLoggedUser(req);
+
+  const users = normalizeChatUsers(req.body.users, loggedUser._id);
+
+  validateChatUsersCount(users);
+
+  let chat = await findChatByUsers(users);
+
+  if (!chat) {
+    chat = await createChat(users);
+  }
+
+  await chat.populate(populateChatContent);
+
+  res.status(200).json({
+    status: "success",
+    chat,
+  });
+});
+
+module.exports.getChatByID = asyncHandler(async (req, res) => {
+  const loggedUser = await getLoggedUser(req);
+
+  const chat = await Chat.findOne({
+    _id: req.params.id,
+    users: loggedUser._id,
+  })
+    .populate({
+      path: "users",
+      select: USER_SELECT,
     })
-      .populate({
-        path: "users",
-        select: "firstName lastName profileImage bannerImage activityStatus",
-      })
-      .populate({
-        path: "content",
-        populate: {
-          path: "user",
-          select: "firstName lastName profileImage bannerImage activityStatus",
-        },
-      });
-    if (!chat)
-      throw { code: 401, err: "User can't manage chats that he's not in." };
+    .populate(populateChatContent);
 
-    res.status(200).json({ status: "success", data: chat });
-  } catch ({ code, err }) {
-    console.log(err);
-    const codeValid = code !== undefined ? code : 400;
-    res.status(codeValid).json({
-      status: "fail",
-      err: err === undefined ? "Not found." : err,
-    });
+  if (!chat) {
+    throw new AppError(
+      "User can't manage chats that he's not in.",
+      403,
+      "USER_NOT_IN_CHAT"
+    );
   }
-};
 
-module.exports.deleteChat = async (req, res) => {
-  try {
-    const decoded = await decodingToken(req);
-    const loggedUser = await User.findById(decoded.id);
-    if (!loggedUser) throw `You need to be logged in.`;
-    const chat = await Chat.findOne({
-      _id: req.params.id,
-      users: loggedUser._id,
-    });
+  res.status(200).json({
+    status: "success",
+    data: chat,
+  });
+});
 
-    if (!chat) throw `User is not a part of the conversation`;
+module.exports.deleteChat = asyncHandler(async (req, res) => {
+  const loggedUser = await getLoggedUser(req);
 
-    const { users } = chat;
-    Array.from(users).forEach(async (user) => {
-      await User.updateOne({ _id: user }, { $pull: { chats: chat._id } });
-    });
+  const chat = await getChatForUser(req.params.id, loggedUser._id);
 
-    await Chat.deleteOne({ _id: chat._id });
+  await User.updateMany(
+    {
+      _id: { $in: chat.users },
+    },
+    {
+      $pull: {
+        chats: chat._id,
+      },
+    }
+  );
 
-    res.status(200).json({});
-  } catch (err) {
-    res.status(404).json({ status: "fail", err });
+  await Chat.deleteOne({
+    _id: chat._id,
+  });
+
+  res.status(204).json({
+    status: "success",
+    data: null,
+  });
+});
+
+module.exports.getAll = asyncHandler(async (req, res) => {
+  const chats = await Chat.find();
+
+  res.status(200).json({
+    status: "success",
+    data: chats,
+  });
+});
+
+module.exports.markAsSeen = asyncHandler(async (req, res) => {
+  const loggedUser = await getLoggedUser(req);
+
+  const { chatID } = req.body;
+
+  if (!chatID) {
+    throw new AppError(
+      `Missing field: "chatID".`,
+      400,
+      "CHAT_ID_REQUIRED"
+    );
   }
-};
 
-module.exports.getAll = async (req, res) => {
-  res.status(200).json({ status: "success", data: await Chat.find() });
-};
+  await getChatForUser(chatID, loggedUser._id);
 
-module.exports.markAsSeen = async (req, res) => {
-  try {
-    const decoded = await decodingToken(req);
-    let loggedUser = await User.findById(decoded.id);
-    let { chatID } = req.body;
-    if (!loggedUser) throw { code: 401, err: `You need to be logged in.` };
-
-    if (!chatID) throw { code: 400, err: `Missing content: "chatID".` };
-    let chat = await Chat.findOne({
+  await Chat.updateOne(
+    {
       _id: chatID,
-      users: { $all: decoded.id },
-    });
-    if (!chat)
-      throw { code: 401, err: "User can't manage chats that he's not in." };
-
-    await Chat.findOneAndUpdate(
-      { _id: chatID },
-      { $pull: { content: { contentType: "seen", user: decoded.id } } }
-    );
-
-    await Chat.findOneAndUpdate(
-      { _id: chatID },
-      {
-        $push: {
-          content: {
-            $each: [{ contentType: "seen", user: decoded.id }],
-            $position: 0,
-          },
+    },
+    {
+      $pull: {
+        content: {
+          contentType: "seen",
+          user: loggedUser._id,
         },
-      }
-    );
-    chat = await Chat.findById(chatID);
+      },
+    }
+  );
 
-    res.status(200).json({ status: "success", data: chat });
-  } catch ({ code, err }) {
-    console.log(err);
-    const codeValid = code !== undefined ? code : 400;
-    res.status(codeValid).json({
-      status: "fail",
-      err: err === undefined ? "Not found." : err,
-    });
-  }
-};
+  const chat = await Chat.findOneAndUpdate(
+    {
+      _id: chatID,
+    },
+    {
+      $push: {
+        content: {
+          $each: [
+            {
+              contentType: "seen",
+              user: loggedUser._id,
+            },
+          ],
+          $position: 0,
+        },
+      },
+    },
+    {
+      new: true,
+    }
+  );
+
+  res.status(200).json({
+    status: "success",
+    data: chat,
+  });
+});
