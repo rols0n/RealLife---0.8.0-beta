@@ -1,31 +1,52 @@
 module.exports = (behaviour, disLikes, likes, userID, reaction, order) => {
-  const disLikesUsrs = [];
-  disLikes.users.forEach((user) => {
-    if (`${user}` !== `${userID}`) disLikesUsrs.push(`${user}`);
-  });
-  const likesUsrs = [];
-  likes.users.forEach((user) => {
-    if (`${user}` !== `${userID}`) likesUsrs.push(`${user}`);
-  });
+  const userId = userID.toString();
 
-  likes.users = Array.from(new Set(likesUsrs));
-  disLikes.users = Array.from(new Set(disLikesUsrs));
+  const likesUsers = [...new Set(
+    likes.users
+      .map((user) => user.toString())
+      .filter((user) => user !== userId)
+  )];
+
+  const disLikesUsers = [...new Set(
+    disLikes.users
+      .map((user) => user.toString())
+      .filter((user) => user !== userId)
+  )];
 
   if (behaviour === "add") {
-    if (reaction === "like") likes.users.push(`${userID}`);
-
-    if (reaction === "disLike") disLikes.users.push(`${userID}`);
-  }
-
-  likes.count = likes.users.length;
-  disLikes.count = disLikes.users.length;
-
-  if (order)
-    if (likes.count < disLikes.count) {
-      order = ["disLikes", "likes"];
+    if (reaction === "like") {
+      likesUsers.push(userId);
     }
 
-  count = likes.count + disLikes.count;
+    if (reaction === "disLike") {
+      disLikesUsers.push(userId);
+    }
+  }
 
-  return { disLikes, likes, count, order };
+  const updatedLikes = {
+    ...likes,
+    users: likesUsers,
+    count: likesUsers.length,
+  };
+
+  const updatedDisLikes = {
+    ...disLikes,
+    users: disLikesUsers,
+    count: disLikesUsers.length,
+  };
+
+  const count = updatedLikes.count + updatedDisLikes.count;
+
+  const updatedOrder = order
+    ? updatedLikes.count >= updatedDisLikes.count
+      ? ["likes", "disLikes"]
+      : ["disLikes", "likes"]
+    : order;
+
+  return {
+    disLikes: updatedDisLikes,
+    likes: updatedLikes,
+    count,
+    order: updatedOrder,
+  };
 };

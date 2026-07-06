@@ -1,12 +1,27 @@
 class sendNotification {
   constructor() {
-    this.user = document
-      .getElementsByTagName(`body`)[0]
-      .getAttribute("data-loggedUser-id");
+    this.user = document.body.getAttribute("data-loggedUser-id");
 
     this.myHeaders = new Headers();
     this.myHeaders.append("Content-Type", "application/json");
   }
+
+  isValidObjectId = (id) => {
+    return /^[a-f\d]{24}$/i.test(String(id));
+  };
+
+  getPostAuthorId = (postID) => {
+    const authorElement = document.querySelector(
+      `.postCard__author[data-postID="${postID}"]`
+    );
+
+    if (!authorElement) {
+      console.error(`Post author element not found for postID: ${postID}`);
+      return null;
+    }
+
+    return authorElement.getAttribute("data-post-author-id");
+  };
 
   sendPostNoti = async (
     postID,
@@ -16,59 +31,65 @@ class sendNotification {
     replyData,
     groupID
   ) => {
-    if (!postAuthor)
-      postAuthor = document
-        .querySelectorAll(`.postCard__author[data-postID="${postID}"]`)[0]
-        .getAttribute("data-post-author-id");
+    const receiverId = postAuthor || this.getPostAuthorId(postID);
 
-    if (`${postAuthor}` === `${this.user}`) return;
+    console.log("notification receiverId:", receiverId);
 
-    const raw_notification = JSON.stringify({
+    if (!receiverId) return;
+
+    if (!this.isValidObjectId(receiverId)) {
+      console.error("Invalid notification receiver ID:", receiverId);
+      return;
+    }
+
+    if (receiverId.toString() === this.user.toString()) return;
+
+    const rawNotification = JSON.stringify({
       eventType: "post",
-      sentTo: postAuthor,
-      eventName: eventName,
+      sentTo: receiverId,
+      eventName,
       notificationStatus: "new",
     });
 
     const requestOptions = {
       method: "POST",
       headers: this.myHeaders,
-      body: raw_notification,
+      body: rawNotification,
       redirect: "follow",
       credentials: "same-origin",
     };
 
-    const response_notification = await fetch(
+    const response = await fetch(
       `/api/v1/notifications/requests/upload`,
       requestOptions
     );
-    const result_notification = await response_notification.json();
-    console.log("done");
-    if (result_notification.status !== "success") return;
 
-    let raw = {
+    const result = await response.json();
+
+    if (result.status !== "success") {
+      console.error("Notification request failed:", result);
+      return;
+    }
+
+    console.log(result)
+    const socketPayload = {
       eventCategory: "notification",
-      eventName: eventName,
-      user: this.user,
-      sentTo: postAuthor,
-
-      notificationData: result_notification.user.notifications[0],
+      eventName,
+      sentTo: receiverId,
+      notificationData: result.user.notifications[0],
     };
 
     if (groupID) {
-      raw = {
-        eventCategory: "notification",
-        eventName: eventName,
-        group: groupID,
-        sentTo: postAuthor,
+      socketPayload.group = groupID;
+    } else {
+      socketPayload.user = this.user;
+    }
 
-        notificationData: result_notification.user.notifications[0],
-      };
-    }
     if (replyData) {
-      raw.replyData = replyData;
+      socketPayload.replyData = replyData;
     }
-    socket.send(JSON.stringify(raw));
+
+    socket.send(JSON.stringify(socketPayload));
   };
 }
 
