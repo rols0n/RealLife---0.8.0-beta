@@ -1,15 +1,13 @@
 "use strict";
+
 import postGenerator from "./utils/post/postGenerator.js";
 import postController from "./_postsController.js";
 
-// DOM elements
-
-class mainPage {
+class MainPage {
   constructor() {
-    this.posts = document.querySelectorAll(`.posts`)[0];
-    this.loggedUserID = document
-      .getElementsByTagName("body")[0]
-      .getAttribute("data-loggedUser-id");
+    this.posts = document.querySelector(".posts");
+
+    this.loggedUserID = document.body.getAttribute("data-loggedUser-id");
 
     this.getReqOpts = {
       method: "GET",
@@ -17,35 +15,51 @@ class mainPage {
     };
   }
 
-  request = async (LINK, requestOptions) => {
-    const response = await fetch(LINK, requestOptions);
+  request = async (link, requestOptions = this.getReqOpts) => {
+  try {
+    const response = await fetch(link, requestOptions);
+
     const result = await response.json();
-    if (result.status !== "success") return;
+
+    if (!response.ok) {
+      console.error("Backend error:", result);
+
+      throw new Error(
+        result.message || `Request failed with status ${response.status}`
+      );
+    }
+
+    if (result.status !== "success") {
+      throw new Error(result.message || "Request was not successful");
+    }
+
     return result;
-  };
+  } catch (err) {
+    console.error("Request error:", err);
+    return null;
+  }
+};
 
   genPostsArray = async () => {
-    const LINK = "http://127.0.0.1:3000/api/v1/users/generateFeedPosts";
-    const requestOptions = {
-      method: "GET",
-      redirect: "follow",
-    };
+    const link = "/api/v1/users/generateFeedPosts";
 
-    return await this.request(LINK, requestOptions);
+    return await this.request(link);
   };
 
   displayPosts = async () => {
-    const posts = Array.from((await this.genPostsArray()).data);
+    const result = await this.genPostsArray();
+
+    if (!result?.data) return;
+
+    const posts = Array.from(result.data);
     const postGen = new postGenerator();
 
-    posts.forEach(async (post) => {
+    for (const post of posts) {
       await postGen.generatePost(post, false);
-    });
+    }
 
-    setTimeout(() => {
-      new postController().script();
-    }, 200);
+    new postController().script();
   };
 }
 
-new mainPage().displayPosts();
+new MainPage().displayPosts();

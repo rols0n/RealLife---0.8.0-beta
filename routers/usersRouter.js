@@ -14,19 +14,6 @@ const router = express.Router();
 router.post("/login", authController.login);
 router.post("/signup", userController.createUser);
 
-router.patch(
-  "/me/activity",
-  userController.updateActivityStatus
-);
-
-router
-  .route("/:id")
-  .get(userController.getUserById)
-  .patch(userController.updateUser)
-  .delete(userController.deleteUser);
-
-
-
 router
   .route("/")
   .post(userController.createUser)
@@ -34,93 +21,100 @@ router
 
 router.route("/generateFeedPosts").get(userFeedController.generateFeedContent);
 
-router
-  .route("/:id")
-  .patch(userController.updateUser)
-  .get(userController.getUserById)
-  .delete(userController.deleteUser);
-
-router
-  .route("/:id/blockList/deleteUser")
-  .patch(userController.deleteUsersFromBlockList);
-
-router
-  .route("/uploadRootCommentText/:id")
-  .patch(userController.uploadRootCommentText);
-
-router
-  .route("/updateProfilePicture/:random")
-  .patch(
-    userProfileController.uploadProfilePicture,
-    userProfileController.resizeProfilePicture,
-    userProfileController.updateProfilePicture
-  );
-
-router
-  .route("/updateBannerPicture/:id")
-  .patch(
-    userProfileController.uploadBannerPicture,
-    userProfileController.resizeBannerPicture,
-    userProfileController.updateBannerPicture
-  );
-
-router
-  .route("/sendFriendsRequest/:id")
-  .patch(authController.protect, userFriendsController.sendFriendsRequest);
-
-router
-  .route("/acceptFriendsRequest/:id")
-  .patch(authController.protect, userFriendsController.acceptFriendsRequest);
-
-router
-  .route("/rejectFriendsRequest/:id")
-  .patch(authController.protect, userFriendsController.rejectFriendsRequest);
-
-router
-  .route("/cancelFriendsRequest/:id")
-  .patch(authController.protect, userFriendsController.cancelFriendsRequest);
-
-router
-  .route("/deleteFriend/:id")
-  .patch(authController.protect, userFriendsController.deleteFriend);
 
 
 router
-  .route("/birthdays/:id")
-  .get(authController.protect, userFriendsController.birthdays);
+.route("/uploadRootCommentText/:id")
+.patch(userController.uploadRootCommentText);
+
+router
+.route("/updateProfilePicture/:random")
+.patch(
+  userProfileController.uploadProfilePicture,
+  userProfileController.resizeProfilePicture,
+  userProfileController.updateProfilePicture
+);
+
+router
+.route("/updateBannerPicture/:id")
+.patch(
+  userProfileController.uploadBannerPicture,
+  userProfileController.resizeBannerPicture,
+  userProfileController.updateBannerPicture
+);
+
+router
+.route("/sendFriendsRequest/:id")
+.patch(authController.protect, userFriendsController.sendFriendsRequest);
+
+router
+.route("/acceptFriendsRequest/:id")
+.patch(authController.protect, userFriendsController.acceptFriendsRequest);
+
+router
+.route("/rejectFriendsRequest/:id")
+.patch(authController.protect, userFriendsController.rejectFriendsRequest);
+
+router
+.route("/cancelFriendsRequest/:id")
+.patch(authController.protect, userFriendsController.cancelFriendsRequest);
+
+router
+.route("/deleteFriend/:id")
+.patch(authController.protect, userFriendsController.deleteFriend);
+
+
+router
+.route("/birthdays/:id")
+.get(authController.protect, userFriendsController.birthdays);
 
 
 
 
 router
-  .route("/groups/sendRequest/:id")
-  .post(authController.protect, userGroupsController.sendGroupsRequests);
+.route("/groups/sendRequest/:id")
+.post(authController.protect, userGroupsController.sendGroupsRequests);
 
 router
-  .route("/groups/cancelRequest/:id")
-  .patch(authController.protect, userGroupsController.cancelGroupsRequests);
+.route("/groups/cancelRequest/:id")
+.patch(authController.protect, userGroupsController.cancelGroupsRequests);
 
 router
-  .route("/groups/acceptRequest/:id")
-  .patch(authController.protect, userGroupsController.acceptGroupsRequests);
+.route("/groups/acceptRequest/:id")
+.patch(authController.protect, userGroupsController.acceptGroupsRequests);
 
 router.route(
   "/groups/rejectRequest/:id",
   authController.protect,
   userGroupsController.rejectGroupsRequests
 );
+// ###########
+// People You May Know
+router
+.route("/peopleYouMayKnow_alreadySeen/add")
+.post(authController.protect,
+  userSearchEngineController.addAlreadySeenPeopleYouMayKnow);
+  
+
+
+router.route("/me/activity").patch(userController.updateActivityStatus)
+
 
 router
-  .route("/:id/searchEngine/friends")
-  .post(userSearchEngineController.searchFriends);
+      .route("/:id")
+      .patch(userController.updateUser)
+      .get(userController.getUserById)
+      .delete(userController.deleteUser);
+router
+.route("/:id/searchEngine/friends")
+.post(userSearchEngineController.searchFriends);
 
-  // ###########
-  // People You May Know
-  router
-    .route("/peopleYouMayKnow_alreadySeen/add")
-    .post(authController.protect,
-       userSearchEngineController.addAlreadySeenPeopleYouMayKnow);
-
-
+router
+    .route("/:id/blockList/deleteUser")
+    .patch(userController.deleteUsersFromBlockList);
+  
+  
 
 module.exports = router;
+
+
