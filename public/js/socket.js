@@ -1,145 +1,319 @@
 "use strict";
-const socket = new WebSocket("ws://localhost:8080");
+
 import NotificationsController from "./utils/notifications/NotificationsController.js";
+
+const SOCKET_URL = "ws://localhost:8080";
+const ACTIVITY_ENDPOINT = "/api/v1/users/me/activity";
+
+const body = document.body;
+
+const loggedUserID = body.getAttribute("data-loggedUser-id");
+const userPageID = body.getAttribute("data-user-id");
+
+const isLoggedIn =
+  loggedUserID &&
+  loggedUserID !== "null" &&
+  loggedUserID !== "undefined";
+
 const notificationGenerator = new NotificationsController();
+
 notificationGenerator.generateNotifications();
 
-const user = document
-  .getElementsByTagName("body")[0]
-  .getAttribute("data-loggedUser-id");
-const userPageID = document
-  .getElementsByTagName("body")[0]
-  .getAttribute("data-user-id");
 
-const updateActivity = async (status, userID) => {
+// ====================
+// Helpers
+// ====================
+
+const getID = (value) => {
+  if (!value) return null;
+
+  return String(value._id ?? value);
+};
+
+
+// ====================
+// WebSocket
+// ====================
+
+const socket = isLoggedIn
+  ? new WebSocket(SOCKET_URL)
+  : null;
+
+const sendActivitySocketEvent = (status) => {
+  if (
+    !socket ||
+    socket.readyState !== WebSocket.OPEN
+  ) {
+    return;
+  }
+
   socket.send(
     JSON.stringify({
       eventCategory: "activityStatus",
       eventType: "activityStatus",
-      status: status,
-      author: userID,
+      status,
+      author: loggedUserID,
     })
   );
-  const raw = JSON.stringify({
-    activityStatus: {
-      lastTimeOnline: Date.now(),
-      status,
-    },
-  });
-  const myHeaders = new Headers();
-  myHeaders.append("Content-Type", "application/json");
-
-  const requestOptions = {
-    method: "PATCH",
-    headers: myHeaders,
-    body: raw,
-    redirect: "follow",
-  };
-
-  const LINK = `/api/v1/users/${userID}`;
-  fetch(LINK, requestOptions);
 };
 
-window.onload = () => {
-  const userID = document
-    .getElementsByTagName("body")[0]
-    .getAttribute("data-loggedUser-id");
 
-  // Updating userSchema in DB;
-  updateActivity("online", userID);
-};
+// ====================
+// Activity status
+// ====================
 
-window.addEventListener("beforeunload", (event) => {
-  const userID = document
-    .getElementsByTagName("body")[0]
-    .getAttribute("data-loggedUser-id");
+const persistActivityStatus = async (
+  status,
+  { keepalive = false } = {}
+) => {
+  if (!isLoggedIn) return;
 
-  // Updating userSchema in DB;
-  updateActivity("offline", userID);
-});
+  try {
+    await fetch(ACTIVITY_ENDPOINT, {
+      method: "PATCH",
 
-const requestOptions = {
-  method: "GET",
-  headers: new Headers(),
-  redirect: "follow",
-  credentials: "same-origin",
-};
-const response = await fetch(
-  `/api/v1/users/${user}?populate=chats&populateType=string`,
-  requestOptions
-);
-const result = await response.json();
+      headers: {
+        "Content-Type": "application/json",
+      },
 
-socket.onmessage = async function (event) {
-  //   console.log("received from server:", JSON.parse(event.data));
+      credentials: "same-origin",
 
-  const data = JSON.parse(event.data);
+      body: JSON.stringify({
+        status,
+      }),
 
-  // if (data.eventType !== "activityStatus") console.log(data);
-
-  if (data.eventType === "notification") {
-    if (`${data.sentTo}` === `${user}`) {
-      if (`${data.notificationData.author}` === `${userPageID}`) {
-        location.reload();
-      }
-
-      // Getting the user that send the notification:
-
-      if (result.status !== "success") return;
-      const author = result.data.data;
-      data.notificationData.author = {
-        profileImage: author.profileImage,
-        firstName: author.firstName,
-        lastName: author.lastName,
-        _id: author._id,
-      };
-      notificationGenerator.generateCard(data.notificationData, "afterbegin");
-      notificationGenerator.correctNotiIcon(user);
-      notificationGenerator.correctTitle();
+      keepalive,
+    });
+  } catch (err) {
+    // Request during page unload can fail silently
+    if (!keepalive) {
+      console.error(
+        "Activity status update failed:",
+        err
+      );
     }
   }
+};
 
-  // Managing statuses (online/offline)
-  if (data.eventType === "activityStatus") {
-    let canContinue = false;
-    if (!result.data) return;
-    const friends = Array.from(result.data.data.friends);
-    const chats = Array.from(result.data.data.chats);
 
-    // Getting IDs of all the users that need the activityStatus of currentlyLoggedUser
-    chats.forEach((chat) => {
-      friends.push(...chat.users);
+// ====================
+// Initialize activity
+// ====================
+
+if (isLoggedIn) {
+  // Save online status in DB
+  persistActivityStatus("online");
+
+  // Send realtime online event when socket connects
+  socket.addEventListener(
+    "open",
+    () => {
+      sendActivitySocketEvent("online");
+    },
+    {
+      once: true,
+    }
+  );
+
+  // Save and broadcast offline status
+  window.addEventListener("pagehide", () => {
+    sendActivitySocketEvent("offline");
+
+    persistActivityStatus("offline", {
+      keepalive: true,
     });
+  });
+}
 
-    // Removing duplicates
-    const userIDs = Array.from(new Set(friends));
 
-    // Looping over friendsNoDupl to check, if the data.author is in it.
-    // So we could know, if the request should be managed by currentlyLoggedUser
-    userIDs.forEach((userID) => {
-      if (`${userID}` === `${data.author}`) canContinue = true;
-    });
-    if (canContinue === false) return;
+// ====================
+// Logged user data
+// ====================
 
-    // Changing all the frontend elements with attribute: data-status="offline" to  data-status="online"
-    let oppositeStatus = "offline";
-    if (data.status === "offline") oppositeStatus = "online";
-    const activityCards = Array.from(
-      document.querySelectorAll(
-        `[data-status="${oppositeStatus}"][data-user-id="${data.author}"]`
-      )
+const getLoggedUserData = async () => {
+  if (!isLoggedIn) return null;
+
+  try {
+    const response = await fetch(
+      `/api/v1/users/${loggedUserID}?populate=chats&populateType=string`,
+      {
+        method: "GET",
+        credentials: "same-origin",
+      }
     );
-    // console.log(activityCards);
-    console.log(data);
-    activityCards.forEach((card) => {
-      card.setAttribute("data-status", data.status);
-    });
 
-    // Checking if the card__time elements exists (it is a h3 tag, that shows time that passed f. e.  "8d", "online" or "offline")
-    const card__time = document.querySelectorAll(
-      `.card__time[data-user-id="${data.author}"]`
-    )[0];
-    card__time.textContent = data.status;
-    card__time.setAttribute("data-status", data.status);
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error(
+      "Failed to fetch logged user data:",
+      err
+    );
+
+    return null;
   }
 };
+
+const loggedUserResult = await getLoggedUserData();
+
+
+// ====================
+// WebSocket events
+// ====================
+
+if (socket) {
+  socket.addEventListener(
+    "message",
+    async (event) => {
+      const data = JSON.parse(event.data);
+
+
+      // ====================
+      // Notifications
+      // ====================
+
+      if (data.eventType === "notification") {
+        if (
+          String(data.sentTo) !==
+          String(loggedUserID)
+        ) {
+          return;
+        }
+
+        if (
+          userPageID &&
+          String(data.notificationData.author) ===
+            String(userPageID)
+        ) {
+          location.reload();
+          return;
+        }
+
+        if (
+          loggedUserResult?.status !== "success"
+        ) {
+          return;
+        }
+
+        const author =
+          loggedUserResult.data.data;
+
+        data.notificationData.author = {
+          profileImage: author.profileImage,
+          firstName: author.firstName,
+          lastName: author.lastName,
+          _id: author._id,
+        };
+
+        notificationGenerator.generateCard(
+          data.notificationData,
+          "afterbegin"
+        );
+
+        notificationGenerator.correctNotiIcon(
+          loggedUserID
+        );
+
+        notificationGenerator.correctTitle();
+
+        return;
+      }
+
+
+      // ====================
+      // Activity statuses
+      // ====================
+
+      if (
+        data.eventType !== "activityStatus"
+      ) {
+        return;
+      }
+
+      if (!loggedUserResult?.data?.data) {
+        return;
+      }
+
+      const loggedUser =
+        loggedUserResult.data.data;
+
+      const friends = loggedUser.friends || [];
+      const chats = loggedUser.chats || [];
+
+      const allowedUserIDs = new Set();
+
+      friends.forEach((friend) => {
+        const friendID = getID(friend);
+
+        if (friendID) {
+          allowedUserIDs.add(friendID);
+        }
+      });
+
+      chats.forEach((chat) => {
+        const chatUsers = chat.users || [];
+
+        chatUsers.forEach((chatUser) => {
+          const chatUserID = getID(chatUser);
+
+          if (chatUserID) {
+            allowedUserIDs.add(chatUserID);
+          }
+        });
+      });
+
+      const activityUserID =
+        String(data.author);
+
+      if (
+        !allowedUserIDs.has(activityUserID)
+      ) {
+        return;
+      }
+
+
+      // ====================
+      // Update activity cards
+      // ====================
+
+      const oppositeStatus =
+        data.status === "online"
+          ? "offline"
+          : "online";
+
+      const activityCards =
+        document.querySelectorAll(
+          `[data-status="${oppositeStatus}"][data-user-id="${activityUserID}"]`
+        );
+
+      activityCards.forEach((card) => {
+        card.setAttribute(
+          "data-status",
+          data.status
+        );
+      });
+
+
+      // ====================
+      // Update activity text
+      // ====================
+
+      const activityTimes =
+        document.querySelectorAll(
+          `.card__time[data-user-id="${activityUserID}"]`
+        );
+
+      activityTimes.forEach((element) => {
+        element.textContent = data.status;
+
+        element.setAttribute(
+          "data-status",
+          data.status
+        );
+      });
+    }
+  );
+}

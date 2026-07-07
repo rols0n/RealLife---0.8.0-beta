@@ -10,6 +10,7 @@ const decodingToken = require("./utils/decodingToken");
 const server = new WebSocket.Server({ port: 8080 });
 
 
+
 const dns = require("dns");
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
@@ -30,6 +31,7 @@ mongoose
   })
   .then(() => {
     console.log("DB connected");
+
 
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);

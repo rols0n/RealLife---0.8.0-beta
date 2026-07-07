@@ -1,185 +1,303 @@
 const User = require("../models/userModel");
 const Group = require("../models/groupModel");
-const decodingToken = require("../utils/decodingToken.js");
 
-const searcher = async (req, res, allPlatform) => {
-  const allUsers = Array.from(await User.find());
-  const matched = [];
-  const searchValue = req.body.searchValue.replace(/\s+/g, "").toLowerCase();
-  // console.log(allUsers);
-  allUsers.forEach((user) => {
-    const userName = `${user.firstName}${user.lastName}`
-      .replace(/\s+/g, "")
-      .toLowerCase();
-    // console.log(searchValue);
-    if (userName.startsWith(searchValue)) matched.push(user);
+const decodingToken = require("../utils/decodingToken");
+const normalizeSearchValue = require(
+  "../utils/normalizeSearchValue"
+);
+
+const {
+  asyncHandler,
+} = require("../middlewares/utils/asyncHandler");
+
+const AppError = require("../middlewares/utils/AppError");
+
+
+// ====================
+// Helpers
+// ====================
+
+const escapeRegex = (value) => {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+};
+
+const addIdsToSet = (set, array = []) => {
+  array.forEach((element) => {
+    const id = element?._id || element;
+
+    if (id) {
+      set.add(String(id));
+    }
   });
-  if (allPlatform) {
-    const allGroups = Array.from(await Group.find());
-    allGroups.forEach((group) => {
-      const groupName = group.name.replace(/\s+/g, "").toLowerCase();
-      if (groupName.startsWith(searchValue)) matched.push(group);
-    });
-  }
-
-  return matched;
 };
 
-const genMutualFriends = (user, friend, friends) => {
-  const mutualFriends = [];
+const shuffleArray = (array) => {
+  return [...array].sort(() => Math.random() - 0.5);
+};
 
-  const potMutualFriends = Array.from(friend.friends);
-  potMutualFriends.forEach((potMutualFriend) => {
-    friends.forEach((friend) => {
-      if (
-        `${friend._id}` === `${potMutualFriend._id}` &&
-        `${potMutualFriend._id}` !== `${user._id}`
-      ) {
-        mutualFriends.push(potMutualFriend);
-      }
-    });
+const getMutualFriendsCount = (user, candidate, friendsIds) => {
+  if (!candidate.friends) return 0;
+
+  return candidate.friends.filter((friend) => {
+    const friendId = String(friend._id);
+
+    return (
+      friendId !== String(user._id) &&
+      friendsIds.has(friendId)
+    );
+  }).length;
+};
+
+const buildUserPreview = (user) => ({
+  _id: user._id,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  profileImage: user.profileImage,
+});
+
+
+// ====================
+// Search
+// ====================
+
+const searcher = async (
+  req,
+  allPlatform = false
+) => {
+  const { searchValue } = req.body;
+
+  if (
+    typeof searchValue !== "string" ||
+    searchValue.trim().length === 0
+  ) {
+    throw new AppError(
+      "Search value is required",
+      400,
+      "SEARCH_VALUE_REQUIRED"
+    );
+  }
+
+  const normalizedSearchValue =
+    normalizeSearchValue(searchValue);
+
+  const searchRegex = new RegExp(
+    `^${escapeRegex(normalizedSearchValue)}`
+  );
+
+  if (!allPlatform) {
+    return await User.find({
+      searchName: searchRegex,
+    }).limit(20);
+  }
+
+  const [users, groups] = await Promise.all([
+    User.find({
+      searchName: searchRegex,
+    }).limit(20),
+
+    Group.find({
+      searchName: searchRegex,
+    }).limit(20),
+  ]);
+
+  return [...users, ...groups].slice(0, 20);
+};
+
+
+// ====================
+// Search endpoints
+// ====================
+
+exports.searchAllUser = asyncHandler(async (req, res) => {
+  const matched = await searcher(req);
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      length: matched.length,
+      matched,
+    },
   });
+});
 
-  return mutualFriends;
-};
+exports.searchRealLife = asyncHandler(async (req, res) => {
+  const matched = await searcher(req, true);
 
-exports.searchAllUser = async (req, res) => {
-  try {
-    const matched = await searcher(req, res);
-    res
-      .status(200)
-      .json({ status: "success", data: { length: matched.length, matched } });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      err,
-    });
-  }
-};
+  res.status(200).json({
+    status: "success",
+    data: {
+      length: matched.length,
+      matched,
+    },
+  });
+});
 
-exports.searchRealLife = async (req, res) => {
-  try {
-    const matched = await searcher(req, res, true);
-    res
-      .status(200)
-      .json({ status: "success", data: { length: matched.length, matched } });
-  } catch (err) {
-    res.status(404).json({
-      status: "fail",
-      err,
-    });
-  }
-};
 
-exports.peopleYouMayKnow = async (req, res) => {
-  try {
-    // ####
-    // 1. Mutual friends - sort them by amount of mutual friends
-    // 2. Common groups
-    // 3. All other users
-    // Implement paging
+// ====================
+// People you may know
+// ====================
 
-    const notAllowedFix = (array) => {
-      Array.from(array).forEach((el) => notAllowed.push(el._id));
-    };
-    const decoded = await decodingToken(req);
-    // const users = Array.from(await User.find());
-    const user = await User.findById(decoded.id)
-      .populate({
+exports.peopleYouMayKnow = asyncHandler(async (req, res) => {
+  const decoded = await decodingToken(req);
+
+  const user = await User.findById(decoded.id)
+    .populate({
+      path: "friends",
+      populate: {
         path: "friends",
+      },
+    })
+    .populate({
+      path: "groups.currentlyIn",
+      populate: {
+        path: "_id",
         populate: {
-          path: "friends",
-        },
-      })
-      .populate({
-        path: "groups.currentlyIn",
-        populate: {
-          path: "_id",
+          path: "members",
           populate: {
-            path: "members",
-            populate: { path: "_id" },
+            path: "_id",
           },
         },
-      });
-
-    const friends = Array.from(user.friends);
-    const groups = Array.from(user.groups.currentlyIn);
-    const matched = [];
-    const notAllowed = req.body.notAllowed;
-    notAllowedFix(user.friends);
-    notAllowedFix(user.sentRequests);
-    notAllowedFix(user.receivedRequests);
-
-    // if (user.peopleYouMayKnow__alreadySeen)
-    //   notAllowed.push(...user.peopleYouMayKnow__alreadySeen);
-
-    friends.forEach((friend) => {
-      const friendsOfFriend = Array.from(friend.friends);
-      // randomize
-      friendsOfFriend.forEach((friendOfFriend) => {
-        const mutualFriends = genMutualFriends(user, friendOfFriend, friends);
-        if (mutualFriends.length > 0 && matched.length < 7) {
-          let canContinue = true;
-          notAllowed.forEach((el) => {
-            if (`${el}` === `${friendOfFriend._id}`) canContinue = false;
-          });
-          notAllowed.push(friendOfFriend._id);
-          if (canContinue)
-            matched.push({
-              user: {
-                _id: friendOfFriend._id,
-                firstName: friendOfFriend.firstName,
-                lastName: friendOfFriend.lastName,
-                profileImage: friendOfFriend.profileImage,
-              },
-              mutualFriends: mutualFriends.length,
-            });
-        }
-      });
+      },
     });
 
-    let count = 0;
+  if (!user) {
+    throw new AppError(
+      "Logged user doesn't exist",
+      404,
+      "USER_NOT_FOUND"
+    );
+  }
 
-    if (groups.length > 0 && matched.length < 7)
-      for (let i = 0; i < 20; i++) {
-        count++;
-        if (matched.length < 7) {
-          const randomGroup =
-            groups[Math.floor(Math.random() * groups.length)]._id;
-          // console.log(Math.floor(Math.random() * groups.length));
-          if (!randomGroup) return;
-          const groupName = randomGroup.name;
-          const member =
-            randomGroup.members[
-              Math.floor(Math.random() * randomGroup.members.length)
-            ];
-          let canContinue = true;
-          notAllowed.forEach((el) => {
-            if (`${el}` === `${member._id._id}`) canContinue = false;
-          });
+  const friends = user.friends || [];
+  const groups = user.groups?.currentlyIn || [];
 
-          if (canContinue) {
-            matched.push({
-              user: {
-                _id: member._id._id,
-                firstName: member._id.firstName,
-                lastName: member._id.lastName,
-                profileImage: member._id.profileImage,
-              },
-              groupName,
-            });
-            // console.log(member);
-            notAllowed.push(member._id._id);
-          }
-        }
+  const matched = [];
+
+  const notAllowed = new Set(
+    (req.body.notAllowed || []).map(String)
+  );
+
+  // User can't be recommended to himself
+  notAllowed.add(String(user._id));
+
+  addIdsToSet(notAllowed, user.friends);
+  addIdsToSet(notAllowed, user.sentRequests);
+  addIdsToSet(notAllowed, user.receivedRequests);
+
+  const friendsIds = new Set(
+    friends.map((friend) => String(friend._id))
+  );
+
+
+  // ====================
+  // 1. Mutual friends
+  // ====================
+
+  const mutualFriendsCandidates = new Map();
+
+  friends.forEach((friend) => {
+    const friendsOfFriend = friend.friends || [];
+
+    friendsOfFriend.forEach((friendOfFriend) => {
+      const candidateId = String(friendOfFriend._id);
+
+      if (notAllowed.has(candidateId)) {
+        return;
       }
 
+      const mutualFriends = getMutualFriendsCount(
+        user,
+        friendOfFriend,
+        friendsIds
+      );
 
-    res.status(200).json({
-      status: "success",
-      data: { length: matched.length, matched },
+      if (mutualFriends === 0) {
+        return;
+      }
+
+      const existingCandidate =
+        mutualFriendsCandidates.get(candidateId);
+
+      if (
+        !existingCandidate ||
+        mutualFriends > existingCandidate.mutualFriends
+      ) {
+        mutualFriendsCandidates.set(candidateId, {
+          user: buildUserPreview(friendOfFriend),
+          mutualFriends,
+        });
+      }
     });
-  } catch (error) {
-    res.status(404).json({ status: "fail", error });
+  });
+
+  const sortedMutualFriends = [
+    ...mutualFriendsCandidates.values(),
+  ].sort((a, b) => b.mutualFriends - a.mutualFriends);
+
+  sortedMutualFriends.forEach((candidate) => {
+    if (matched.length >= 7) return;
+
+    matched.push(candidate);
+    notAllowed.add(String(candidate.user._id));
+  });
+
+
+  // ====================
+  // 2. Common groups
+  // ====================
+
+  if (matched.length < 7) {
+    const groupCandidates = [];
+
+    groups.forEach((groupEntry) => {
+      const group = groupEntry?._id;
+
+      if (!group?.members) {
+        return;
+      }
+
+      group.members.forEach((member) => {
+        const memberUser = member?._id;
+
+        if (
+          !memberUser?._id ||
+          !memberUser.firstName
+        ) {
+          return;
+        }
+
+        groupCandidates.push({
+          user: buildUserPreview(memberUser),
+          groupName: group.name,
+        });
+      });
+    });
+
+    const randomizedCandidates =
+      shuffleArray(groupCandidates);
+
+    for (const candidate of randomizedCandidates) {
+      if (matched.length >= 7) {
+        break;
+      }
+
+      const candidateId = String(candidate.user._id);
+
+      if (notAllowed.has(candidateId)) {
+        continue;
+      }
+
+      matched.push(candidate);
+      notAllowed.add(candidateId);
+    }
   }
-};
+
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      length: matched.length,
+      matched,
+    },
+  });
+});

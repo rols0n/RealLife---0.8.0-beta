@@ -14,6 +14,19 @@ const router = express.Router();
 router.post("/login", authController.login);
 router.post("/signup", userController.createUser);
 
+router.patch(
+  "/me/activity",
+  userController.updateActivityStatus
+);
+
+router
+  .route("/:id")
+  .get(userController.getUserById)
+  .patch(userController.updateUser)
+  .delete(userController.deleteUser);
+
+
+
 router
   .route("/")
   .post(userController.createUser)

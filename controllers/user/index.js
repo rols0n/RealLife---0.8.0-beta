@@ -163,3 +163,48 @@ exports.deleteUsersFromBlockList = asyncHandler(async (req, res) => {
     },
   });
 });
+
+
+
+exports.updateActivityStatus = asyncHandler(async (req, res) => {
+  const { status } = req.body;
+
+  if (!["online", "offline"].includes(status)) {
+    throw new AppError(
+      'Activity status must be either "online" or "offline"',
+      400,
+      "INVALID_ACTIVITY_STATUS"
+    );
+  }
+
+  const decoded = await decodingToken(req);
+
+  const user = await User.findByIdAndUpdate(
+    decoded.id,
+    {
+      $set: {
+        "activityStatus.status": status,
+        "activityStatus.lastTimeOnline": Date.now(),
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  if (!user) {
+    throw new AppError(
+      "Logged user doesn't exist",
+      404,
+      "USER_NOT_FOUND"
+    );
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: {
+      activityStatus: user.activityStatus,
+    },
+  });
+});

@@ -1,10 +1,16 @@
 const mongoose = require("mongoose");
+const normalizeSearchValue = require("../utils/normalizeSearchValue");
 
 const groupSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: [true, "You have to provide group's name"],
-    // unique: [true, "Group with this name already exists"],
+    required: [true, "You have to provide group's name"],
+  },
+
+  searchName: {
+    type: String,
+    index: true,
+    select: false,
   },
 
   avatarImage: { type: String, default: "/imgs/icons/home-white.png" },
@@ -150,6 +156,43 @@ const groupSchema = new mongoose.Schema({
     default: Date.now(),
   },
 });
+
+groupSchema.pre("save", function () {
+  if (
+    this.isModified("name") ||
+    !this.searchName
+  ) {
+    this.searchName = normalizeSearchValue(
+      this.name
+    );
+  }
+});
+
+const syncSearchNameOnUpdate = function () {
+  const update = this.getUpdate();
+
+  if (!update) return;
+
+  const name =
+    update.$set?.name ??
+    update.name;
+
+  if (name === undefined) return;
+
+  this.set({
+    searchName: normalizeSearchValue(name),
+  });
+};
+
+groupSchema.pre(
+  "findOneAndUpdate",
+  syncSearchNameOnUpdate
+);
+
+groupSchema.pre(
+  "updateOne",
+  syncSearchNameOnUpdate
+);
 
 const Groups = mongoose.model("Groups", groupSchema);
 

@@ -1,3 +1,5 @@
+
+const normalizeSearchValue = require("../utils/normalizeSearchValue");
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
 
@@ -11,6 +13,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "You have to provide your Last Name"],
   },
+  searchName: {
+  type: String,
+  index: true,
+  select: false,
+  },
+
+
   email: {
     type: String,
     unique: true,
@@ -125,16 +134,7 @@ const userSchema = new mongoose.Schema({
       default: "public",
     },
 
-    visibilityOfPhotosTab: {
-      type: String,
-      enum: [
-        "friends-only",
-        "friends-and-their-friends-only",
-        "public",
-        "private",
-      ],
-      default: "public",
-    },
+   
     visibilityOfFriends: {
       type: String,
       enum: [
@@ -218,9 +218,77 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.pre("save", async function (next) {
-  this.password = await bcrypt.hash(this.password, 12);
+  if (!this.isModified("password")) {
+    return next();
+  }
+
+  this.password = await bcrypt.hash(
+    this.password,
+    12
+  );
+
   next();
 });
+
+userSchema.pre("save", function () {
+  if (
+    this.isModified("firstName") ||
+    this.isModified("lastName") ||
+    !this.searchName
+  ) {
+    this.searchName = normalizeSearchValue(
+      `${this.firstName}${this.lastName}`
+    );
+  }
+});
+
+const syncSearchNameOnUpdate = async function () {
+  const update = this.getUpdate();
+
+  if (!update) return;
+
+  const firstName =
+    update.$set?.firstName ??
+    update.firstName;
+
+  const lastName =
+    update.$set?.lastName ??
+    update.lastName;
+
+  if (
+    firstName === undefined &&
+    lastName === undefined
+  ) {
+    return;
+  }
+
+  const currentUser = await this.model
+    .findOne(this.getQuery())
+    .select("firstName lastName")
+    .lean();
+
+  if (!currentUser) return;
+
+  this.set({
+    searchName: normalizeSearchValue(
+      `${firstName ?? currentUser.firstName}${
+        lastName ?? currentUser.lastName
+      }`
+    ),
+  });
+};
+
+userSchema.pre(
+  "findOneAndUpdate", syncSearchNameOnUpdate
+ 
+
+);
+
+userSchema.pre(
+  "updateOne",
+  syncSearchNameOnUpdate
+);
+
 
 userSchema.methods.correctPassword = async function (
   candidatePassword,
